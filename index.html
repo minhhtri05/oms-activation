@@ -89,8 +89,8 @@
       border-radius: 16px; padding: 18px; margin-bottom: 14px; box-shadow: 0 10px 28px rgba(0,0,0,0.45);
     }
 
-    .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 8px; }
 
     input, select {
       width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.9);
@@ -131,15 +131,101 @@
     .geo-fail { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
     .geo-wait { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fcd34d; }
 
-    .cam-btn {
-      width: 100%; padding: 13px; background: rgba(14, 165, 233, 0.1); border: 1px dashed var(--accent);
-      border-radius: 10px; color: #38bdf8; font-weight: 600; font-size: 13px; cursor: pointer;
+    /* GALLERY CHỤP NHIỀU ẢNH KIỂU Ô VUÔNG */
+    .photo-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 6px;
     }
-    .preview-wrap { display: none; position: relative; margin-top: 8px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-glow); }
-    .preview-wrap img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
-    .retake-badge {
-      position: absolute; bottom: 8px; right: 8px; background: rgba(15, 23, 42, 0.88); color: #fff;
-      border: 1px solid rgba(255,255,255,0.25); padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+    .cam-tile {
+      height: 155px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #38bdf8;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .cam-tile:hover { background: rgba(14, 165, 233, 0.12); border-color: #38bdf8; }
+    .cam-tile .cam-icon { font-size: 32px; }
+    .cam-tile .cam-label { font-size: 12px; font-weight: 600; text-align: center; padding: 0 8px; }
+
+    .photo-thumb-card {
+      position: relative;
+      height: 155px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: #000;
+    }
+    .photo-thumb-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .thumb-actions-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 8px 10px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .thumb-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      color: #0f172a;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .thumb-action-btn.del { color: #dc2626; }
+
+    /* POPUP XEM PHÓNG TO ẢNH */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(5px);
+      z-index: 3500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .lightbox-card {
+      background: #fff;
+      padding: 12px;
+      border-radius: 16px;
+      max-width: 95vw;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .lightbox-card img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #0f172a;
     }
 
     .activity-card {
@@ -166,7 +252,7 @@
       z-index: 2000; display: flex; align-items: flex-end; justify-content: center;
     }
     .modal-sheet {
-      width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto;
+      width: 100%; max-width: 540px; max-height: 92vh; overflow-y: auto;
       background: #111827; border-top: 1px solid var(--accent); border-radius: 20px 20px 0 0; padding: 20px 18px;
     }
 
@@ -199,6 +285,17 @@
   <div id="loadingMask" class="loading-mask hidden">
     <div style="font-size:28px; margin-bottom:10px;">⏳</div>
     <div id="loadingText">Đang đồng bộ dữ liệu...</div>
+  </div>
+
+  <!-- LIGHTBOX XEM PHÓNG TO + TẢI ẢNH -->
+  <div id="photoLightbox" class="lightbox-overlay hidden" onclick="closePhotoLightbox()">
+    <div class="lightbox-card" onclick="event.stopPropagation()">
+      <img id="lightboxImg" src="">
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="downloadCurrentLightboxImg()">⬇️ Tải ảnh về máy</button>
+        <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="closePhotoLightbox()">✕ Đóng</button>
+      </div>
+    </div>
   </div>
 
   <!-- TOP NAVBAR -->
@@ -245,7 +342,7 @@
         </div>
       </div>
     </div>
-    <div class="drawer-footer">Phiên bản 1.4.8 • Google Sheets Sync</div>
+    <div class="drawer-footer">Phiên bản 1.6.0 • Auto-Save Photo</div>
   </div>
 
   <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
@@ -306,7 +403,7 @@
     <div class="glass-card">
       <h3 style="margin-bottom:12px; color:#38bdf8;">🔔 Thông Báo Hệ Thống</h3>
       <div style="padding:12px; background:rgba(255,255,255,0.05); border-radius:10px; font-size:13px;">
-        <strong>Lưu ý vận hành:</strong> Toàn bộ hình ảnh chụp sẽ được tự động đóng dấu thời gian + tọa độ GPS và lưu trực tiếp về Google Sheet & Drive.
+        <strong>Lưu ý vận hành:</strong> Ảnh chụp được tự động đóng dấu thời gian + GPS và tự động tải về thư mục Download của điện thoại làm bản sao lưu.
       </div>
     </div>
   </div>
@@ -324,7 +421,7 @@
       <p style="font-size:13px; color:var(--text-sub); line-height:1.6;">
         1. Chọn điểm làm việc thuộc dự án.<br>
         2. Đứng trong bán kính GPS cho phép và chụp đủ 2 ảnh Check-in đầu ca.<br>
-        3. Ghi nhận hoạt động bán hàng, vòng quay, mini game, check-in FB.<br>
+        3. Ghi nhận hoạt động (có thể chụp nhiều ảnh liên tiếp nếu bill dài).<br>
         4. Bấm Check-out khi kết thúc ca trực.
       </p>
     </div>
@@ -377,26 +474,16 @@
 
     <div id="startShiftPhotoBox" class="glass-card hidden">
       <h3 style="color:#38bdf8; font-size:16px; margin-bottom:4px;">📸 XÁC THỰC CHECK-IN ĐẦU CA</h3>
-      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px;">Chụp đủ 2 ảnh để lưu Check-in đầu ca lên Google Sheet</p>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px;">Chụp đủ 2 mục ảnh bên dưới (Bấm 👁️ để xem lại, 🗑️ để xóa chụp lại)</p>
 
       <div class="form-group">
         <label>1. Ảnh chụp bản thân đứng cạnh Booth *</label>
-        <input type="file" id="camStart1" accept="image/*" capture="environment" class="hidden" onchange="handleCapture(this, 'startImg1', 'startWrap1', 'btnStart1')">
-        <button type="button" id="btnStart1" class="cam-btn" onclick="document.getElementById('camStart1').click()">📷 Chụp ảnh bản thân + Booth</button>
-        <div id="startWrap1" class="preview-wrap">
-          <img id="startImg1" src="">
-          <button type="button" class="retake-badge" onclick="document.getElementById('camStart1').click()">Chụp lại</button>
-        </div>
+        <div id="gallery_start1"></div>
       </div>
 
       <div class="form-group">
         <label>2. Ảnh chụp toàn cảnh Booth *</label>
-        <input type="file" id="camStart2" accept="image/*" capture="environment" class="hidden" onchange="handleCapture(this, 'startImg2', 'startWrap2', 'btnStart2')">
-        <button type="button" id="btnStart2" class="cam-btn" onclick="document.getElementById('camStart2').click()">📷 Chụp ảnh Booth</button>
-        <div id="startWrap2" class="preview-wrap">
-          <img id="startImg2" src="">
-          <button type="button" class="retake-badge" onclick="document.getElementById('camStart2').click()">Chụp lại</button>
-        </div>
+        <div id="gallery_start2"></div>
       </div>
 
       <button type="button" class="btn btn-success" onclick="completeStartCheckIn()">✅ HOÀN TẤT CHECK-IN & VÀO CA</button>
@@ -407,7 +494,10 @@
   <div id="workspaceScreen" class="container hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <button type="button" class="icon-btn" onclick="showScreen('outletListScreen')">← Danh sách điểm</button>
-      <span style="font-size:11px; color:#34d399; font-weight:700;">🟢 Đã Check-in đầu ca</span>
+      <label style="display:flex; align-items:center; gap:6px; margin:0; font-size:12px; color:#34d399; cursor:pointer;">
+        <input type="checkbox" id="autoDownloadToggle" checked style="width:15px; height:15px; accent-color:#10b981;">
+        Tự tải ảnh về máy
+      </label>
     </div>
 
     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.85); padding:10px 14px; border-radius:10px; margin-bottom:14px; border:1px solid rgba(56,189,248,0.2);">
@@ -478,13 +568,13 @@
         <h3 id="modalTitle" style="font-size:16px; color:#38bdf8;">Thêm mới</h3>
         <button type="button" class="icon-btn" onclick="closeModal('activityModal')">✕ Đóng</button>
       </div>
-      <div id="dynamicTextFields"></div>
       <div id="dynamicPhotoFields"></div>
+      <div id="dynamicTextFields"></div>
       <button type="button" class="btn btn-primary" onclick="saveActivityRecord()">LƯU GHI NHẬN LÊN SHEET</button>
     </div>
   </div>
 
-  <!-- MODAL XEM DANH SÁCH -->
+  <!-- MODAL XEM DANH SÁCH (CÓ HÌNH ẢNH) -->
   <div id="listModal" class="modal-overlay hidden">
     <div class="modal-sheet">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -615,10 +705,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // URL API APPS SCRIPT CỦA BẠN
     const API_URL = 'https://script.google.com/macros/s/AKfycbzYHLM9DS_MGgVuNhHhz4Sofd5oSSvnxO8AOJpFiwJz1YqfIU4oA2A2c9wrDc1nF9nlZg/exec';
 
-    // Hàm gọi API Apps Script qua fetch POST (Hoạt động mượt trên mọi trình duyệt mobile)
     async function callSheetApi(bodyObj) {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -682,15 +770,139 @@
     let userCurrentLng = null;
     let mapInstance = null;
     let currentActivityType = '';
-    let capturedPhotos = {};
     let editingFieldIdx = -1;
     let editingPhotoIdx = -1;
+
+    // Lưu mảng nhiều ảnh cho từng slot: { 'start1': [base64...], 'dynPhoto_0': [base64...] }
+    let photoGalleries = {};
 
     function showLoading(msg) {
       document.getElementById('loadingText').innerText = msg || 'Đang xử lý...';
       document.getElementById('loadingMask').classList.remove('hidden');
     }
     function hideLoading() { document.getElementById('loadingMask').classList.add('hidden'); }
+
+    // ================= HÀM TẢI ẢNH VỀ ĐIỆN THOẠI =================
+    function triggerImageDownload(dataUrl, customPrefix) {
+      try {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        const code = selectedOutlet ? selectedOutlet.code : 'OMS';
+        const fileName = `${code}_${customPrefix || 'PHOTO'}_${stamp}.jpg`;
+
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (e) {
+        console.warn('Không tự động tải được ảnh:', e);
+      }
+    }
+
+    // ================= GALLERY CHỤP NHIỀU ẢNH + XEM + XÓA =================
+    function renderPhotoGallery(slotKey, containerId, maxCount) {
+      if (!photoGalleries[slotKey]) photoGalleries[slotKey] = [];
+      const list = photoGalleries[slotKey];
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const canAddMore = !maxCount || list.length < maxCount;
+      let html = `<div class="photo-gallery-grid">`;
+
+      if (canAddMore) {
+        html += `
+          <input type="file" id="input_${slotKey}" accept="image/*" capture="environment" class="hidden"
+                 onchange="handleGalleryCapture(this, '${slotKey}', '${containerId}', ${maxCount || 0})">
+          <div class="cam-tile" onclick="document.getElementById('input_${slotKey}').click()">
+            <div class="cam-icon">📷</div>
+            <div class="cam-label">${list.length === 0 ? 'Chụp ảnh' : '+ Chụp thêm tấm nữa'}</div>
+          </div>
+        `;
+      }
+
+      list.forEach((dataUrl, idx) => {
+        html += `
+          <div class="photo-thumb-card">
+            <img src="${dataUrl}" onclick="openPhotoLightbox('${slotKey}', ${idx})">
+            <div class="thumb-actions-bar">
+              <button type="button" class="thumb-action-btn" title="Xem phóng to" onclick="openPhotoLightbox('${slotKey}', ${idx})">👁️</button>
+              <button type="button" class="thumb-action-btn del" title="Xóa ảnh" onclick="deleteGalleryPhoto('${slotKey}', '${containerId}', ${idx}, ${maxCount || 0})">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function handleGalleryCapture(input, slotKey, containerId, maxCount) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 960;
+          const scale = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scale;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          const now = new Date().toLocaleString('vi-VN');
+          const gpsStr = userCurrentLat ? `${userCurrentLat.toFixed(5)}, ${userCurrentLng.toFixed(5)}` : 'N/A';
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+          ctx.fillRect(0, canvas.height - 34, canvas.width, 34);
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 15px sans-serif';
+          ctx.fillText(`${now} | ${selectedOutlet.code} | GPS: ${gpsStr}`, 12, canvas.height - 11);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+          if (!photoGalleries[slotKey]) photoGalleries[slotKey] = [];
+          photoGalleries[slotKey].push(dataUrl);
+
+          // Tự động tải ảnh đã chụp (có watermark) về điện thoại nếu đang bật
+          const autoDl = document.getElementById('autoDownloadToggle');
+          if (!autoDl || autoDl.checked) {
+            triggerImageDownload(dataUrl, currentActivityType || 'CHECKIN');
+          }
+
+          renderPhotoGallery(slotKey, containerId, maxCount);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function deleteGalleryPhoto(slotKey, containerId, idx, maxCount) {
+      if (photoGalleries[slotKey]) {
+        photoGalleries[slotKey].splice(idx, 1);
+        renderPhotoGallery(slotKey, containerId, maxCount);
+      }
+    }
+
+    function openPhotoLightbox(slotKey, idx) {
+      const url = photoGalleries[slotKey][idx];
+      if (!url) return;
+      document.getElementById('lightboxImg').src = url;
+      document.getElementById('photoLightbox').classList.remove('hidden');
+    }
+
+    function downloadCurrentLightboxImg() {
+      const url = document.getElementById('lightboxImg').src;
+      if (url) triggerImageDownload(url, 'SAVE');
+    }
+
+    function closePhotoLightbox() {
+      document.getElementById('photoLightbox').classList.add('hidden');
+    }
 
     // ================= 1. ĐĂNG NHẬP =================
     async function handleLogin() {
@@ -854,7 +1066,16 @@
       body.innerHTML = myLogs.map((item, idx) => `
         <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px;">
           <div style="color:#38bdf8; font-weight:700;">#${idx + 1} • Điểm ${item.outletCode} • ${item.time}</div>
-          <div style="margin-top:4px; color:#e2e8f0;">${item.detailText}</div>
+          <div style="margin-top:4px; margin-bottom:6px; color:#e2e8f0;">${item.detailText}</div>
+          ${(item.photos && item.photos.length > 0) ? `
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap:6px;">
+              ${item.photos.map(url => `
+                <a href="${url}" target="_blank">
+                  <img src="${url}" style="width:100%; height:95px; object-fit:cover; border-radius:6px; border:1px solid rgba(56,189,248,0.35);">
+                </a>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
       `).join('');
     }
@@ -914,12 +1135,10 @@
       document.getElementById('detailRadius').innerText = selectedOutlet.radius;
 
       document.getElementById('startShiftPhotoBox').classList.add('hidden');
-      capturedPhotos['startImg1'] = '';
-      capturedPhotos['startImg2'] = '';
-      document.getElementById('startWrap1').style.display = 'none';
-      document.getElementById('startWrap2').style.display = 'none';
-      document.getElementById('btnStart1').classList.remove('hidden');
-      document.getElementById('btnStart2').classList.remove('hidden');
+      photoGalleries['start1'] = [];
+      photoGalleries['start2'] = [];
+      renderPhotoGallery('start1', 'gallery_start1', 1);
+      renderPhotoGallery('start2', 'gallery_start2', 1);
 
       showScreen('outletDetailScreen');
 
@@ -992,45 +1211,10 @@
       document.getElementById('startShiftPhotoBox').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function handleCapture(input, imgId, wrapId, btnId) {
-      const file = input.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 960;
-          const scale = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scale;
-
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          const now = new Date().toLocaleString('vi-VN');
-          const gpsStr = userCurrentLat ? `${userCurrentLat.toFixed(5)}, ${userCurrentLng.toFixed(5)}` : 'N/A';
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-          ctx.fillRect(0, canvas.height - 34, canvas.width, 34);
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = 'bold 15px sans-serif';
-          ctx.fillText(`${now} | ${selectedOutlet.code} | GPS: ${gpsStr}`, 12, canvas.height - 11);
-
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
-          capturedPhotos[imgId] = dataUrl;
-
-          document.getElementById(imgId).src = dataUrl;
-          document.getElementById(wrapId).style.display = 'block';
-          document.getElementById(btnId).classList.add('hidden');
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
     async function completeStartCheckIn() {
-      if (!capturedPhotos['startImg1'] || !capturedPhotos['startImg2']) {
+      const p1 = photoGalleries['start1'] || [];
+      const p2 = photoGalleries['start2'] || [];
+      if (p1.length === 0 || p2.length === 0) {
         alert('⚠️ Vui lòng chụp đủ cả 2 tấm ảnh (Bản thân cạnh Booth và Toàn cảnh Booth)!');
         return;
       }
@@ -1049,7 +1233,7 @@
             activityType: 'CHECKIN_DAU_CA',
             gps: gpsText,
             detailText: `Check-in đầu ca bởi ${currentUser.fullname}`,
-            photos: [capturedPhotos['startImg1'], capturedPhotos['startImg2']]
+            photos: [p1[0], p2[0]]
           }
         });
         hideLoading();
@@ -1075,7 +1259,7 @@
       showScreen('workspaceScreen');
     }
 
-    // ================= 4. HOẠT ĐỘNG & LƯU LÊN SHEET =================
+    // ================= 4. HOẠT ĐỘNG & XEM LẠI HÌNH ẢNH =================
     function getRecordsForCurrentOutlet(actType) {
       return allActivityRecords.filter(r =>
         r.projectId === selectedOutlet.projectId &&
@@ -1109,6 +1293,26 @@
 
       const schema = getSchemaFor(selectedOutlet.projectId, type);
 
+      // Render vùng chụp nhiều ảnh (mỗi mục tối đa 3 tấm để khớp 3 cột Anh_1, Anh_2, Anh_3 trên Sheet)
+      const photoContainer = document.getElementById('dynamicPhotoFields');
+      photoContainer.innerHTML = schema.photos.map((p, idx) => {
+        const reqMark = p.required ? ' *' : '';
+        const slotKey = `dynPhoto_${idx}`;
+        const containerId = `gallery_${slotKey}`;
+        photoGalleries[slotKey] = [];
+        return `
+          <div class="form-group">
+            <label>${p.label}${reqMark} <span style="font-weight:400; font-size:11px; color:var(--text-sub);">(Có thể chụp nhiều tấm nếu bill dài)</span></label>
+            <div id="${containerId}"></div>
+          </div>
+        `;
+      }).join('');
+
+      schema.photos.forEach((p, idx) => {
+        renderPhotoGallery(`dynPhoto_${idx}`, `gallery_dynPhoto_${idx}`, 3);
+      });
+
+      // Render các trường nhập chữ/số
       const textContainer = document.getElementById('dynamicTextFields');
       textContainer.innerHTML = schema.fields.map((f, idx) => {
         const reqMark = f.required ? ' *' : '';
@@ -1117,24 +1321,6 @@
           return `<div class="form-group"><label>${f.label}${reqMark}</label><select id="dynField_${idx}">${opts}</select></div>`;
         }
         return `<div class="form-group"><label>${f.label}${reqMark}</label><input type="${f.type}" id="dynField_${idx}" placeholder="Nhập ${f.label.toLowerCase()}"></div>`;
-      }).join('');
-
-      capturedPhotos = {};
-      const photoContainer = document.getElementById('dynamicPhotoFields');
-      photoContainer.innerHTML = schema.photos.map((p, idx) => {
-        const reqMark = p.required ? ' *' : '';
-        const key = `dynPhoto_${idx}`;
-        return `
-          <div class="form-group">
-            <label>${p.label}${reqMark}</label>
-            <input type="file" id="cam_${key}" accept="image/*" capture="environment" class="hidden" onchange="handleCapture(this, '${key}', 'wrap_${key}', 'btn_${key}')">
-            <button type="button" id="btn_${key}" class="cam-btn" onclick="document.getElementById('cam_${key}').click()">📷 Chụp: ${p.label}</button>
-            <div id="wrap_${key}" class="preview-wrap">
-              <img id="${key}" src="">
-              <button type="button" class="retake-badge" onclick="document.getElementById('cam_${key}').click()">Chụp lại</button>
-            </div>
-          </div>
-        `;
       }).join('');
 
       document.getElementById('activityModal').classList.remove('hidden');
@@ -1153,18 +1339,22 @@
         detailParts.push(`${f.label}: ${val}`);
       }
 
-      let photoDataList = [];
+      // Gom tất cả các ảnh đã chụp từ các slot (tối đa 3 ảnh đẩy lên Sheet)
+      let allPhotosToUpload = [];
       for (let i = 0; i < schema.photos.length; i++) {
         const p = schema.photos[i];
-        const imgData = capturedPhotos[`dynPhoto_${i}`];
-        if (p.required && !imgData) return alert(`⚠️ Vui lòng chụp ảnh bắt buộc: "${p.label}"!`);
-        if (imgData) photoDataList.push(imgData);
+        const list = photoGalleries[`dynPhoto_${i}`] || [];
+        if (p.required && list.length === 0) {
+          return alert(`⚠️ Vui lòng chụp ít nhất 1 ảnh cho mục: "${p.label}"!`);
+        }
+        allPhotosToUpload = allPhotosToUpload.concat(list);
       }
+      allPhotosToUpload = allPhotosToUpload.slice(0, 3);
 
       const detailText = detailParts.join(' | ');
       const gpsText = document.getElementById('wsGpsCoords').innerText;
 
-      showLoading('Đang upload ảnh lên Drive và ghi dữ liệu về Sheet...');
+      showLoading(`Đang tải ${allPhotosToUpload.length} ảnh lên Drive và ghi về Sheet...`);
       try {
         const res = await callSheetApi({
           action: 'saveRecord',
@@ -1176,7 +1366,7 @@
             activityType: currentActivityType,
             gps: gpsText,
             detailText: detailText,
-            photos: photoDataList
+            photos: allPhotosToUpload
           }
         });
         hideLoading();
@@ -1187,7 +1377,8 @@
           outletName: selectedOutlet.name,
           staff: currentUser.username,
           activityType: currentActivityType,
-          detailText: detailText
+          detailText: detailText,
+          photos: res.photos || []
         });
         refreshOutletCounters();
         closeModal('activityModal');
@@ -1212,7 +1403,16 @@
               <span>#${idx + 1} • NV: ${item.staff}</span>
               <span>${item.time}</span>
             </div>
-            <div style="color:#e2e8f0; line-height:1.5;">${item.detailText}</div>
+            <div style="color:#e2e8f0; line-height:1.5; margin-bottom:8px;">${item.detailText}</div>
+            ${(item.photos && item.photos.length > 0) ? `
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:8px;">
+                ${item.photos.map(url => `
+                  <a href="${url}" target="_blank">
+                    <img src="${url}" style="width:100%; height:110px; object-fit:cover; border-radius:8px; border:1px solid rgba(56,189,248,0.35);">
+                  </a>
+                `).join('')}
+              </div>
+            ` : ''}
           </div>
         `).join('');
       }
