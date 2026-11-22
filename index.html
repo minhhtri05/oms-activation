@@ -307,6 +307,7 @@
         <div class="drawer-item" onclick="navFromDrawer('outletListScreen')"><span class="ico">🏪</span> Ca làm việc</div>
         <div class="drawer-item" onclick="navFromDrawer('historyScreen')"><span class="ico">🕒</span> Lịch sử hoạt động</div>
         <div class="drawer-item" onclick="navFromDrawer('giftStockScreen')"><span class="ico">🎁</span> Tồn quà tặng</div>
+        <div class="drawer-item" onclick="navFromDrawer('warehouseScreen')"><span class="ico">📦</span> Xuất / Nhập Kho</div>
         <div class="drawer-item" onclick="navFromDrawer('projectInfoScreen')"><span class="ico">ℹ️</span> Thông tin dự án</div>
         <div class="drawer-item" onclick="navFromDrawer('supportScreen')"><span class="ico">❓</span> Đào tạo & Hỗ trợ</div>
         <div class="drawer-item" onclick="navFromDrawer('myProjectsScreen')"><span class="ico">⚙️</span> Dự án của tôi</div>
@@ -412,7 +413,70 @@
       <div id="giftStockListBody"></div>
     </div>
   </div>
+<!-- MÀN HÌNH QUẢN LÝ XUẤT / NHẬP KHO (SAMPLING & VẬT TƯ) -->
+  <div id="warehouseScreen" class="container hidden">
+    <div class="glass-card">
+      <h3 style="margin-bottom:6px; color:#38bdf8;">📦 XUẤT / NHẬP KHO SỰ KIỆN</h3>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px;">Quản lý tồn đầu, xuất kho & nhập hoàn hàng Sampling / POSM theo điểm</p>
 
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div><label>Dự án</label><select id="whProjSelect" onchange="renderWarehouseView()"></select></div>
+        <div><label>Điểm làm</label><select id="whOutletSelect" onchange="renderWarehouseView()"></select></div>
+      </div>
+
+      <!-- Khối Admin khai báo tồn đầu -->
+      <div id="adminKhoTonDauBox" class="hidden" style="background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.35); padding:12px; border-radius:12px; margin-bottom:14px;">
+        <div style="font-size:13px; font-weight:700; color:#38bdf8; margin-bottom:8px;">⚙️ [Admin] Khai báo / Cập nhật Tồn đầu</div>
+        <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:6px; margin-bottom:8px;">
+          <input type="text" id="whInitName" placeholder="Tên SP (VD: NuVi Dâu)">
+          <input type="text" id="whInitUnit" placeholder="ĐVT (Thùng)">
+          <input type="number" id="whInitQty" placeholder="Tồn đầu">
+        </div>
+        <input type="text" id="whInitNote" placeholder="Ghi chú (nếu có)" style="margin-bottom:8px;">
+        <button type="button" class="btn btn-primary btn-sm" style="width:100%;" onclick="saveKhoTonDauItem()">💾 LƯU TỒN ĐẦU</button>
+      </div>
+
+      <!-- Bảng tổng hợp Tồn hiện tại tại điểm -->
+      <div style="margin-bottom:16px;">
+        <strong style="font-size:13px; color:#34d399; display:block; margin-bottom:8px;">📊 Tồn kho hiện tại tại điểm:</strong>
+        <div id="whStockSummaryBody"></div>
+      </div>
+
+      <!-- Form tạo Phiếu Xuất / Nhập -->
+      <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); padding:12px; border-radius:12px; margin-bottom:16px;">
+        <div style="font-size:13px; font-weight:700; color:#fbbf24; margin-bottom:8px;">📝 Tạo Phiếu Xuất / Nhập Kho</div>
+        <div class="form-group">
+          <label>Loại phiếu *</label>
+          <select id="whLoaiPhieu">
+            <option value="XUAT_KHO">📤 Xuất kho xuống điểm (+ Tăng tồn điểm)</option>
+            <option value="NHAP_HOAN">📥 Nhập hoàn về kho tổng (- Giảm tồn điểm)</option>
+          </select>
+        </div>
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px; margin-bottom:10px;">
+          <div>
+            <label>Chọn sản phẩm *</label>
+            <select id="whItemSelect"></select>
+          </div>
+          <div>
+            <label>Số lượng *</label>
+            <input type="number" id="whTxQty" min="1" value="1">
+          </div>
+        </div>
+        <div class="form-group"><label>Ghi chú phiếu</label><input type="text" id="whTxNote" placeholder="VD: Xuất bổ sung ca chiều"></div>
+        <div class="form-group">
+          <label>Ảnh biên bản giao nhận (Nếu có)</label>
+          <div id="gallery_whPhoto"></div>
+        </div>
+        <button type="button" class="btn btn-success" onclick="submitPhieuXuatNhap()">✅ GỬI PHIẾU XUẤT / NHẬP</button>
+      </div>
+
+      <!-- Lịch sử phiếu xuất nhập -->
+      <div>
+        <strong style="font-size:13px; color:#38bdf8; display:block; margin-bottom:8px;">📋 Lịch sử Phiếu Xuất / Nhập (Bấm duyệt nếu có quyền):</strong>
+        <div id="whPhieuListBody"></div>
+      </div>
+    </div>
+  </div>
   <!-- 5. CÁC MÀN HÌNH PHỤ -->
   <div id="notifScreen" class="container hidden">
     <div class="glass-card">
@@ -792,6 +856,8 @@
     let shiftHistory = [];
     let allActivityRecords = [];
     let giftStocks = [];
+    let khoTonDauList = [];
+    let phieuXuatNhapList = [];
     let currentUser = null;
     let selectedOutlet = null;
     let activeShiftId = '';
@@ -948,6 +1014,8 @@
         shiftHistory = res.shifts || [];
         allActivityRecords = res.records || [];
         giftStocks = res.gifts || [];
+        khoTonDauList = res.khoTonDau || [];
+        phieuXuatNhapList = res.phieuXuatNhap || [];
 
         document.getElementById('loginErr').innerText = '';
         document.getElementById('loginScreen').classList.add('hidden');
@@ -985,7 +1053,7 @@
       const allScreens = [
         'loginScreen', 'outletListScreen', 'outletDetailScreen', 'workspaceScreen',
         'adminScreen', 'profileScreen', 'changePassScreen', 'historyScreen',
-        'shiftHistoryDetailScreen', 'giftStockScreen',
+        'shiftHistoryDetailScreen', 'giftStockScreen', 'warehouseScreen',
         'notifScreen', 'projectInfoScreen', 'supportScreen', 'myProjectsScreen'
       ];
       allScreens.forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1005,6 +1073,7 @@
       closeLeftDrawer();
       if (screenId === 'historyScreen') renderShiftHistoryList();
       if (screenId === 'giftStockScreen') initGiftStockScreen();
+      if (screenId === 'warehouseScreen') initWarehouseScreen();
       if (screenId === 'projectInfoScreen') {
         const proj = projects.find(p => p.id === currentUser.projectId);
         document.getElementById('projInfoContent').innerHTML = `
@@ -1886,6 +1955,169 @@
       getSchemaFor(projId, actType).photos.splice(idx, 1);
       persistSchemaToSheet(projId);
       renderSchemaEditor();
+    }
+    // ================= QUẢN LÝ KHO (KhoTonDau & PhieuXuatNhap) =================
+    function initWarehouseScreen() {
+      const pSel = document.getElementById('whProjSelect');
+      pSel.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      if (currentUser.role !== 'ADMIN') pSel.value = currentUser.projectId;
+
+      const oSel = document.getElementById('whOutletSelect');
+      const filteredOutlets = outlets.filter(o => currentUser.role === 'ADMIN' || o.projectId === currentUser.projectId);
+      oSel.innerHTML = filteredOutlets.map(o => `<option value="${o.code}">${o.code} - ${o.name}</option>`).join('');
+      if (selectedOutlet) oSel.value = selectedOutlet.code;
+
+      document.getElementById('adminKhoTonDauBox').classList.toggle('hidden', currentUser.role !== 'ADMIN');
+      photoGalleries['whPhoto'] = [];
+      renderPhotoGallery('whPhoto', 'gallery_whPhoto', 1);
+      renderWarehouseView();
+    }
+
+    function renderWarehouseView() {
+      const projId = document.getElementById('whProjSelect').value;
+      const outletCode = document.getElementById('whOutletSelect').value;
+
+      const baseItems = khoTonDauList.filter(k => k.projectId === projId && k.outletCode === outletCode);
+      const approvedPhieus = phieuXuatNhapList.filter(p => p.projectId === projId && p.outletCode === outletCode && p.trangThai === 'DA_DUYET');
+
+      // Tính tồn hiện tại = TonDau + TongXuatDaDuyet - TongNhapHoanDaDuyet
+      const summaryHtml = baseItems.map(item => {
+        let tongXuat = 0, tongNhapHoan = 0;
+        approvedPhieus.forEach(p => {
+          (p.items || []).forEach(line => {
+            if (line.itemId === item.itemId || line.name.toLowerCase() === item.name.toLowerCase()) {
+              if (p.loaiPhieu === 'XUAT_KHO') tongXuat += Number(line.qty) || 0;
+              if (p.loaiPhieu === 'NHAP_HOAN') tongNhapHoan += Number(line.qty) || 0;
+            }
+          });
+        });
+        const tonHienTai = item.tonDau + tongXuat - tongNhapHoan;
+        return `
+          <div class="schema-item" style="flex-direction:column; align-items:stretch; gap:4px;">
+            <div style="display:flex; justify-content:space-between;">
+              <strong>📦 ${item.name} (${item.unit})</strong>
+              <span style="color:#34d399; font-weight:700;">Tồn hiện tại: ${tonHienTai}</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-sub); display:flex; justify-content:space-between;">
+              <span>Tồn đầu: ${item.tonDau}</span>
+              <span>Xuất thêm: +${tongXuat}</span>
+              <span>Nhập hoàn: -${tongNhapHoan}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('whStockSummaryBody').innerHTML = summaryHtml || '<p style="color:var(--text-sub); font-size:12px;">Chưa có sản phẩm nào được khai báo tồn đầu tại điểm này.</p>';
+      document.getElementById('whItemSelect').innerHTML = baseItems.map(i => `<option value="${i.itemId}">${i.name} (${i.unit})</option>`).join('');
+
+      // Danh sách phiếu xuất nhập của điểm
+      const phieuList = phieuXuatNhapList.filter(p => p.projectId === projId && p.outletCode === outletCode);
+      document.getElementById('whPhieuListBody').innerHTML = phieuList.map(p => {
+        const badgeColor = p.trangThai === 'DA_DUYET' ? '#34d399' : (p.trangThai === 'TU_CHOI' ? '#f87171' : '#fbbf24');
+        const canApprove = (currentUser.role === 'ADMIN' || currentUser.role === 'SUP') && p.trangThai === 'CHO_DUYET';
+        return `
+          <div style="background:rgba(255,255,255,0.05); padding:10px 12px; border-radius:10px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.08); font-size:13px;">
+            <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
+              <span style="color:${p.loaiPhieu === 'XUAT_KHO' ? '#38bdf8' : '#fbbf24'};">${p.loaiPhieu === 'XUAT_KHO' ? '📤 XUẤT KHO' : '📥 NHẬP HOÀN'}</span>
+              <span style="color:${badgeColor};">${p.trangThai}</span>
+            </div>
+            <div style="color:#f8fafc; margin-bottom:4px;">${p.summary}</div>
+            <div style="font-size:11px; color:var(--text-sub);">Tạo bởi: ${p.nguoiTao} • ${p.time} ${p.nguoiDuyet ? '• Duyệt: ' + p.nguoiDuyet : ''}</div>
+            ${p.photo ? `<div style="margin-top:6px;"><a href="${p.photo}" target="_blank" style="color:#38bdf8; font-size:12px;">🖼️ Xem ảnh chứng từ</a></div>` : ''}
+            ${canApprove ? `
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <button type="button" class="btn btn-success btn-sm" onclick="handleApprovePhieu('${p.maPhieu}', 'DA_DUYET')">✓ Duyệt phiếu</button>
+                <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.25); color:#fca5a5;" onclick="handleApprovePhieu('${p.maPhieu}', 'TU_CHOI')">✕ Từ chối</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('') || '<p style="color:var(--text-sub); font-size:12px;">Chưa có phiếu xuất/nhập nào.</p>';
+    }
+
+    async function saveKhoTonDauItem() {
+      const projectId = document.getElementById('whProjSelect').value;
+      const outletCode = document.getElementById('whOutletSelect').value;
+      const name = document.getElementById('whInitName').value.trim();
+      const unit = document.getElementById('whInitUnit').value.trim() || 'Thùng';
+      const tonDau = parseInt(document.getElementById('whInitQty').value);
+      const note = document.getElementById('whInitNote').value.trim();
+
+      if (!name || isNaN(tonDau)) return alert('⚠️ Vui lòng nhập Tên sản phẩm và Số lượng tồn đầu!');
+
+      showLoading('Đang lưu tồn đầu lên Sheet...');
+      const existing = khoTonDauList.find(k => k.projectId === projectId && k.outletCode === outletCode && k.name.toLowerCase() === name.toLowerCase());
+      const res = await callSheetApi({
+        action: 'upsertKhoTonDau',
+        item: { itemId: existing ? existing.itemId : '', projectId, outletCode, name, unit, tonDau, note }
+      });
+      hideLoading();
+
+      if (existing) {
+        existing.unit = unit;
+        existing.tonDau = tonDau;
+        existing.note = note;
+      } else {
+        khoTonDauList.push({ itemId: res.itemId, projectId, outletCode, name, unit, tonDau, note });
+      }
+      document.getElementById('whInitName').value = '';
+      document.getElementById('whInitQty').value = '';
+      document.getElementById('whInitNote').value = '';
+      renderWarehouseView();
+      alert('✅ Đã lưu tồn đầu kho!');
+    }
+
+    async function submitPhieuXuatNhap() {
+      const projectId = document.getElementById('whProjSelect').value;
+      const outletCode = document.getElementById('whOutletSelect').value;
+      const loaiPhieu = document.getElementById('whLoaiPhieu').value;
+      const itemId = document.getElementById('whItemSelect').value;
+      const qty = parseInt(document.getElementById('whTxQty').value);
+      const note = document.getElementById('whTxNote').value.trim();
+
+      const itemObj = khoTonDauList.find(k => k.itemId === itemId);
+      if (!itemObj || isNaN(qty) || qty <= 0) return alert('⚠️ Vui lòng chọn sản phẩm và nhập số lượng > 0!');
+
+      const summary = `${itemObj.name}: ${qty} ${itemObj.unit}`;
+      const photoBase64 = (photoGalleries['whPhoto'] && photoGalleries['whPhoto'][0]) ? photoGalleries['whPhoto'][0] : '';
+
+      showLoading('Đang tạo phiếu xuất/nhập kho...');
+      const res = await callSheetApi({
+        action: 'createPhieuKho',
+        payload: {
+          projectId, outletCode, loaiPhieu,
+          items: [{ itemId: itemObj.itemId, name: itemObj.name, unit: itemObj.unit, qty }],
+          summary, nguoiTao: currentUser.username, role: currentUser.role,
+          photo: photoBase64, note
+        }
+      });
+      hideLoading();
+
+      phieuXuatNhapList.unshift({
+        maPhieu: res.maPhieu, time: res.time, projectId, outletCode, loaiPhieu,
+        items: [{ itemId: itemObj.itemId, name: itemObj.name, unit: itemObj.unit, qty }],
+        summary, nguoiTao: currentUser.username, trangThai: res.trangThai,
+        nguoiDuyet: res.nguoiDuyet, photo: res.photo, note
+      });
+
+      document.getElementById('whTxQty').value = 1;
+      document.getElementById('whTxNote').value = '';
+      photoGalleries['whPhoto'] = [];
+      renderPhotoGallery('whPhoto', 'gallery_whPhoto', 1);
+      renderWarehouseView();
+      alert(res.trangThai === 'DA_DUYET' ? '✅ Đã tạo & duyệt phiếu thành công!' : '✅ Đã gửi phiếu! Đang chờ Admin/Sup duyệt.');
+    }
+
+    async function handleApprovePhieu(maPhieu, trangThai) {
+      showLoading('Đang cập nhật trạng thái phiếu...');
+      await callSheetApi({ action: 'duyetPhieuKho', maPhieu, trangThai, nguoiDuyet: currentUser.username });
+      hideLoading();
+      const p = phieuXuatNhapList.find(x => x.maPhieu === maPhieu);
+      if (p) {
+        p.trangThai = trangThai;
+        p.nguoiDuyet = currentUser.username;
+      }
+      renderWarehouseView();
     }
   </script>
 </body>
