@@ -121,9 +121,33 @@
     }
     .status-tag { position: absolute; top: 14px; right: 14px; font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 700; }
     .tag-working { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .tag-new { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
     .outlet-name { font-size: 17px; font-weight: 700; color: #f8fafc; padding-right: 95px; }
     .outlet-code { font-size: 12px; font-weight: 700; color: #38bdf8; margin: 4px 0; }
     .outlet-addr { font-size: 13px; color: var(--text-sub); margin-bottom: 12px; }
+
+    /* CARD LỊCH SỬ CA LÀM (GIỐNG MẪU) */
+    .shift-history-card {
+      background: rgba(24, 33, 54, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .shift-history-card:hover { border-color: #38bdf8; transform: translateY(-1px); }
+    .shift-card-banner {
+      background: rgba(14, 165, 233, 0.18);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      justify-content: space-between;
+    }
+    .shift-card-body { padding: 14px; }
 
     #map { width: 100%; height: 210px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--border-glow); z-index: 1; }
     .geo-status-box { padding: 12px; border-radius: 10px; font-size: 13px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -131,102 +155,42 @@
     .geo-fail { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
     .geo-wait { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fcd34d; }
 
-    /* GALLERY CHỤP NHIỀU ẢNH KIỂU Ô VUÔNG */
-    .photo-gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 6px;
-    }
+    /* GALLERY CHỤP NHIỀU ẢNH */
+    .photo-gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 6px; }
     .cam-tile {
-      height: 155px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 2px dashed rgba(56, 189, 248, 0.45);
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      color: #38bdf8;
-      cursor: pointer;
-      transition: 0.2s;
+      height: 150px; background: rgba(15, 23, 42, 0.9); border: 2px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; color: #38bdf8; cursor: pointer;
     }
-    .cam-tile:hover { background: rgba(14, 165, 233, 0.12); border-color: #38bdf8; }
-    .cam-tile .cam-icon { font-size: 32px; }
+    .cam-tile .cam-icon { font-size: 30px; }
     .cam-tile .cam-label { font-size: 12px; font-weight: 600; text-align: center; padding: 0 8px; }
 
     .photo-thumb-card {
-      position: relative;
-      height: 155px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      background: #000;
+      position: relative; height: 150px; border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.35); background: #000;
     }
-    .photo-thumb-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .photo-thumb-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .thumb-actions-bar {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 8px 10px;
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 10px;
       background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
     }
     .thumb-action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, 0.92);
-      color: #0f172a;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: rgba(255, 255, 255, 0.92); color: #0f172a; font-size: 16px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .thumb-action-btn.del { color: #dc2626; }
 
-    /* POPUP XEM PHÓNG TO ẢNH */
     .lightbox-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(5px);
-      z-index: 3500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(5px);
+      z-index: 3500; display: flex; align-items: center; justify-content: center; padding: 18px;
     }
     .lightbox-card {
-      background: #fff;
-      padding: 12px;
-      border-radius: 16px;
-      max-width: 95vw;
-      max-height: 88vh;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      background: #fff; padding: 12px; border-radius: 16px; max-width: 95vw; max-height: 88vh;
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .lightbox-card img {
-      max-width: 100%;
-      max-height: 70vh;
-      object-fit: contain;
-      border-radius: 8px;
-      background: #0f172a;
-    }
+    .lightbox-card img { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; background: #0f172a; }
 
     .activity-card {
       background: rgba(24, 33, 54, 0.95); border: 1px solid rgba(148, 163, 184, 0.22);
@@ -256,9 +220,9 @@
       background: #111827; border-top: 1px solid var(--accent); border-radius: 20px 20px 0 0; padding: 20px 18px;
     }
 
-    .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 16px; }
+    .admin-tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 16px; }
     .admin-tab {
-      padding: 9px 4px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148,163,184,0.2);
+      padding: 9px 2px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148,163,184,0.2);
       color: var(--text-sub); border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;
     }
     .admin-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -268,10 +232,18 @@
       background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(148,163,184,0.2);
       padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; font-size: 13px;
     }
-    .schema-actions { display: flex; gap: 6px; }
+    .schema-actions { display: flex; gap: 4px; }
     .inline-editor-box { background: rgba(14, 165, 233, 0.08); border: 1px solid var(--accent); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
     .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); margin-bottom: 12px; cursor: pointer; }
     .checkbox-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); }
+
+    .gift-stock-box {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
 
     .loading-mask {
       position: fixed; inset: 0; background: rgba(9, 13, 22, 0.85); z-index: 3000;
@@ -334,6 +306,7 @@
         <div class="drawer-item" onclick="navFromDrawer('notifScreen')"><span class="ico">🔔</span> Thông báo</div>
         <div class="drawer-item" onclick="navFromDrawer('outletListScreen')"><span class="ico">🏪</span> Ca làm việc</div>
         <div class="drawer-item" onclick="navFromDrawer('historyScreen')"><span class="ico">🕒</span> Lịch sử hoạt động</div>
+        <div class="drawer-item" onclick="navFromDrawer('giftStockScreen')"><span class="ico">🎁</span> Tồn quà tặng</div>
         <div class="drawer-item" onclick="navFromDrawer('projectInfoScreen')"><span class="ico">ℹ️</span> Thông tin dự án</div>
         <div class="drawer-item" onclick="navFromDrawer('supportScreen')"><span class="ico">❓</span> Đào tạo & Hỗ trợ</div>
         <div class="drawer-item" onclick="navFromDrawer('myProjectsScreen')"><span class="ico">⚙️</span> Dự án của tôi</div>
@@ -342,7 +315,7 @@
         </div>
       </div>
     </div>
-    <div class="drawer-footer">Phiên bản 1.6.0 • Auto-Save Photo</div>
+    <div class="drawer-footer">Phiên bản 2.0 • Shift & Gift Sync</div>
   </div>
 
   <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
@@ -365,7 +338,7 @@
     </div>
   </div>
 
-  <!-- 2. THÔNG TIN CÁ NHÂN -->
+  <!-- 2. THÔNG TIN CÁ NHÂN & ĐỔI MẬT KHẨU -->
   <div id="profileScreen" class="container hidden">
     <div class="glass-card">
       <div style="text-align:center; margin-bottom:18px;">
@@ -380,7 +353,6 @@
     </div>
   </div>
 
-  <!-- 3. ĐỔI MẬT KHẨU -->
   <div id="changePassScreen" class="container hidden">
     <div class="glass-card">
       <h3 style="margin-bottom:14px; color:#38bdf8;">🔒 Đổi Mật Khẩu</h3>
@@ -391,19 +363,62 @@
     </div>
   </div>
 
-  <!-- 4. CÁC MÀN HÌNH PHỤ -->
+  <!-- 3. LỊCH SỬ HOẠT ĐỘNG (THEO TỪNG CA ĐÃ LÀM - GIỐNG MẪU) -->
   <div id="historyScreen" class="container hidden">
+    <h3 style="margin-bottom:14px; color:#38bdf8;">🕒 LỊCH SỬ HOẠT ĐỘNG</h3>
+    <div id="shiftHistoryListContainer"></div>
+  </div>
+
+  <!-- CHI TIẾT 1 CA LÀM TRONG LỊCH SỬ -->
+  <div id="shiftHistoryDetailScreen" class="container hidden">
+    <button type="button" class="icon-btn" onclick="showScreen('historyScreen')" style="margin-bottom:12px;">← Quay lại lịch sử ca</button>
+
+    <div class="shift-history-card" style="cursor:default;">
+      <div class="shift-card-banner" id="shDetailBanner">CN, 22/11/2026 • 09:08 => 09:09</div>
+      <div class="shift-card-body">
+        <div style="font-size:18px; font-weight:700;" id="shDetailOutletName">Tên điểm</div>
+        <div style="font-size:13px; color:#38bdf8; font-weight:700; margin:4px 0;" id="shDetailOutletCode">CODE</div>
+        <div style="font-size:13px; color:var(--text-sub);" id="shDetailOutletAddr">Địa chỉ</div>
+      </div>
+    </div>
+
     <div class="glass-card">
-      <h3 style="margin-bottom:12px; color:#38bdf8;">🕒 Lịch Sử Hoạt Động Hôm Nay</h3>
-      <div id="globalHistoryBody" style="font-size:13px;"></div>
+      <div style="font-size:16px; font-weight:700; color:#38bdf8; margin-bottom:14px;" id="shDetailProject">2026307 - Modern BTS</div>
+      <div id="shDetailActivitiesBody"></div>
     </div>
   </div>
 
+  <!-- 4. MÀN HÌNH XEM & NHẬP TỒN QUÀ TẶNG -->
+  <div id="giftStockScreen" class="container hidden">
+    <div class="glass-card">
+      <h3 style="margin-bottom:6px; color:#34d399;">🎁 QUẢN LÝ TỒN QUÀ TẶNG</h3>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px;">Số lượng tồn tự động giảm khi nhân viên ghi nhận phát quà</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div><label>Dự án</label><select id="gsProjSelect" onchange="renderGiftStockList()"></select></div>
+        <div><label>Điểm làm (Outlet)</label><select id="gsOutletSelect" onchange="renderGiftStockList()"></select></div>
+      </div>
+
+      <!-- Form thêm mới / nhập tồn đầu quà tặng -->
+      <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); padding:12px; border-radius:12px; margin-bottom:14px;">
+        <div style="font-size:13px; font-weight:700; color:#34d399; margin-bottom:8px;">➕ Thêm quà / Cập nhật tồn ban đầu</div>
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px; margin-bottom:8px;">
+          <input type="text" id="gsNewName" placeholder="Tên quà (VD: Gấu bông)">
+          <input type="number" id="gsNewInitQty" placeholder="SL tồn đầu">
+        </div>
+        <button type="button" class="btn btn-success btn-sm" style="width:100%;" onclick="saveGiftStockItem()">💾 LƯU TỒN QUÀ LÊN SHEET</button>
+      </div>
+
+      <div id="giftStockListBody"></div>
+    </div>
+  </div>
+
+  <!-- 5. CÁC MÀN HÌNH PHỤ -->
   <div id="notifScreen" class="container hidden">
     <div class="glass-card">
       <h3 style="margin-bottom:12px; color:#38bdf8;">🔔 Thông Báo Hệ Thống</h3>
       <div style="padding:12px; background:rgba(255,255,255,0.05); border-radius:10px; font-size:13px;">
-        <strong>Lưu ý vận hành:</strong> Ảnh chụp được tự động đóng dấu thời gian + GPS và tự động tải về thư mục Download của điện thoại làm bản sao lưu.
+        <strong>Lưu ý vận hành:</strong> Sau khi Check-out, điểm làm sẽ tự động reset về trạng thái Ca mới cho ngày hôm sau. Toàn bộ dữ liệu ca cũ nằm trong mục <strong>Lịch sử hoạt động</strong>.
       </div>
     </div>
   </div>
@@ -421,8 +436,8 @@
       <p style="font-size:13px; color:var(--text-sub); line-height:1.6;">
         1. Chọn điểm làm việc thuộc dự án.<br>
         2. Đứng trong bán kính GPS cho phép và chụp đủ 2 ảnh Check-in đầu ca.<br>
-        3. Ghi nhận hoạt động (có thể chụp nhiều ảnh liên tiếp nếu bill dài).<br>
-        4. Bấm Check-out khi kết thúc ca trực.
+        3. Ghi nhận hoạt động (chọn quà sẽ tự động trừ vào tồn kho điểm).<br>
+        4. Bấm Check-out khi kết thúc ca để lưu ca vào Lịch sử và reset ca mới.
       </p>
     </div>
   </div>
@@ -434,7 +449,7 @@
     </div>
   </div>
 
-  <!-- 5. DANH SÁCH ĐIỂM LÀM -->
+  <!-- 6. DANH SÁCH ĐIỂM LÀM -->
   <div id="outletListScreen" class="container hidden">
     <div style="text-align:center; margin-bottom:14px;">
       <h3 style="font-size:18px;">Ca làm việc 🔄</h3>
@@ -447,7 +462,7 @@
     <div id="outletContainer"></div>
   </div>
 
-  <!-- 6. CHI TIẾT ĐIỂM & CHECK-IN ĐẦU CA -->
+  <!-- 7. CHI TIẾT ĐIỂM & CHECK-IN ĐẦU CA -->
   <div id="outletDetailScreen" class="container hidden">
     <button type="button" class="icon-btn" onclick="showScreen('outletListScreen')" style="margin-bottom:12px; background:rgba(255,255,255,0.1);">← Quay lại danh sách</button>
 
@@ -490,14 +505,17 @@
     </div>
   </div>
 
-  <!-- 7. MÀN HÌNH LÀM VIỆC -->
+  <!-- 8. MÀN HÌNH LÀM VIỆC -->
   <div id="workspaceScreen" class="container hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <button type="button" class="icon-btn" onclick="showScreen('outletListScreen')">← Danh sách điểm</button>
-      <label style="display:flex; align-items:center; gap:6px; margin:0; font-size:12px; color:#34d399; cursor:pointer;">
-        <input type="checkbox" id="autoDownloadToggle" checked style="width:15px; height:15px; accent-color:#10b981;">
-        Tự tải ảnh về máy
-      </label>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" class="icon-btn" style="background:rgba(16,185,129,0.25); color:#34d399;" onclick="openQuickGiftStockModal()">🎁 Tồn quà</button>
+        <label style="display:flex; align-items:center; gap:5px; margin:0; font-size:12px; color:#34d399; cursor:pointer;">
+          <input type="checkbox" id="autoDownloadToggle" checked style="width:14px; height:14px; accent-color:#10b981;">
+          Tự lưu ảnh
+        </label>
+      </div>
     </div>
 
     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.85); padding:10px 14px; border-radius:10px; margin-bottom:14px; border:1px solid rgba(56,189,248,0.2);">
@@ -561,7 +579,7 @@
     </div>
   </div>
 
-  <!-- MODAL NHẬP DỮ LIỆU ĐỘNG -->
+  <!-- MODAL NHẬP DỮ LIỆU ĐỘNG + CHỌN QUÀ TRỪ TỒN -->
   <div id="activityModal" class="modal-overlay hidden">
     <div class="modal-sheet">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -570,30 +588,41 @@
       </div>
       <div id="dynamicPhotoFields"></div>
       <div id="dynamicTextFields"></div>
+
+      <!-- Khối chọn quà tặng từ kho tồn của điểm (Tự động giảm tồn đầu khi lưu) -->
+      <div id="giftDeductionSection" class="gift-stock-box hidden">
+        <div style="font-size:12px; font-weight:700; color:#34d399; margin-bottom:8px;">🎁 Quà tặng phát cho khách (Tự động trừ tồn kho)</div>
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px;">
+          <select id="actGiftSelect"></select>
+          <input type="number" id="actGiftQty" value="1" min="0" placeholder="SL quà">
+        </div>
+      </div>
+
       <button type="button" class="btn btn-primary" onclick="saveActivityRecord()">LƯU GHI NHẬN LÊN SHEET</button>
     </div>
   </div>
 
-  <!-- MODAL XEM DANH SÁCH (CÓ HÌNH ẢNH) -->
+  <!-- MODAL XEM DANH SÁCH BILL -->
   <div id="listModal" class="modal-overlay hidden">
     <div class="modal-sheet">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
-        <h3 id="listModalTitle" style="font-size:16px; color:#38bdf8;">Danh sách tại điểm</h3>
+        <h3 id="listModalTitle" style="font-size:16px; color:#38bdf8;">Danh sách</h3>
         <button type="button" class="icon-btn" onclick="closeModal('listModal')">✕ Đóng</button>
       </div>
       <div id="listModalBody" style="font-size:13px;"></div>
     </div>
   </div>
 
-  <!-- 8. MÀN HÌNH QUẢN TRỊ ADMIN -->
+  <!-- 9. MÀN HÌNH QUẢN TRỊ ADMIN -->
   <div id="adminScreen" class="container hidden">
     <h2 style="font-size:18px; margin-bottom:12px; color:#38bdf8;">⚙️ QUẢN TRỊ HỆ THỐNG (ADMIN)</h2>
 
     <div class="admin-tabs">
       <button type="button" class="admin-tab active" onclick="switchAdminTab('tabAddProject', this)">+ Dự án</button>
-      <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddOutlet', this)">+ Điểm làm</button>
-      <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddUser', this)">+ Tài khoản</button>
-      <button type="button" class="admin-tab" onclick="switchAdminTab('tabFormBuilder', this)">⚙️ Form động</button>
+      <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddOutlet', this)">+ Điểm</button>
+      <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddUser', this)">+ User</button>
+      <button type="button" class="admin-tab" onclick="switchAdminTab('tabFormBuilder', this)">⚙️ Form</button>
+      <button type="button" class="admin-tab" onclick="navFromDrawer('giftStockScreen')">🎁 Quà</button>
     </div>
 
     <div id="tabAddProject" class="glass-card admin-pane">
@@ -636,8 +665,8 @@
     </div>
 
     <div id="tabFormBuilder" class="glass-card admin-pane hidden">
-      <h4 style="margin-bottom:6px; color:#38bdf8;">Cấu Hình Trường Nhập & Ảnh Chụp</h4>
-      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px;">Tự động lưu cấu hình form lên Google Sheet</p>
+      <h4 style="margin-bottom:6px; color:#38bdf8;">Cấu Hình & Đổi Thứ Tự Trường Nhập</h4>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px;">Dùng nút ⬆️ ⬇️ để sắp xếp thứ tự hiển thị trước sau trên form</p>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
         <div><label>Chọn Dự án</label><select id="cfgProjSelect" onchange="renderSchemaEditor()"></select></div>
@@ -719,19 +748,18 @@
     const DEFAULT_PROJECT_SCHEMA = {
       BAN_HANG: {
         fields: [
+          { label: 'Mã bill', type: 'text', required: true },
           { label: 'Tên khách hàng', type: 'text', required: true },
           { label: 'Số điện thoại', type: 'tel', required: true },
-          { label: 'Sản phẩm bán ra', type: 'text', required: true },
           { label: 'Tổng giá trị đơn hàng (VNĐ)', type: 'number', required: true }
         ],
-        photos: [{ label: 'Ảnh hóa đơn / Sản phẩm khách mua', required: true }]
+        photos: [{ label: 'Ảnh bill / Sản phẩm khách mua', required: true }]
       },
       VONG_QUAY: {
         fields: [
           { label: 'Tên khách hàng', type: 'text', required: true },
           { label: 'Số điện thoại', type: 'tel', required: true },
-          { label: 'Số hóa đơn (Bill)', type: 'text', required: true },
-          { label: 'Quà tặng trúng thưởng', type: 'select', options: 'Balo LED, Kính mát, Xe đạp, Áo thun Cafina, Bình nước', required: true }
+          { label: 'Số hóa đơn (Bill)', type: 'text', required: true }
         ],
         photos: [
           { label: 'Ảnh chụp Bill mua hàng', required: true },
@@ -749,8 +777,7 @@
       CHECKIN_FB: {
         fields: [
           { label: 'Tên khách hàng', type: 'text', required: true },
-          { label: 'Số điện thoại', type: 'tel', required: true },
-          { label: 'Quà Check-in đã trao', type: 'text', required: true }
+          { label: 'Số điện thoại', type: 'tel', required: true }
         ],
         photos: [
           { label: 'Ảnh màn hình bài đăng Check-in FB', required: true },
@@ -762,9 +789,12 @@
     let projects = [];
     let outlets = [];
     let formSchemas = {};
+    let shiftHistory = [];
     let allActivityRecords = [];
+    let giftStocks = [];
     let currentUser = null;
     let selectedOutlet = null;
+    let activeShiftId = '';
     let isInsideGeofence = false;
     let userCurrentLat = null;
     let userCurrentLng = null;
@@ -772,8 +802,6 @@
     let currentActivityType = '';
     let editingFieldIdx = -1;
     let editingPhotoIdx = -1;
-
-    // Lưu mảng nhiều ảnh cho từng slot: { 'start1': [base64...], 'dynPhoto_0': [base64...] }
     let photoGalleries = {};
 
     function showLoading(msg) {
@@ -782,27 +810,22 @@
     }
     function hideLoading() { document.getElementById('loadingMask').classList.add('hidden'); }
 
-    // ================= HÀM TẢI ẢNH VỀ ĐIỆN THOẠI =================
+    // ================= TẢI ẢNH & GALLERY =================
     function triggerImageDownload(dataUrl, customPrefix) {
       try {
         const d = new Date();
         const pad = (n) => String(n).padStart(2, '0');
         const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
         const code = selectedOutlet ? selectedOutlet.code : 'OMS';
-        const fileName = `${code}_${customPrefix || 'PHOTO'}_${stamp}.jpg`;
-
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = fileName;
+        link.download = `${code}_${customPrefix || 'PHOTO'}_${stamp}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      } catch (e) {
-        console.warn('Không tự động tải được ảnh:', e);
-      }
+      } catch (e) {}
     }
 
-    // ================= GALLERY CHỤP NHIỀU ẢNH + XEM + XÓA =================
     function renderPhotoGallery(slotKey, containerId, maxCount) {
       if (!photoGalleries[slotKey]) photoGalleries[slotKey] = [];
       const list = photoGalleries[slotKey];
@@ -828,8 +851,8 @@
           <div class="photo-thumb-card">
             <img src="${dataUrl}" onclick="openPhotoLightbox('${slotKey}', ${idx})">
             <div class="thumb-actions-bar">
-              <button type="button" class="thumb-action-btn" title="Xem phóng to" onclick="openPhotoLightbox('${slotKey}', ${idx})">👁️</button>
-              <button type="button" class="thumb-action-btn del" title="Xóa ảnh" onclick="deleteGalleryPhoto('${slotKey}', '${containerId}', ${idx}, ${maxCount || 0})">🗑️</button>
+              <button type="button" class="thumb-action-btn" onclick="openPhotoLightbox('${slotKey}', ${idx})">👁️</button>
+              <button type="button" class="thumb-action-btn del" onclick="deleteGalleryPhoto('${slotKey}', '${containerId}', ${idx}, ${maxCount || 0})">🗑️</button>
             </div>
           </div>
         `;
@@ -868,12 +891,10 @@
           if (!photoGalleries[slotKey]) photoGalleries[slotKey] = [];
           photoGalleries[slotKey].push(dataUrl);
 
-          // Tự động tải ảnh đã chụp (có watermark) về điện thoại nếu đang bật
           const autoDl = document.getElementById('autoDownloadToggle');
           if (!autoDl || autoDl.checked) {
             triggerImageDownload(dataUrl, currentActivityType || 'CHECKIN');
           }
-
           renderPhotoGallery(slotKey, containerId, maxCount);
         };
         img.src = e.target.result;
@@ -900,9 +921,7 @@
       if (url) triggerImageDownload(url, 'SAVE');
     }
 
-    function closePhotoLightbox() {
-      document.getElementById('photoLightbox').classList.add('hidden');
-    }
+    function closePhotoLightbox() { document.getElementById('photoLightbox').classList.add('hidden'); }
 
     // ================= 1. ĐĂNG NHẬP =================
     async function handleLogin() {
@@ -926,7 +945,9 @@
         projects = res.projects;
         outlets = res.outlets;
         formSchemas = res.formSchemas || {};
+        shiftHistory = res.shifts || [];
         allActivityRecords = res.records || [];
+        giftStocks = res.gifts || [];
 
         document.getElementById('loginErr').innerText = '';
         document.getElementById('loginScreen').classList.add('hidden');
@@ -964,13 +985,14 @@
       const allScreens = [
         'loginScreen', 'outletListScreen', 'outletDetailScreen', 'workspaceScreen',
         'adminScreen', 'profileScreen', 'changePassScreen', 'historyScreen',
+        'shiftHistoryDetailScreen', 'giftStockScreen',
         'notifScreen', 'projectInfoScreen', 'supportScreen', 'myProjectsScreen'
       ];
       allScreens.forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(screenId).classList.remove('hidden');
     }
 
-    // ================= 2. MENU & PROFILE =================
+    // ================= 2. MENU & LỊCH SỬ CA LÀM (3 CẤP) =================
     function openLeftDrawer() {
       document.getElementById('drawerBackdrop').classList.remove('hidden');
       document.getElementById('leftDrawer').classList.remove('hidden');
@@ -981,7 +1003,8 @@
     }
     function navFromDrawer(screenId) {
       closeLeftDrawer();
-      if (screenId === 'historyScreen') renderGlobalHistory();
+      if (screenId === 'historyScreen') renderShiftHistoryList();
+      if (screenId === 'giftStockScreen') initGiftStockScreen();
       if (screenId === 'projectInfoScreen') {
         const proj = projects.find(p => p.id === currentUser.projectId);
         document.getElementById('projInfoContent').innerHTML = `
@@ -1022,7 +1045,6 @@
       const name = document.getElementById('profFullname').value.trim();
       const phone = document.getElementById('profPhone').value.trim();
       if (!name || !phone) return alert('⚠️ Vui lòng nhập đầy đủ Họ tên và Số điện thoại!');
-
       showLoading('Đang cập nhật hồ sơ...');
       await callSheetApi({ action: 'updateUser', username: currentUser.username, fullname: name, phone: phone });
       hideLoading();
@@ -1044,10 +1066,8 @@
       const oldP = document.getElementById('cpOldPass').value;
       const newP = document.getElementById('cpNewPass').value;
       const confP = document.getElementById('cpConfirmPass').value;
-
       if (oldP !== currentUser.password) return alert('❌ Mật khẩu hiện tại không đúng!');
       if (!newP || newP !== confP) return alert('❌ Mật khẩu mới không khớp!');
-
       showLoading('Đang đổi mật khẩu...');
       await callSheetApi({ action: 'updateUser', username: currentUser.username, password: newP });
       hideLoading();
@@ -1056,37 +1076,176 @@
       showScreen('outletListScreen');
     }
 
-    function renderGlobalHistory() {
-      const myLogs = allActivityRecords.filter(r => r.staff === currentUser.username);
-      const body = document.getElementById('globalHistoryBody');
-      if (myLogs.length === 0) {
-        body.innerHTML = '<p style="color:var(--text-sub);">Hôm nay bạn chưa ghi nhận lượt hoạt động nào.</p>';
+    // Cấp 1 Lịch sử: Danh sách các ca làm việc đã làm
+    function renderShiftHistoryList() {
+      const container = document.getElementById('shiftHistoryListContainer');
+      if (shiftHistory.length === 0) {
+        container.innerHTML = '<div class="glass-card"><p style="color:var(--text-sub); text-align:center;">Chưa có lịch sử ca làm việc nào.</p></div>';
         return;
       }
-      body.innerHTML = myLogs.map((item, idx) => `
-        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px;">
-          <div style="color:#38bdf8; font-weight:700;">#${idx + 1} • Điểm ${item.outletCode} • ${item.time}</div>
-          <div style="margin-top:4px; margin-bottom:6px; color:#e2e8f0;">${item.detailText}</div>
+
+      container.innerHTML = shiftHistory.map(s => `
+        <div class="shift-history-card" onclick="openShiftHistoryDetail('${s.shiftId}')">
+          <div class="shift-card-banner">
+            <span>${s.dateLabel} • ${s.startTime} => ${s.endTime}</span>
+            <span>${s.status === 'WORKING' ? '🟢 Đang làm' : '✓ Hoàn tất'}</span>
+          </div>
+          <div class="shift-card-body">
+            <div style="font-size:17px; font-weight:700; color:#f8fafc;">${s.outletName}</div>
+            <div style="font-size:13px; font-weight:700; color:#38bdf8; margin:4px 0;">${s.outletCode} ${currentUser.role === 'ADMIN' ? '(NV: ' + s.staff + ')' : ''}</div>
+            <div style="font-size:13px; color:var(--text-sub);"><strong>Địa chỉ:</strong> ${s.outletAddr || '---'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Cấp 2 Lịch sử: Chi tiết 1 ca làm (Hiển thị tổng số từng hoạt động của ca đó)
+    function openShiftHistoryDetail(shiftId) {
+      const shift = shiftHistory.find(s => s.shiftId === shiftId);
+      if (!shift) return;
+
+      document.getElementById('shDetailBanner').innerText = `${shift.dateLabel} • ${shift.startTime} => ${shift.endTime}`;
+      document.getElementById('shDetailOutletName').innerText = shift.outletName;
+      document.getElementById('shDetailOutletCode').innerText = shift.outletCode;
+      document.getElementById('shDetailOutletAddr').innerText = `Địa chỉ: ${shift.outletAddr || '---'}`;
+
+      const proj = projects.find(p => p.id === shift.projectId);
+      document.getElementById('shDetailProject').innerText = proj ? proj.name : shift.projectId;
+
+      const actTypes = [
+        { code: 'BAN_HANG', name: 'Hoạt động bán hàng' },
+        { code: 'VONG_QUAY', name: 'Hoạt động chơi vòng quay may mắn' },
+        { code: 'MINI_GAME', name: 'Hoạt động Mini Game' },
+        { code: 'CHECKIN_FB', name: 'Hoạt động check-in FB nhận quà' }
+      ];
+
+      document.getElementById('shDetailActivitiesBody').innerHTML = actTypes.map(act => {
+        const logs = allActivityRecords.filter(r => r.shiftId === shiftId && r.activityType === act.code);
+        return `
+          <div style="padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <div style="font-size:14px; font-weight:700; margin-bottom:6px;">• ${act.name}:</div>
+            <div style="display:flex; align-items:center; gap:14px; font-size:13px;">
+              <span class="list-link" style="${logs.length === 0 ? 'color:var(--text-sub); pointer-events:none;' : ''}"
+                    onclick="openHistoryBillList('${shiftId}', '${act.code}', '${act.name}')">
+                ☰ DANH SÁCH
+              </span>
+              <span>Tổng số: <strong style="color:#38bdf8;">${logs.length}</strong></span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      showScreen('shiftHistoryDetailScreen');
+    }
+
+    // Cấp 3 Lịch sử: Xem toàn bộ bill + ảnh đã chụp của hoạt động trong ca đó
+    function openHistoryBillList(shiftId, actCode, actTitle) {
+      const list = allActivityRecords.filter(r => r.shiftId === shiftId && r.activityType === actCode);
+      const body = document.getElementById('listModalBody');
+      document.getElementById('listModalTitle').innerText = `${actTitle} (Tổng: ${list.length})`;
+
+      body.innerHTML = list.map((item, idx) => `
+        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex; justify-content:space-between; color:#38bdf8; font-weight:700; margin-bottom:6px;">
+            <span>#${idx + 1} • ${item.time}</span>
+            <span>NV: ${item.staff}</span>
+          </div>
+          <div style="color:#e2e8f0; line-height:1.6; margin-bottom:8px;">${item.detailText.split(' | ').map(line => `• ${line}`).join('<br>')}</div>
           ${(item.photos && item.photos.length > 0) ? `
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap:6px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:8px;">
               ${item.photos.map(url => `
                 <a href="${url}" target="_blank">
-                  <img src="${url}" style="width:100%; height:95px; object-fit:cover; border-radius:6px; border:1px solid rgba(56,189,248,0.35);">
+                  <img src="${url}" style="width:100%; height:110px; object-fit:cover; border-radius:8px; border:1px solid rgba(56,189,248,0.35);">
                 </a>
               `).join('')}
             </div>
           ` : ''}
         </div>
       `).join('');
+
+      document.getElementById('listModal').classList.remove('hidden');
     }
 
-    // ================= 3. ĐIỂM LÀM & CHECK-IN ĐẦU CA =================
-    function getShiftStorageKey(outletId) {
-      const today = new Date().toISOString().slice(0, 10);
-      return `checkedIn_${currentUser.projectId}_${outletId}_${currentUser.username}_${today}`;
+    // ================= 3. QUẢN LÝ TỒN QUÀ TẶNG =================
+    function initGiftStockScreen() {
+      const pSel = document.getElementById('gsProjSelect');
+      pSel.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      if (currentUser.role !== 'ADMIN') pSel.value = currentUser.projectId;
+
+      const oSel = document.getElementById('gsOutletSelect');
+      const filteredOutlets = outlets.filter(o => currentUser.role === 'ADMIN' || o.projectId === currentUser.projectId);
+      oSel.innerHTML = filteredOutlets.map(o => `<option value="${o.code}">${o.code} - ${o.name}</option>`).join('');
+      if (selectedOutlet) oSel.value = selectedOutlet.code;
+
+      renderGiftStockList();
     }
-    function isOutletCheckedInToday(outletId) {
-      return localStorage.getItem(getShiftStorageKey(outletId)) !== null;
+
+    function openQuickGiftStockModal() {
+      initGiftStockScreen();
+      showScreen('giftStockScreen');
+    }
+
+    function renderGiftStockList() {
+      const projId = document.getElementById('gsProjSelect').value;
+      const outletCode = document.getElementById('gsOutletSelect').value;
+      const list = giftStocks.filter(g => g.projectId === projId && g.outletCode === outletCode);
+      const body = document.getElementById('giftStockListBody');
+
+      if (list.length === 0) {
+        body.innerHTML = '<p style="color:var(--text-sub); text-align:center; padding:12px;">Điểm này chưa khai báo quà tặng tồn đầu.</p>';
+        return;
+      }
+
+      body.innerHTML = list.map(g => `
+        <div class="schema-item" style="flex-direction:column; align-items:stretch; gap:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:14px; color:#f8fafc;">🎁 ${g.name}</strong>
+            <span style="font-size:12px; font-weight:700; padding:3px 10px; border-radius:12px; background:${g.remaining > 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color:${g.remaining > 0 ? '#34d399' : '#f87171'};">
+              Còn lại: ${g.remaining}
+            </span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-sub);">
+            <span>Tồn ban đầu: <strong style="color:#fff;">${g.initialQty}</strong></span>
+            <span>Đã phát: <strong style="color:#fbbf24;">${g.usedQty}</strong></span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function saveGiftStockItem() {
+      const projectId = document.getElementById('gsProjSelect').value;
+      const outletCode = document.getElementById('gsOutletSelect').value;
+      const name = document.getElementById('gsNewName').value.trim();
+      const initialQty = parseInt(document.getElementById('gsNewInitQty').value);
+
+      if (!name || isNaN(initialQty) || initialQty < 0) {
+        return alert('⚠️ Vui lòng nhập Tên quà và Số lượng tồn ban đầu hợp lệ!');
+      }
+
+      showLoading('Đang lưu tồn quà tặng lên Sheet...');
+      const existing = giftStocks.find(g => g.projectId === projectId && g.outletCode === outletCode && g.name.toLowerCase() === name.toLowerCase());
+      const res = await callSheetApi({
+        action: 'upsertGift',
+        gift: { id: existing ? existing.id : '', projectId, outletCode, name, initialQty }
+      });
+      hideLoading();
+
+      if (existing) {
+        existing.initialQty = initialQty;
+        existing.remaining = Math.max(0, initialQty - existing.usedQty);
+      } else {
+        giftStocks.push({ id: res.id, projectId, outletCode, name, initialQty, usedQty: 0, remaining: initialQty });
+      }
+
+      document.getElementById('gsNewName').value = '';
+      document.getElementById('gsNewInitQty').value = '';
+      renderGiftStockList();
+      alert(`✅ Đã cập nhật tồn ban đầu cho quà "${name}"!`);
+    }
+
+    // ================= 4. ĐIỂM LÀM, CHECK-IN & RESET CA SAU CHECK-OUT =================
+    function getActiveShiftStorageKey(outletId) {
+      return `activeShift_${currentUser.projectId}_${outletId}_${currentUser.username}`;
     }
 
     function renderOutlets() {
@@ -1102,15 +1261,18 @@
       container.innerHTML = '';
 
       filtered.forEach(o => {
-        const alreadyIn = isOutletCheckedInToday(o.id);
+        const activeData = localStorage.getItem(getActiveShiftStorageKey(o.id));
+        const isWorking = activeData !== null;
         container.innerHTML += `
           <div class="outlet-card">
-            ${alreadyIn ? '<span class="status-tag tag-working">🟢 Đang trong ca</span>' : ''}
+            ${isWorking
+              ? '<span class="status-tag tag-working">🟢 Đang trong ca</span>'
+              : '<span class="status-tag tag-new">✨ Ca mới</span>'}
             <div class="outlet-name">${o.name}</div>
             <div class="outlet-code">${o.code} ${currentUser.role === 'ADMIN' ? '(Dự án: ' + o.projectId + ')' : ''}</div>
             <div class="outlet-addr"><strong>Địa chỉ:</strong> ${o.addr}</div>
-            <button type="button" class="btn ${alreadyIn ? 'btn-primary' : 'btn-danger-outline'}" style="width:auto; padding:7px 14px; font-size:12px;" onclick="selectOutlet('${o.id}')">
-              ${alreadyIn ? 'TIẾP TỤC LÀM VIỆC →' : 'XEM CHI TIẾT & CHECK-IN'}
+            <button type="button" class="btn ${isWorking ? 'btn-primary' : 'btn-danger-outline'}" style="width:auto; padding:7px 14px; font-size:12px;" onclick="selectOutlet('${o.id}')">
+              ${isWorking ? 'TIẾP TỤC LÀM VIỆC →' : 'BẮT ĐẦU CA MỚI & CHECK-IN'}
             </button>
           </div>
         `;
@@ -1121,9 +1283,10 @@
       selectedOutlet = outlets.find(o => String(o.id) === String(outletId));
       if (!selectedOutlet) return;
 
-      const savedShiftData = localStorage.getItem(getShiftStorageKey(outletId));
+      const savedShiftData = localStorage.getItem(getActiveShiftStorageKey(outletId));
       if (savedShiftData) {
         const info = JSON.parse(savedShiftData);
+        activeShiftId = info.shiftId;
         enterWorkspace(info.checkInTime, info.gps);
         return;
       }
@@ -1220,29 +1383,45 @@
       }
 
       const gpsText = `${userCurrentLat.toFixed(6)}, ${userCurrentLng.toFixed(6)}`;
-      showLoading('Đang tải 2 ảnh Check-in đầu ca lên Drive & Sheet...');
+      showLoading('Đang tạo ca mới & tải 2 ảnh Check-in lên Drive...');
 
       try {
-        await callSheetApi({
-          action: 'saveRecord',
+        const res = await callSheetApi({
+          action: 'startShift',
           payload: {
             projectId: selectedOutlet.projectId,
             outletCode: selectedOutlet.code,
             outletName: selectedOutlet.name,
+            outletAddr: selectedOutlet.addr,
             staff: currentUser.username,
-            activityType: 'CHECKIN_DAU_CA',
             gps: gpsText,
             detailText: `Check-in đầu ca bởi ${currentUser.fullname}`,
             photos: [p1[0], p2[0]]
           }
         });
         hideLoading();
-        const nowTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-        localStorage.setItem(getShiftStorageKey(selectedOutlet.id), JSON.stringify({
-          checkInTime: nowTime,
+
+        activeShiftId = res.shiftId;
+        shiftHistory.unshift({
+          shiftId: res.shiftId,
+          projectId: selectedOutlet.projectId,
+          outletCode: selectedOutlet.code,
+          outletName: selectedOutlet.name,
+          outletAddr: selectedOutlet.addr,
+          staff: currentUser.username,
+          dateLabel: res.dateLabel,
+          startTime: res.startTime,
+          endTime: 'Đang làm',
+          status: 'WORKING'
+        });
+
+        localStorage.setItem(getActiveShiftStorageKey(selectedOutlet.id), JSON.stringify({
+          shiftId: res.shiftId,
+          checkInTime: res.startTime,
           gps: gpsText
         }));
-        enterWorkspace(nowTime, gpsText);
+
+        enterWorkspace(res.startTime, gpsText);
       } catch (err) {
         hideLoading();
         alert('Lỗi lưu Check-in: ' + err.message);
@@ -1259,18 +1438,14 @@
       showScreen('workspaceScreen');
     }
 
-    // ================= 4. HOẠT ĐỘNG & XEM LẠI HÌNH ẢNH =================
-    function getRecordsForCurrentOutlet(actType) {
-      return allActivityRecords.filter(r =>
-        r.projectId === selectedOutlet.projectId &&
-        r.outletCode === selectedOutlet.code &&
-        r.activityType === actType
-      );
+    // ================= 5. HOẠT ĐỘNG TRONG CA & TRỪ TỒN QUÀ =================
+    function getRecordsForCurrentShift(actType) {
+      return allActivityRecords.filter(r => r.shiftId === activeShiftId && r.activityType === actType);
     }
 
     function refreshOutletCounters() {
       ['BAN_HANG', 'VONG_QUAY', 'MINI_GAME', 'CHECKIN_FB'].forEach(type => {
-        document.getElementById('count_' + type).innerText = getRecordsForCurrentOutlet(type).length;
+        document.getElementById('count_' + type).innerText = getRecordsForCurrentShift(type).length;
       });
     }
 
@@ -1293,7 +1468,6 @@
 
       const schema = getSchemaFor(selectedOutlet.projectId, type);
 
-      // Render vùng chụp nhiều ảnh (mỗi mục tối đa 3 tấm để khớp 3 cột Anh_1, Anh_2, Anh_3 trên Sheet)
       const photoContainer = document.getElementById('dynamicPhotoFields');
       photoContainer.innerHTML = schema.photos.map((p, idx) => {
         const reqMark = p.required ? ' *' : '';
@@ -1302,7 +1476,7 @@
         photoGalleries[slotKey] = [];
         return `
           <div class="form-group">
-            <label>${p.label}${reqMark} <span style="font-weight:400; font-size:11px; color:var(--text-sub);">(Có thể chụp nhiều tấm nếu bill dài)</span></label>
+            <label>${p.label}${reqMark} <span style="font-weight:400; font-size:11px; color:var(--text-sub);">(Có thể chụp nhiều tấm)</span></label>
             <div id="${containerId}"></div>
           </div>
         `;
@@ -1312,7 +1486,6 @@
         renderPhotoGallery(`dynPhoto_${idx}`, `gallery_dynPhoto_${idx}`, 3);
       });
 
-      // Render các trường nhập chữ/số
       const textContainer = document.getElementById('dynamicTextFields');
       textContainer.innerHTML = schema.fields.map((f, idx) => {
         const reqMark = f.required ? ' *' : '';
@@ -1322,6 +1495,19 @@
         }
         return `<div class="form-group"><label>${f.label}${reqMark}</label><input type="${f.type}" id="dynField_${idx}" placeholder="Nhập ${f.label.toLowerCase()}"></div>`;
       }).join('');
+
+      // Hiển thị hộp chọn Quà tặng từ tồn kho điểm làm (nếu điểm có khai báo tồn quà)
+      const outletGifts = giftStocks.filter(g => g.projectId === selectedOutlet.projectId && g.outletCode === selectedOutlet.code);
+      const giftBox = document.getElementById('giftDeductionSection');
+      if (outletGifts.length > 0) {
+        giftBox.classList.remove('hidden');
+        document.getElementById('actGiftSelect').innerHTML =
+          `<option value="">-- Không phát quà / Chọn quà --</option>` +
+          outletGifts.map(g => `<option value="${g.id}">${g.name} (Tồn: ${g.remaining})</option>`).join('');
+        document.getElementById('actGiftQty').value = 1;
+      } else {
+        giftBox.classList.add('hidden');
+      }
 
       document.getElementById('activityModal').classList.remove('hidden');
     }
@@ -1339,7 +1525,22 @@
         detailParts.push(`${f.label}: ${val}`);
       }
 
-      // Gom tất cả các ảnh đã chụp từ các slot (tối đa 3 ảnh đẩy lên Sheet)
+      // Kiểm tra quà tặng & trừ tồn kho
+      let giftDeduction = null;
+      const giftBox = document.getElementById('giftDeductionSection');
+      if (!giftBox.classList.contains('hidden')) {
+        const selectedGiftId = document.getElementById('actGiftSelect').value;
+        const giftQty = parseInt(document.getElementById('actGiftQty').value) || 0;
+        if (selectedGiftId && giftQty > 0) {
+          const giftObj = giftStocks.find(g => g.id === selectedGiftId);
+          if (giftObj && giftQty > giftObj.remaining) {
+            return alert(`⚠️ Quà "${giftObj.name}" chỉ còn tồn ${giftObj.remaining}, không đủ phát ${giftQty}!`);
+          }
+          giftDeduction = { giftId: selectedGiftId, qty: giftQty };
+          detailParts.push(`Quà tặng: ${giftObj.name} (SL: ${giftQty})`);
+        }
+      }
+
       let allPhotosToUpload = [];
       for (let i = 0; i < schema.photos.length; i++) {
         const p = schema.photos[i];
@@ -1354,11 +1555,12 @@
       const detailText = detailParts.join(' | ');
       const gpsText = document.getElementById('wsGpsCoords').innerText;
 
-      showLoading(`Đang tải ${allPhotosToUpload.length} ảnh lên Drive và ghi về Sheet...`);
+      showLoading(`Đang lưu dữ liệu & ảnh lên Sheet...`);
       try {
         const res = await callSheetApi({
           action: 'saveRecord',
           payload: {
+            shiftId: activeShiftId,
             projectId: selectedOutlet.projectId,
             outletCode: selectedOutlet.code,
             outletName: selectedOutlet.name,
@@ -1366,11 +1568,23 @@
             activityType: currentActivityType,
             gps: gpsText,
             detailText: detailText,
-            photos: allPhotosToUpload
+            photos: allPhotosToUpload,
+            giftDeduction: giftDeduction
           }
         });
         hideLoading();
+
+        // Cập nhật tồn quà trên bộ nhớ cục bộ
+        if (giftDeduction) {
+          const g = giftStocks.find(item => item.id === giftDeduction.giftId);
+          if (g) {
+            g.usedQty += giftDeduction.qty;
+            g.remaining = Math.max(0, g.initialQty - g.usedQty);
+          }
+        }
+
         allActivityRecords.push({
+          shiftId: activeShiftId,
           time: res.time,
           projectId: selectedOutlet.projectId,
           outletCode: selectedOutlet.code,
@@ -1380,6 +1594,7 @@
           detailText: detailText,
           photos: res.photos || []
         });
+
         refreshOutletCounters();
         closeModal('activityModal');
         alert(`✅ Đã lưu thành công lên Google Sheet!`);
@@ -1390,12 +1605,12 @@
     }
 
     function openActivityList(type) {
-      const list = getRecordsForCurrentOutlet(type);
+      const list = getRecordsForCurrentShift(type);
       const body = document.getElementById('listModalBody');
-      document.getElementById('listModalTitle').innerText = `Danh sách tại ${selectedOutlet.code} (${list.length} lượt)`;
+      document.getElementById('listModalTitle').innerText = `Danh sách ca hiện tại (${list.length} lượt)`;
 
       if (list.length === 0) {
-        body.innerHTML = '<p style="color:var(--text-sub); text-align:center; padding:20px;">Điểm làm này chưa có dữ liệu nào.</p>';
+        body.innerHTML = '<p style="color:var(--text-sub); text-align:center; padding:20px;">Ca này chưa có dữ liệu nào.</p>';
       } else {
         body.innerHTML = list.map((item, idx) => `
           <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.08);">
@@ -1419,14 +1634,33 @@
       document.getElementById('listModal').classList.remove('hidden');
     }
 
-    function handleCheckOut() {
-      localStorage.removeItem(getShiftStorageKey(selectedOutlet.id));
+    // Check-out: Lưu giờ kết thúc ca vào Lịch sử + Reset điểm về Ca mới (0 lượt)
+    async function handleCheckOut() {
+      if (!confirm('Xác nhận CHECK-OUT kết thúc ca làm việc tại điểm này?')) return;
+
+      const now = new Date();
+      const endTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      showLoading('Đang chốt ca & lưu vào Lịch sử hoạt động...');
+      await callSheetApi({ action: 'endShift', shiftId: activeShiftId, endTime: endTime });
+      hideLoading();
+
+      const shiftObj = shiftHistory.find(s => s.shiftId === activeShiftId);
+      if (shiftObj) {
+        shiftObj.endTime = endTime;
+        shiftObj.status = 'COMPLETED';
+      }
+
+      // Xóa phiên ca hiện tại để điểm làm reset về "Ca mới" (bộ đếm về 0)
+      localStorage.removeItem(getActiveShiftStorageKey(selectedOutlet.id));
+      activeShiftId = '';
+
       renderOutlets();
       showScreen('outletListScreen');
-      alert(`✅ Đã Check-out kết thúc ca tại điểm ${selectedOutlet.name}!`);
+      alert(`✅ Đã Check-out lúc ${endTime}!\nCa làm việc đã lưu vào Lịch sử hoạt động và điểm làm đã sẵn sàng cho ca mới.`);
     }
 
-    // ================= 5. QUẢN TRỊ ADMIN =================
+    // ================= 6. QUẢN TRỊ ADMIN & SẮP XẾP THỨ TỰ FORM =================
     function switchAdminTab(tabId, btn) {
       document.querySelectorAll('.admin-pane').forEach(p => p.classList.add('hidden'));
       document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
@@ -1497,6 +1731,22 @@
       callSheetApi({ action: 'saveSchema', projectId: projId, schema: formSchemas[projId] });
     }
 
+    // Đổi thứ tự trường dữ liệu / ảnh chụp lên xuống
+    function moveSchemaItem(kind, idx, direction) {
+      const projId = document.getElementById('cfgProjSelect').value;
+      const actType = document.getElementById('cfgActSelect').value;
+      const arr = getSchemaFor(projId, actType)[kind];
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= arr.length) return;
+
+      const temp = arr[idx];
+      arr[idx] = arr[targetIdx];
+      arr[targetIdx] = temp;
+
+      persistSchemaToSheet(projId);
+      renderSchemaEditor();
+    }
+
     function renderSchemaEditor() {
       closeFieldEditor();
       closePhotoEditor();
@@ -1508,10 +1758,12 @@
       document.getElementById('schemaFieldsList').innerHTML = schema.fields.map((f, idx) => `
         <div class="schema-item">
           <div>
-            <strong>${f.label}</strong> ${f.required ? '<span style="color:#f87171">*</span>' : ''}
+            <strong>${idx + 1}. ${f.label}</strong> ${f.required ? '<span style="color:#f87171">*</span>' : ''}
             <div style="font-size:11px; color:var(--text-sub);">Kiểu: ${f.type} ${f.options ? '(' + f.options + ')' : ''}</div>
           </div>
           <div class="schema-actions">
+            <button type="button" class="icon-btn" onclick="moveSchemaItem('fields', ${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+            <button type="button" class="icon-btn" onclick="moveSchemaItem('fields', ${idx}, 1)" ${idx === schema.fields.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
             <button type="button" class="icon-btn" onclick="openFieldEditor(${idx})">✏️</button>
             <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.25);" onclick="deleteSchemaField(${idx})">🗑️</button>
           </div>
@@ -1520,8 +1772,10 @@
 
       document.getElementById('schemaPhotosList').innerHTML = schema.photos.map((p, idx) => `
         <div class="schema-item">
-          <div><strong>📷 ${p.label}</strong> ${p.required ? '<span style="color:#f87171">*</span>' : ''}</div>
+          <div><strong>📷 ${idx + 1}. ${p.label}</strong> ${p.required ? '<span style="color:#f87171">*</span>' : ''}</div>
           <div class="schema-actions">
+            <button type="button" class="icon-btn" onclick="moveSchemaItem('photos', ${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+            <button type="button" class="icon-btn" onclick="moveSchemaItem('photos', ${idx}, 1)" ${idx === schema.photos.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
             <button type="button" class="icon-btn" onclick="openPhotoEditor(${idx})">✏️</button>
             <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.25);" onclick="deleteSchemaPhoto(${idx})">🗑️</button>
           </div>
