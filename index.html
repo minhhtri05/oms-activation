@@ -306,8 +306,8 @@
         <div class="drawer-item" onclick="navFromDrawer('notifScreen')"><span class="ico">🔔</span> Thông báo</div>
         <div class="drawer-item" onclick="navFromDrawer('outletListScreen')"><span class="ico">🏪</span> Ca làm việc</div>
         <div class="drawer-item" onclick="navFromDrawer('historyScreen')"><span class="ico">🕒</span> Lịch sử hoạt động</div>
-        <div class="drawer-item" onclick="navFromDrawer('giftStockScreen')"><span class="ico">🎁</span> Tồn quà tặng</div>
-        <div class="drawer-item" onclick="navFromDrawer('warehouseScreen')"><span class="ico">📦</span> Kho Tổng & Xuất/Nhập</div>
+        <div id="drawerGiftItem" class="drawer-item hidden" onclick="navFromDrawer('giftStockScreen')"><span class="ico">🎁</span> Tồn quà tặng</div>
+        <div id="drawerWarehouseItem" class="drawer-item hidden" onclick="navFromDrawer('warehouseScreen')"><span class="ico">📦</span> Kho Tổng & Xuất/Nhập</div>
         <div class="drawer-item" onclick="navFromDrawer('projectInfoScreen')"><span class="ico">ℹ️</span> Thông tin dự án</div>
         <div class="drawer-item" onclick="navFromDrawer('supportScreen')"><span class="ico">❓</span> Đào tạo & Hỗ trợ</div>
         <div class="drawer-item" onclick="navFromDrawer('myProjectsScreen')"><span class="ico">⚙️</span> Dự án của tôi</div>
@@ -401,7 +401,7 @@
       </div>
 
       <!-- Form thêm mới / nhập tồn đầu quà tặng -->
-      <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); padding:12px; border-radius:12px; margin-bottom:14px;">
+      <div id="giftAddStockBox" style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); padding:12px; border-radius:12px; margin-bottom:14px;">
         <div style="font-size:13px; font-weight:700; color:#34d399; margin-bottom:8px;">➕ Thêm quà / Cập nhật tồn ban đầu</div>
         <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px; margin-bottom:8px;">
           <input type="text" id="gsNewName" placeholder="Tên quà (VD: Gấu bông)">
@@ -1046,6 +1046,9 @@
         } else {
           document.getElementById('drawerAdminItem').classList.add('hidden');
         }
+        const canManageStock = (currentUser.role === 'ADMIN' || currentUser.role === 'SUP');
+        document.getElementById('drawerGiftItem').classList.toggle('hidden', !canManageStock);
+        document.getElementById('drawerWarehouseItem').classList.toggle('hidden', !canManageStock);
 
         renderOutlets();
         showScreen('outletListScreen');
@@ -1250,6 +1253,8 @@
 
     // ================= 3. QUẢN LÝ TỒN QUÀ TẶNG =================
     function initGiftStockScreen() {
+      const canManageStock = (currentUser.role === 'ADMIN' || currentUser.role === 'SUP');
+      document.getElementById('giftAddStockBox').classList.toggle('hidden', !canManageStock);
       const pSel = document.getElementById('gsProjSelect');
       pSel.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
       if (currentUser.role !== 'ADMIN') pSel.value = currentUser.projectId;
@@ -1971,6 +1976,10 @@
     }
    // ================= QUẢN LÝ KHO TỔNG DỰ ÁN <-> BOOTH =================
     function initWarehouseScreen() {
+      if (currentUser.role !== 'ADMIN' && currentUser.role !== 'SUP') {
+        alert('⛔ Chỉ Sup và Admin mới có quyền truy cập Kho Tổng!');
+        return showScreen('outletListScreen');
+      }
       const pSel = document.getElementById('whProjSelect');
       pSel.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
       if (currentUser.role !== 'ADMIN') pSel.value = currentUser.projectId;
