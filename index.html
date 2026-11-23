@@ -258,7 +258,20 @@
     <div style="font-size:28px; margin-bottom:10px;">⏳</div>
     <div id="loadingText">Đang đồng bộ dữ liệu...</div>
   </div>
-
+<!-- MODAL CAMERA CHỤP TRỰC TIẾP (CHỐNG CHỌN ẢNH TỪ THƯ VIỆN) -->
+  <div id="liveCameraModal" class="lightbox-overlay hidden" style="z-index:3600; flex-direction:column; gap:12px;">
+    <div style="width:100%; max-width:480px; background:#0f172a; border:1px solid #38bdf8; border-radius:16px; overflow:hidden;">
+      <div style="padding:10px 14px; display:flex; justify-content:space-between; align-items:center; background:rgba(14,165,233,0.15);">
+        <span style="font-size:13px; font-weight:700; color:#38bdf8;">📸 CAMERA CHỤP TRỰC TIẾP</span>
+        <button type="button" class="icon-btn" onclick="switchLiveCameraFacing()">🔄 Đổi Cam</button>
+      </div>
+      <video id="liveCameraVideo" autoplay playsinline muted style="width:100%; max-height:62vh; background:#000; display:block; object-fit:cover;"></video>
+      <div style="padding:12px; display:flex; gap:10px;">
+        <button type="button" class="btn btn-success" style="flex:2;" onclick="snapLiveCameraPhoto()">📸 CHỤP ẢNH NGAY</button>
+        <button type="button" class="icon-btn" style="flex:1; background:rgba(239,68,68,0.25); color:#fca5a5;" onclick="closeLiveCamera()">✕ Đóng</button>
+      </div>
+    </div>
+  </div>
   <!-- LIGHTBOX XEM PHÓNG TO + TẢI ẢNH -->
   <div id="photoLightbox" class="lightbox-overlay hidden" onclick="closePhotoLightbox()">
     <div class="lightbox-card" onclick="event.stopPropagation()">
@@ -913,13 +926,11 @@
       const canAddMore = !maxCount || list.length < maxCount;
       let html = `<div class="photo-gallery-grid">`;
 
-      if (canAddMore) {
+     if (canAddMore) {
         html += `
-          <input type="file" id="input_${slotKey}" accept="image/*" capture="environment" class="hidden"
-                 onchange="handleGalleryCapture(this, '${slotKey}', '${containerId}', ${maxCount || 0})">
-          <div class="cam-tile" onclick="document.getElementById('input_${slotKey}').click()">
+          <div class="cam-tile" onclick="openLiveCamera('${slotKey}', '${containerId}', ${maxCount || 0})">
             <div class="cam-icon">📷</div>
-            <div class="cam-label">${list.length === 0 ? 'Chụp ảnh' : '+ Chụp thêm tấm nữa'}</div>
+            <div class="cam-label">${list.length === 0 ? 'Mở Camera chụp trực tiếp' : '+ Chụp thêm tấm nữa'}</div>
           </div>
         `;
       }
@@ -979,7 +990,83 @@
       };
       reader.readAsDataURL(file);
     }
+let liveCamStream = null;
+    let liveCamFacing = 'environment'; // 'environment' = cam sau, 'user' = cam trước
+    let liveCamTarget = { slotKey: '', containerId: '', maxCount: 0 };
 
+    async function openLiveCamera(slotKey, containerId, maxCount) {
+      liveCamTarget = { slotKey, containerId, maxCount };
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('⚠️ Trình duyệt Zalo đang chặn Camera. Vui lòng bấm dấu ⋮ góc trên phải -> chọn "Mở bằng trình duyệt (Chrome/Safari)"!');
+        return;
+      }
+
+      try {
+        if (liveCamStream) {
+          liveCamStream.getTracks().forEach(t => t.stop());
+        }
+        liveCamStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: liveCamFacing, width: { ideal: 1280 }, height: { ideal: 960 } },
+          audio: false
+        });
+        const video = document.getElementById('liveCameraVideo');
+        video.srcObject = liveCamStream;
+        document.getElementById('liveCameraModal').classList.remove('hidden');
+      } catch (err) {
+        alert('⚠️ Không mở được Camera trực tiếp!\nNếu bạn đang mở link trong Zalo, hãy bấm dấu ⋮ góc trên -> chọn "Mở bằng trình duyệt" (Chrome/Safari) và cấp quyền Camera.');
+      }
+    }
+
+    function switchLiveCameraFacing() {
+      liveCamFacing = (liveCamFacing === 'environment') ? 'user' : 'environment';
+      openLiveCamera(liveCamTarget.slotKey, liveCamTarget.containerId, liveCamTarget.maxCount);
+    }
+
+    function closeLiveCamera() {
+      if (liveCamStream) {
+        liveCamStream.getTracks().forEach(t => t.stop());
+        liveCamStream = null;
+      }
+      document.getElementById('liveCameraModal').classList.add('hidden');
+    }
+
+    function snapLiveCameraPhoto() {
+      const video = document.getElementById('liveCameraVideo');
+      if (!video || !video.videoWidth) return;
+
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 960;
+      const scale = MAX_WIDTH / video.videoWidth;
+      canvas.width = MAX_WIDTH;
+      canvas.height = video.videoHeight * scale;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Đóng dấu thời gian + Mã điểm + GPS trực tiếp lên ảnh
+      const now = new Date().toLocaleString('vi-VN');
+      const gpsStr = userCurrentLat ? `${userCurrentLat.toFixed(5)}, ${userCurrentLng.toFixed(5)}` : 'N/A';
+      const code = selectedOutlet ? selectedOutlet.code : (document.getElementById('whBoothSelect')?.value || 'OMS');
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+      ctx.fillRect(0, canvas.height - 34, canvas.width, 34);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText(`${now} | ${code} | GPS: ${gpsStr}`, 12, canvas.height - 11);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+      const { slotKey, containerId, maxCount } = liveCamTarget;
+
+      if (!photoGalleries[slotKey]) photoGalleries[slotKey] = [];
+      photoGalleries[slotKey].push(dataUrl);
+
+      const autoDl = document.getElementById('autoDownloadToggle');
+      if (!autoDl || autoDl.checked) {
+        triggerImageDownload(dataUrl, currentActivityType || 'CHECKIN');
+      }
+
+      closeLiveCamera();
+      renderPhotoGallery(slotKey, containerId, maxCount);
+    }
     function deleteGalleryPhoto(slotKey, containerId, idx, maxCount) {
       if (photoGalleries[slotKey]) {
         photoGalleries[slotKey].splice(idx, 1);
