@@ -1600,16 +1600,17 @@
     }
 
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
     async function saveActivityRecord() {
       const schema = getSchemaFor(selectedOutlet.projectId, currentActivityType);
       let detailParts = [];
+      let structuredFields = [];
 
       for (let i = 0; i < schema.fields.length; i++) {
         const f = schema.fields[i];
         const val = document.getElementById(`dynField_${i}`).value.trim();
         if (f.required && !val) return alert(`⚠️ Vui lòng nhập trường bắt buộc: "${f.label}"!`);
         detailParts.push(`${f.label}: ${val}`);
+        structuredFields.push({ label: f.label, value: val });
       }
 
       // Kiểm tra quà tặng & trừ tồn kho
@@ -1625,6 +1626,8 @@
           }
           giftDeduction = { giftId: selectedGiftId, qty: giftQty };
           detailParts.push(`Quà tặng: ${giftObj.name} (SL: ${giftQty})`);
+          structuredFields.push({ label: 'Quà tặng', value: giftObj.name });
+          structuredFields.push({ label: 'SL quà', value: giftQty });
         }
       }
 
@@ -1655,41 +1658,11 @@
             activityType: currentActivityType,
             gps: gpsText,
             detailText: detailText,
+            structuredFields: structuredFields,
             photos: allPhotosToUpload,
             giftDeduction: giftDeduction
           }
         });
-        hideLoading();
-
-        // Cập nhật tồn quà trên bộ nhớ cục bộ
-        if (giftDeduction) {
-          const g = giftStocks.find(item => item.id === giftDeduction.giftId);
-          if (g) {
-            g.usedQty += giftDeduction.qty;
-            g.remaining = Math.max(0, g.initialQty - g.usedQty);
-          }
-        }
-
-        allActivityRecords.push({
-          shiftId: activeShiftId,
-          time: res.time,
-          projectId: selectedOutlet.projectId,
-          outletCode: selectedOutlet.code,
-          outletName: selectedOutlet.name,
-          staff: currentUser.username,
-          activityType: currentActivityType,
-          detailText: detailText,
-          photos: res.photos || []
-        });
-
-        refreshOutletCounters();
-        closeModal('activityModal');
-        alert(`✅ Đã lưu thành công lên Google Sheet!`);
-      } catch (err) {
-        hideLoading();
-        alert('Lỗi lưu dữ liệu: ' + err.message);
-      }
-    }
 
     function openActivityList(type) {
       const list = getRecordsForCurrentShift(type);
