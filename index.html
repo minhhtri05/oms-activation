@@ -250,6 +250,123 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center; color: #38bdf8; font-weight: 700;
     }
     .hidden { display: none !important; }
+    /* === POS CHỌN SẢN PHẨM TRONG HOẠT ĐỘNG BÁN HÀNG === */
+    .pos-section-box {
+      background: rgba(14, 165, 233, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .pos-card {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .pos-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+    .pos-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(14, 165, 233, 0.15);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .pos-dropdown {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      border-radius: 10px;
+      max-height: 210px;
+      overflow-y: auto;
+      z-index: 2500;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75);
+    }
+    .pos-dropdown-item {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 9px 12px;
+      color: #f8fafc;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .pos-dropdown-item:hover { background: rgba(14, 165, 233, 0.2); }
+    .pos-selected-tag {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .pos-unit-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      background: rgba(30, 41, 59, 0.9);
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .pos-unit-btn {
+      border: none;
+      border-radius: 7px;
+      padding: 8px 4px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      background: transparent;
+      color: #94a3b8;
+    }
+    .pos-unit-btn.active {
+      background: #0ea5e9;
+      color: #fff;
+    }
+    .pos-subtotal-bar {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 8px;
+      padding: 7px 10px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .pos-grand-box {
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.22), rgba(16, 185, 129, 0.18));
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   </style>
 </head>
 <body onclick="closeRightDropdownOnOutside(event)">
@@ -681,7 +798,9 @@
       </div>
       <div id="dynamicPhotoFields"></div>
       <div id="dynamicTextFields"></div>
-
+      <!-- Khối thêm nhiều sản phẩm bán hàng (Chỉ hiện ở Hoạt động bán hàng) -->
+      <div id="salesProductSection" class="pos-section-box hidden"></div>
+  
       <!-- Khối chọn quà tặng từ kho tồn của điểm (Tự động giảm tồn đầu khi lưu) -->
       <div id="giftDeductionSection" class="gift-stock-box hidden">
         <div style="font-size:12px; font-weight:700; color:#34d399; margin-bottom:8px;">🎁 Quà tặng phát cho khách (Tự động trừ tồn kho)</div>
@@ -1688,7 +1807,349 @@ let liveCamStream = null;
       }
       return formSchemas[projectId][actType];
     }
+// ================= DANH MỤC SẢN PHẨM & POS BÁN HÀNG =================
+    const PRODUCT_CATALOG = [
+      // Nhóm Tăng Chiều Cao
+      { id: 'CC01', name: 'SB GrowPLUS+ Bạc TCC 1+ 800G', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 435 },
+      { id: 'CC02', name: 'SB GrowPLUS+ Bạc TCC 2+ 800G', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 425 },
+      { id: 'CC03', name: 'SBPS GrowPLUS+ Bạc TCC', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 36 },
+      { id: 'CC04', name: 'SB NuVi Grow Height 1+ 800G', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 375 },
+      { id: 'CC05', name: 'SB NuVi Grow Height 2+ 800G', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 365 },
+      { id: 'CC06', name: 'SBPS NuVi Grow Height Ít Ngọt', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 34 },
+      { id: 'CC07', name: 'SBPS NuVi Grow Height Vị Chuối', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 34 },
 
+      // Nhóm Tăng Đề Kháng
+      { id: 'DK01', name: 'SB GrowPLUS+ Sữa non vàng 0+ 400G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '400g', defaultPrice: 285 },
+      { id: 'DK02', name: 'SB GrowPLUS+ Sữa non vàng 0+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 515 },
+      { id: 'DK03', name: 'SB GrowPLUS+ Sữa non vàng 1+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 495 },
+      { id: 'DK04', name: 'SB GrowPLUS+ Sữa non vàng 2+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 485 },
+      { id: 'DK05', name: 'SBPS GrowPLUS+ Sữa non vàng 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 42 },
+      { id: 'DK06', name: 'SBPS GrowPLUS+ Sữa non vàng 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 42 },
+      { id: 'DK07', name: 'SB GrowPLUS+ Immunel 0+ 400G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '400g', defaultPrice: 295 },
+      { id: 'DK08', name: 'SB GrowPLUS+ Immunel 0+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 525 },
+      { id: 'DK09', name: 'SB GrowPLUS+ Immunel 1+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 505 },
+      { id: 'DK10', name: 'SB GrowPLUS+ Immunel 2+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 495 },
+      { id: 'DK11', name: 'SBPS GrowPLUS+ Immunel 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 44 },
+      { id: 'DK12', name: 'SBPS GrowPLUS+ Immunel 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 44 },
+      { id: 'DK13', name: 'SB GrowPLUS+ Colostrum Lactoferrin 0+ 400G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '400g', defaultPrice: 315 },
+      { id: 'DK14', name: 'SB GrowPLUS+ Colostrum Lactoferrin 0+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 565 },
+      { id: 'DK15', name: 'SB GrowPLUS+ Colostrum Lactoferrin 1+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 545 },
+      { id: 'DK16', name: 'SB GrowPLUS+ Colostrum Lactoferrin 2+ 800G', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 535 },
+      { id: 'DK17', name: 'SBPS GrowPLUS+ Colostrum Lactoferrin 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 46 },
+      { id: 'DK18', name: 'SBPS GrowPLUS+ Colostrum Lactoferrin 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 46 },
+
+      // Nhóm Tiêu Hóa Tốt
+      { id: 'TH01', name: 'SB GrowPLUS+ Xanh nhạt 0+ 800G', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 395 },
+      { id: 'TH02', name: 'SB GrowPLUS+ Xanh nhạt 1+ 800G', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 385 },
+      { id: 'TH03', name: 'SB GrowPLUS+ Xanh nhạt 2+ 800G', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 375 },
+      { id: 'TH04', name: 'SBPS GrowPLUS+ Xanh nhạt 1+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 35 },
+      { id: 'TH05', name: 'SBPS GrowPLUS+ Xanh nhạt 2+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 35 },
+
+      // Nhóm Tăng Cân
+      { id: 'TC01', name: 'SB GrowPLUS+ Xanh 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 350 },
+      { id: 'TC02', name: 'SB GrowPLUS+ Xanh 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 340 },
+      { id: 'TC03', name: 'SBPS GrowPLUS+ Xanh 1+', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 33 },
+      { id: 'TC04', name: 'SBPS GrowPLUS+ Xanh 2+', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 33 },
+      { id: 'TC05', name: 'SB GrowPLUS+ Đỏ 0+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '780g', defaultPrice: 395 },
+      { id: 'TC06', name: 'SB GrowPLUS+ Đỏ 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 410 },
+      { id: 'TC07', name: 'SB GrowPLUS+ Đỏ 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 395 },
+      { id: 'TC08', name: 'SBPS GrowPLUS+ Đỏ', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 36 },
+      { id: 'TC09', name: 'SBPS GrowPLUS+ Đỏ ít đường', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 36 }
+    ];
+
+    const UNIT_SPECS = {
+      'Lon': ['350g', '400g', '780g', '800g', '850g', '900g', '1.5kg', '1.65kg'],
+      'Lốc': ['110ml', '180ml']
+    };
+
+    let posRowCounter = 0;
+
+    function removeVietnameseTones(str) {
+      if (!str) return '';
+      return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+    }
+
+    function formatCurrencyVND(num) {
+      if (!num || isNaN(num)) return '0';
+      return Number(num).toLocaleString('vi-VN');
+    }
+
+    function parsePriceInVND(val) {
+      const num = parseFloat(String(val).replace(',', '.'));
+      if (isNaN(num) || num <= 0) return 0;
+      return Math.round(num * 1000);
+    }
+
+    function initSalesProductSection() {
+      posRowCounter = 0;
+      const box = document.getElementById('salesProductSection');
+      box.classList.remove('hidden');
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <strong style="font-size:13px; color:#38bdf8;">🛒 Danh sách sản phẩm khách mua *</strong>
+          <span style="font-size:11px; color:var(--text-sub);">Gõ từ khóa (VD: colostrum)</span>
+        </div>
+
+        <div id="posProductsContainer"></div>
+
+        <div id="posAddControlBox" style="display:flex; gap:8px; margin-top:8px;">
+          <button type="button" class="btn btn-primary btn-sm" style="flex:2;" onclick="addPosProductRow()">+ Thêm SP tiếp</button>
+          <button type="button" class="icon-btn" style="flex:1; background:rgba(239,68,68,0.2); color:#fca5a5;" onclick="stopPosAdding()">Nhập 0 (Dừng)</button>
+        </div>
+
+        <div id="posStoppedBanner" class="hidden" style="background:rgba(16,185,129,0.15); border:1px solid #10b981; border-radius:10px; padding:9px 12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+          <span style="color:#34d399; font-weight:700;">✓ Đã chốt danh sách SP (0)</span>
+          <button type="button" class="icon-btn" onclick="resumePosAdding()">Mở lại</button>
+        </div>
+
+        <div class="pos-grand-box">
+          <div>
+            <div style="font-size:11px; color:var(--text-sub); text-transform:uppercase; font-weight:700;">Tổng tiền tất cả SP</div>
+            <div style="font-size:12px; color:#34d399;"><strong id="posValidCount">0</strong> sản phẩm</div>
+          </div>
+          <div id="posGrandTotalDisplay" style="font-size:19px; font-weight:800; color:#38bdf8;">0 ₫</div>
+        </div>
+      `;
+      addPosProductRow();
+    }
+
+    function addPosProductRow() {
+      posRowCounter++;
+      const rowId = `posRow_${posRowCounter}`;
+      const container = document.getElementById('posProductsContainer');
+
+      const card = document.createElement('div');
+      card.id = rowId;
+      card.className = 'pos-card';
+      card.innerHTML = `
+        <div class="pos-card-header">
+          <span class="pos-badge">Sản phẩm #${posRowCounter}</span>
+          <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.2); color:#fca5a5; padding:3px 8px;" onclick="removePosRow('${rowId}')">🗑️</button>
+        </div>
+
+        <div style="position:relative;">
+          <div class="pos-search-wrap">
+            <input type="text" class="pos-search-input" placeholder="🔍 Gõ tên SP (VD: colostrum) hoặc 0 để dừng..."
+                   oninput="handlePosSearch(this, '${rowId}')" onfocus="handlePosSearch(this, '${rowId}')" autocomplete="off">
+          </div>
+          <div class="pos-dropdown hidden"></div>
+          <div class="pos-selected-tag hidden">
+            <span class="pos-selected-name" style="font-size:13px; font-weight:700; color:#34d399;"></span>
+            <button type="button" class="icon-btn" style="font-size:11px;" onclick="clearPosProduct('${rowId}')">Đổi SP</button>
+          </div>
+        </div>
+
+        <div class="pos-details hidden">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+            <div>
+              <label style="font-size:11px; margin-bottom:4px;">Đơn vị tính</label>
+              <div class="pos-unit-switch">
+                <button type="button" class="pos-unit-btn pos-btn-lon active" onclick="selectPosUnit('${rowId}', 'Lon')">Lon</button>
+                <button type="button" class="pos-unit-btn pos-btn-loc" onclick="selectPosUnit('${rowId}', 'Lốc')">Lốc</button>
+              </div>
+              <input type="hidden" class="pos-unit-val" value="Lon">
+            </div>
+            <div>
+              <label class="pos-spec-label" style="font-size:11px; margin-bottom:4px;">Quy cách Lon</label>
+              <select class="pos-spec-select">
+                ${UNIT_SPECS['Lon'].map(w => `<option value="${w}" ${w === '800g' ? 'selected' : ''}>${w}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px;">
+            <div>
+              <label style="font-size:11px; margin-bottom:4px;">Số lượng</label>
+              <input type="number" min="0" inputmode="numeric" value="1" class="pos-qty-input" style="text-align:center; font-weight:700;"
+                     oninput="calcPosRowAndGrandTotal('${rowId}')">
+            </div>
+            <div>
+              <label style="font-size:11px; margin-bottom:4px;">Đơn giá (x 1.000đ)</label>
+              <div style="position:relative;">
+                <input type="number" step="any" min="0" inputmode="decimal" placeholder="VD: 545" class="pos-price-input"
+                       style="padding-right:48px; text-align:right; font-weight:700;" oninput="calcPosRowAndGrandTotal('${rowId}')">
+                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#94a3b8; font-weight:700;">.000đ</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pos-subtotal-bar">
+            <span style="color:var(--text-sub);">Thành tiền SP này:</span>
+            <strong class="pos-row-subtotal" style="color:#f8fafc;">0 ₫</strong>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function handlePosSearch(inputEl, rowId) {
+      const rawVal = inputEl.value;
+      const keyword = rawVal.trim().toLowerCase();
+      const row = document.getElementById(rowId);
+      const dropdown = row.querySelector('.pos-dropdown');
+
+      if (keyword === '0') {
+        dropdown.classList.add('hidden');
+        inputEl.value = '';
+        stopPosAdding();
+        return;
+      }
+
+      const normKey = removeVietnameseTones(keyword);
+      const matches = PRODUCT_CATALOG.filter(item =>
+        removeVietnameseTones(item.name).includes(normKey) ||
+        removeVietnameseTones(item.group).includes(normKey)
+      );
+
+      if (matches.length === 0) {
+        dropdown.innerHTML = `<div style="padding:10px; font-size:12px; color:#94a3b8; text-align:center;">Không tìm thấy "${rawVal}"</div>`;
+      } else {
+        dropdown.innerHTML = matches.map(item => `
+          <button type="button" class="pos-dropdown-item" onclick="selectPosProduct('${rowId}', '${item.id}')">
+            <div>
+              <div style="font-size:13px; font-weight:700;">${item.name}</div>
+              <div style="font-size:11px; color:#94a3b8;">${item.group} • ${item.defaultUnit} (${item.defaultSpec}) - ${item.defaultPrice}k</div>
+            </div>
+            <span style="font-size:11px; color:#38bdf8; font-weight:700;">Chọn</span>
+          </button>
+        `).join('');
+      }
+      dropdown.classList.remove('hidden');
+    }
+
+    function selectPosProduct(rowId, prodId) {
+      const prod = PRODUCT_CATALOG.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const row = document.getElementById(rowId);
+      row.dataset.selectedProduct = prod.name;
+
+      row.querySelector('.pos-dropdown').classList.add('hidden');
+      row.querySelector('.pos-search-wrap').classList.add('hidden');
+
+      const tag = row.querySelector('.pos-selected-tag');
+      tag.querySelector('.pos-selected-name').textContent = '✓ ' + prod.name;
+      tag.classList.remove('hidden');
+
+      row.querySelector('.pos-details').classList.remove('hidden');
+      selectPosUnit(rowId, prod.defaultUnit || 'Lon', prod.defaultSpec);
+      row.querySelector('.pos-price-input').value = prod.defaultPrice || '';
+
+      calcPosRowAndGrandTotal(rowId);
+    }
+
+    function clearPosProduct(rowId) {
+      const row = document.getElementById(rowId);
+      delete row.dataset.selectedProduct;
+      row.querySelector('.pos-search-input').value = '';
+      row.querySelector('.pos-search-wrap').classList.remove('hidden');
+      row.querySelector('.pos-selected-tag').classList.add('hidden');
+      row.querySelector('.pos-details').classList.add('hidden');
+      row.querySelector('.pos-qty-input').value = 1;
+      row.querySelector('.pos-price-input').value = '';
+      row.querySelector('.pos-row-subtotal').textContent = '0 ₫';
+      calcPosRowAndGrandTotal();
+    }
+
+    function selectPosUnit(rowId, unit, preferredSpec = null) {
+      const row = document.getElementById(rowId);
+      const btnLon = row.querySelector('.pos-btn-lon');
+      const btnLoc = row.querySelector('.pos-btn-loc');
+      const specLabel = row.querySelector('.pos-spec-label');
+      const specSelect = row.querySelector('.pos-spec-select');
+      row.querySelector('.pos-unit-val').value = unit;
+
+      const specs = UNIT_SPECS[unit] || [];
+      const defaultVal = (preferredSpec && specs.includes(preferredSpec)) ? preferredSpec : (unit === 'Lon' ? '800g' : '110ml');
+      specSelect.innerHTML = specs.map(s => `<option value="${s}" ${s === defaultVal ? 'selected' : ''}>${s}</option>`).join('');
+
+      if (unit === 'Lon') {
+        btnLon.classList.add('active');
+        btnLoc.classList.remove('active');
+        specLabel.textContent = 'Quy cách Lon';
+      } else {
+        btnLoc.classList.add('active');
+        btnLon.classList.remove('active');
+        specLabel.textContent = 'Dung tích Lốc';
+      }
+    }
+
+    function calcPosRowAndGrandTotal(rowId) {
+      if (rowId) {
+        const row = document.getElementById(rowId);
+        if (row) {
+          const qty = parseInt(row.querySelector('.pos-qty-input').value, 10) || 0;
+          const priceVND = parsePriceInVND(row.querySelector('.pos-price-input').value);
+          row.querySelector('.pos-row-subtotal').textContent = formatCurrencyVND(qty * priceVND) + ' ₫';
+        }
+      }
+
+      let grandTotal = 0;
+      let validItems = 0;
+      document.querySelectorAll('.pos-card').forEach(r => {
+        if (r.dataset.selectedProduct) {
+          const qty = parseInt(r.querySelector('.pos-qty-input').value, 10) || 0;
+          const priceVND = parsePriceInVND(r.querySelector('.pos-price-input').value);
+          if (qty > 0) {
+            grandTotal += qty * priceVND;
+            validItems++;
+          }
+        }
+      });
+
+      const disp = document.getElementById('posGrandTotalDisplay');
+      const cnt = document.getElementById('posValidCount');
+      if (disp) disp.textContent = formatCurrencyVND(grandTotal) + ' ₫';
+      if (cnt) cnt.textContent = validItems;
+
+      // Tự động điền tổng tiền vào ô "Tổng giá trị đơn hàng (VNĐ)" nếu có trong form động
+      const schema = getSchemaFor(selectedOutlet.projectId, 'BAN_HANG');
+      schema.fields.forEach((f, idx) => {
+        const lbl = f.label.toLowerCase();
+        if (lbl.includes('tổng giá trị') || lbl.includes('tổng tiền') || lbl.includes('doanh số')) {
+          const inp = document.getElementById(`dynField_${idx}`);
+          if (inp) inp.value = grandTotal;
+        }
+      });
+    }
+
+    function removePosRow(rowId) {
+      const cards = document.querySelectorAll('.pos-card');
+      if (cards.length === 1) {
+        clearPosProduct(rowId);
+        return;
+      }
+      document.getElementById(rowId).remove();
+      document.querySelectorAll('.pos-card').forEach((c, i) => {
+        c.querySelector('.pos-badge').textContent = `Sản phẩm #${i + 1}`;
+      });
+      calcPosRowAndGrandTotal();
+    }
+
+    function stopPosAdding() {
+      const cards = Array.from(document.querySelectorAll('.pos-card'));
+      const selected = cards.filter(c => c.dataset.selectedProduct);
+      if (selected.length > 0) {
+        cards.forEach(c => { if (!c.dataset.selectedProduct) c.remove(); });
+        document.querySelectorAll('.pos-card').forEach((c, i) => {
+          c.querySelector('.pos-badge').textContent = `Sản phẩm #${i + 1}`;
+        });
+      }
+      document.getElementById('posAddControlBox').classList.add('hidden');
+      document.getElementById('posStoppedBanner').classList.remove('hidden');
+      calcPosRowAndGrandTotal();
+    }
+
+    function resumePosAdding() {
+      document.getElementById('posStoppedBanner').classList.add('hidden');
+      document.getElementById('posAddControlBox').classList.remove('hidden');
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.pos-card')) {
+        document.querySelectorAll('.pos-dropdown').forEach(d => d.classList.add('hidden'));
+      }
+    });
     function openActivityForm(type) {
       currentActivityType = type;
       const titles = {
@@ -1742,6 +2203,15 @@ let liveCamStream = null;
         giftBox.classList.add('hidden');
       }
 
+    // Bật khung thêm nhiều sản phẩm khi ở Hoạt động bán hàng
+      const salesBox = document.getElementById('salesProductSection');
+      if (type === 'BAN_HANG') {
+        initSalesProductSection();
+      } else {
+        salesBox.classList.add('hidden');
+        salesBox.innerHTML = '';
+      }
+
       document.getElementById('activityModal').classList.remove('hidden');
     }
 
@@ -1758,7 +2228,35 @@ let liveCamStream = null;
         detailParts.push(`${f.label}: ${val}`);
         structuredFields.push({ label: f.label, value: val });
       }
+// Thu thập danh sách sản phẩm đã chọn (nếu là Hoạt động bán hàng)
+      if (currentActivityType === 'BAN_HANG') {
+        const posItems = [];
+        let posGrandTotal = 0;
 
+        document.querySelectorAll('.pos-card').forEach(row => {
+          const name = row.dataset.selectedProduct;
+          if (name) {
+            const unit = row.querySelector('.pos-unit-val').value;
+            const spec = row.querySelector('.pos-spec-select').value;
+            const qty = parseInt(row.querySelector('.pos-qty-input').value, 10) || 0;
+            const price = parsePriceInVND(row.querySelector('.pos-price-input').value);
+            if (qty > 0) {
+              posItems.push(`${name} [${unit} ${spec} x ${qty} = ${formatCurrencyVND(qty * price)}đ]`);
+              posGrandTotal += qty * price;
+            }
+          }
+        });
+
+        if (posItems.length === 0) {
+          return alert('⚠️ Vui lòng chọn ít nhất 1 sản phẩm có số lượng > 0!');
+        }
+
+        const productSummaryText = posItems.join('; ');
+        detailParts.push(`Sản phẩm mua: ${productSummaryText}`);
+        detailParts.push(`Tổng tiền SP: ${formatCurrencyVND(posGrandTotal)}đ`);
+        structuredFields.push({ label: 'Chi tiết sản phẩm', value: productSummaryText });
+        structuredFields.push({ label: 'Số dòng SP', value: posItems.length });
+      }
       // Kiểm tra quà tặng & trừ tồn kho
       let giftDeduction = null;
       const giftBox = document.getElementById('giftDeductionSection');
