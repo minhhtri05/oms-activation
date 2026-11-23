@@ -1645,7 +1645,7 @@
       const detailText = detailParts.join(' | ');
       const gpsText = document.getElementById('wsGpsCoords').innerText;
 
-      showLoading(`Đang lưu dữ liệu & ảnh lên Sheet...`);
+    showLoading(`Đang lưu dữ liệu & ảnh lên Sheet...`);
       try {
         const res = await callSheetApi({
           action: 'saveRecord',
@@ -1663,6 +1663,40 @@
             giftDeduction: giftDeduction
           }
         });
+        hideLoading();
+
+        if (!res.success) {
+          return alert('❌ Lỗi lưu dữ liệu: ' + (res.message || 'Không xác định'));
+        }
+
+        allActivityRecords.push({
+          time: res.time,
+          projectId: selectedOutlet.projectId,
+          outletCode: selectedOutlet.code,
+          outletName: selectedOutlet.name,
+          staff: currentUser.username,
+          activityType: currentActivityType,
+          detailText: detailText,
+          photos: res.photos || [],
+          shiftId: activeShiftId
+        });
+
+        if (giftDeduction) {
+          const giftObj = giftStocks.find(g => g.id === giftDeduction.giftId);
+          if (giftObj) {
+            giftObj.usedQty += giftDeduction.qty;
+            giftObj.remaining = Math.max(0, giftObj.initialQty - giftObj.usedQty);
+          }
+        }
+
+        refreshOutletCounters();
+        closeModal('activityModal');
+        alert('✅ Đã lưu dữ liệu thành công!');
+      } catch (err) {
+        hideLoading();
+        alert('❌ Lỗi kết nối khi lưu dữ liệu: ' + err.message);
+      }
+    }
 
     function openActivityList(type) {
       const list = getRecordsForCurrentShift(type);
