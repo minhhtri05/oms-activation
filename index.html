@@ -377,9 +377,13 @@
     </div>
   </div>
 
-  <!-- 3. LỊCH SỬ HOẠT ĐỘNG (THEO TỪNG CA ĐÃ LÀM - GIỐNG MẪU) -->
+ <!-- 3. LỊCH SỬ HOẠT ĐỘNG (THEO TỪNG CA ĐÃ LÀM) -->
   <div id="historyScreen" class="container hidden">
-    <h3 style="margin-bottom:14px; color:#38bdf8;">🕒 LỊCH SỬ HOẠT ĐỘNG</h3>
+    <h3 style="margin-bottom:10px; color:#38bdf8;">🕒 LỊCH SỬ HOẠT ĐỘNG</h3>
+    <div id="supHistoryFilterBox" class="form-group hidden">
+      <label>Lọc theo nhân viên (PG / Sup)</label>
+      <select id="historyStaffFilter" onchange="renderShiftHistoryList()"></select>
+    </div>
     <div id="shiftHistoryListContainer"></div>
   </div>
 
@@ -735,7 +739,7 @@
       <button type="button" class="btn btn-primary" onclick="adminAddOutlet()">LƯU ĐIỂM LÀM VÀO SHEET</button>
     </div>
 
-    <div id="tabAddUser" class="glass-card admin-pane hidden">
+   <div id="tabAddUser" class="glass-card admin-pane hidden">
       <h4 style="margin-bottom:12px;">Cấp Tài Khoản Nhân Sự</h4>
       <div class="form-group"><label>Phân công vào Dự án *</label><select id="userProjSelect"></select></div>
       <div class="form-group">
@@ -744,6 +748,12 @@
           <option value="PG">PG (Nhân viên điểm bán)</option>
           <option value="SUP">SUP (Giám sát tuyến)</option>
           <option value="ADMIN">ADMIN (Quản trị toàn hệ thống)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sup quản lý (Nếu tạo tài khoản PG)</label>
+        <select id="newUserSupSelect">
+          <option value="">-- Tất cả Sup trong dự án --</option>
         </select>
       </div>
       <div class="form-group"><label>Tên đăng nhập *</label><input type="text" id="newUsername" placeholder="VD: pg02"></div>
@@ -876,6 +886,7 @@
     };
 
     let projects = [];
+    let allUsersList = [];
     let outlets = [];
     let formSchemas = {};
     let shiftHistory = [];
@@ -1108,6 +1119,7 @@ let liveCamStream = null;
 
         currentUser = res.user;
         projects = res.projects;
+        allUsersList = res.allUsers || [];
         outlets = res.outlets;
         formSchemas = res.formSchemas || {};
         shiftHistory = res.shifts || [];
@@ -1248,41 +1260,78 @@ let liveCamStream = null;
       showScreen('outletListScreen');
     }
 
-    // Cấp 1 Lịch sử: Danh sách các ca làm việc đã làm
+   // Cấp 1 Lịch sử: Danh sách các ca làm việc (Sup xem được tất cả ca của PG thuộc tuyến)
     function renderShiftHistoryList() {
       const container = document.getElementById('shiftHistoryListContainer');
-      if (shiftHistory.length === 0) {
+      const filterBox = document.getElementById('supHistoryFilterBox');
+      const filterSel = document.getElementById('historyStaffFilter');
+
+      if (currentUser.role === 'SUP' || currentUser.role === 'ADMIN') {
+        filterBox.classList.remove('hidden');
+        const prevVal = filterSel.value;
+        const uniqueStaffs = [];
+        const seen = new Set();
+        shiftHistory.forEach(s => {
+          if (!seen.has(s.staff)) {
+            seen.add(s.staff);
+            uniqueStaffs.push({ username: s.staff, fullname: s.staffName || s.staff });
+          }
+        });
+        filterSel.innerHTML = `<option value="ALL">-- Tất cả nhân viên (${shiftHistory.length} ca) --</option>` +
+          uniqueStaffs.map(u => `<option value="${u.username}">${u.fullname} (${u.username})</option>`).join('');
+        if (prevVal && (prevVal === 'ALL' || seen.has(prevVal))) filterSel.value = prevVal;
+      } else {
+        filterBox.classList.add('hidden');
+      }
+
+      const selectedStaff = (currentUser.role === 'SUP' || currentUser.role === 'ADMIN') ? filterSel.value : 'ALL';
+      const filteredShifts = (selectedStaff === 'ALL')
+        ? shiftHistory
+        : shiftHistory.filter(s => s.staff === selectedStaff);
+
+      if (filteredShifts.length === 0) {
         container.innerHTML = '<div class="glass-card"><p style="color:var(--text-sub); text-align:center;">Chưa có lịch sử ca làm việc nào.</p></div>';
         return;
       }
 
-      container.innerHTML = shiftHistory.map(s => `
-        <div class="shift-history-card" onclick="openShiftHistoryDetail('${s.shiftId}')">
-          <div class="shift-card-banner">
-            <span>${s.dateLabel} • ${s.startTime} => ${s.endTime}</span>
-            <span>${s.status === 'WORKING' ? '🟢 Đang làm' : '✓ Hoàn tất'}</span>
+      container.innerHTML = filteredShifts.map(s => {
+        const totalBills = allActivityRecords.filter(r => r.shiftId === s.shiftId).length;
+        return `
+          <div class="shift-history-card" onclick="openShiftHistoryDetail('${s.shiftId}')">
+            <div class="shift-card-banner">
+              <span>${s.dateLabel} • ${s.startTime} => ${s.endTime}</span>
+              <span>${s.status === 'WORKING' ? '🟢 Đang làm' : '✓ Hoàn tất'}</span>
+            </div>
+            <div class="shift-card-body">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                <div style="font-size:17px; font-weight:700; color:#f8fafc;">${s.outletName}</div>
+                <span style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; white-space:nowrap;">
+                  Đã nhập: ${totalBills} lượt
+                </span>
+              </div>
+              <div style="font-size:13px; font-weight:700; color:#38bdf8; margin:4px 0;">
+                ${s.outletCode} • 👤 PG: ${s.staffName || s.staff} (${s.staff})
+              </div>
+              <div style="font-size:13px; color:var(--text-sub);"><strong>Địa chỉ:</strong> ${s.outletAddr || '---'}</div>
+            </div>
           </div>
-          <div class="shift-card-body">
-            <div style="font-size:17px; font-weight:700; color:#f8fafc;">${s.outletName}</div>
-            <div style="font-size:13px; font-weight:700; color:#38bdf8; margin:4px 0;">${s.outletCode} ${currentUser.role === 'ADMIN' ? '(NV: ' + s.staff + ')' : ''}</div>
-            <div style="font-size:13px; color:var(--text-sub);"><strong>Địa chỉ:</strong> ${s.outletAddr || '---'}</div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    // Cấp 2 Lịch sử: Chi tiết 1 ca làm (Hiển thị tổng số từng hoạt động của ca đó)
+    // Cấp 2 Lịch sử: Chi tiết 1 ca làm của PG (Tổng số từng hoạt động + nút xem chi tiết từng bill)
     function openShiftHistoryDetail(shiftId) {
       const shift = shiftHistory.find(s => s.shiftId === shiftId);
       if (!shift) return;
 
       document.getElementById('shDetailBanner').innerText = `${shift.dateLabel} • ${shift.startTime} => ${shift.endTime}`;
       document.getElementById('shDetailOutletName').innerText = shift.outletName;
-      document.getElementById('shDetailOutletCode').innerText = shift.outletCode;
+      document.getElementById('shDetailOutletCode').innerText = `${shift.outletCode} • 👤 Nhân viên: ${shift.staffName || shift.staff} (${shift.staff})`;
       document.getElementById('shDetailOutletAddr').innerText = `Địa chỉ: ${shift.outletAddr || '---'}`;
 
       const proj = projects.find(p => p.id === shift.projectId);
-      document.getElementById('shDetailProject').innerText = proj ? proj.name : shift.projectId;
+      const totalShiftRecords = allActivityRecords.filter(r => r.shiftId === shiftId).length;
+      document.getElementById('shDetailProject').innerText = `${proj ? proj.name : shift.projectId} (Tổng đã nhập: ${totalShiftRecords} lượt)`;
 
       const actTypes = [
         { code: 'BAN_HANG', name: 'Hoạt động bán hàng' },
@@ -1294,46 +1343,56 @@ let liveCamStream = null;
       document.getElementById('shDetailActivitiesBody').innerHTML = actTypes.map(act => {
         const logs = allActivityRecords.filter(r => r.shiftId === shiftId && r.activityType === act.code);
         return `
-          <div style="padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
-            <div style="font-size:14px; font-weight:700; margin-bottom:6px;">• ${act.name}:</div>
-            <div style="display:flex; align-items:center; gap:14px; font-size:13px;">
-              <span class="list-link" style="${logs.length === 0 ? 'color:var(--text-sub); pointer-events:none;' : ''}"
-                    onclick="openHistoryBillList('${shiftId}', '${act.code}', '${act.name}')">
-                ☰ DANH SÁCH
-              </span>
-              <span>Tổng số: <strong style="color:#38bdf8;">${logs.length}</strong></span>
+          <div style="padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:14px; font-weight:700; margin-bottom:4px;">• ${act.name}</div>
+              <div style="font-size:13px; color:var(--text-sub);">Số lượng PG đã nhập: <strong style="color:#38bdf8;">${logs.length}</strong></div>
             </div>
+            <button type="button" class="btn btn-primary btn-sm"
+                    ${logs.length === 0 ? 'disabled style="opacity:0.35; pointer-events:none;"' : ''}
+                    onclick="openHistoryBillList('${shiftId}', '${act.code}', '${act.name}')">
+              ☰ Xem chi tiết
+            </button>
           </div>
         `;
       }).join('');
 
       showScreen('shiftHistoryDetailScreen');
     }
-
-    // Cấp 3 Lịch sử: Xem toàn bộ bill + ảnh đã chụp của hoạt động trong ca đó
+    // Cấp 3 Lịch sử: Xem chi tiết từng bill + ảnh đã chụp của PG trong ca đó
     function openHistoryBillList(shiftId, actCode, actTitle) {
       const list = allActivityRecords.filter(r => r.shiftId === shiftId && r.activityType === actCode);
       const body = document.getElementById('listModalBody');
       document.getElementById('listModalTitle').innerText = `${actTitle} (Tổng: ${list.length})`;
 
-      body.innerHTML = list.map((item, idx) => `
-        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.08);">
-          <div style="display:flex; justify-content:space-between; color:#38bdf8; font-weight:700; margin-bottom:6px;">
-            <span>#${idx + 1} • ${item.time}</span>
-            <span>NV: ${item.staff}</span>
-          </div>
-          <div style="color:#e2e8f0; line-height:1.6; margin-bottom:8px;">${item.detailText.split(' | ').map(line => `• ${line}`).join('<br>')}</div>
-          ${(item.photos && item.photos.length > 0) ? `
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:8px;">
-              ${item.photos.map(url => `
-                <a href="${url}" target="_blank">
-                  <img src="${url}" style="width:100%; height:110px; object-fit:cover; border-radius:8px; border:1px solid rgba(56,189,248,0.35);">
-                </a>
-              `).join('')}
+      if (list.length === 0) {
+        body.innerHTML = '<p style="color:var(--text-sub); text-align:center; padding:16px;">Chưa có bill nào được nhập.</p>';
+      } else {
+        body.innerHTML = list.map((item, idx) => {
+          const staffObj = allUsersList.find(u => u.username.toLowerCase() === item.staff.toLowerCase());
+          const staffDisplay = staffObj ? `${staffObj.fullname} (${item.staff})` : item.staff;
+          return `
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:10px; border:1px solid rgba(56,189,248,0.2);">
+              <div style="display:flex; justify-content:space-between; align-items:center; color:#38bdf8; font-weight:700; margin-bottom:6px; font-size:12px;">
+                <span>#${idx + 1} • 🕒 ${item.time}</span>
+                <span>👤 ${staffDisplay}</span>
+              </div>
+              <div style="color:#f8fafc; line-height:1.65; margin-bottom:8px; font-size:13px;">
+                ${item.detailText.split(' | ').map(line => `• ${line}`).join('<br>')}
+              </div>
+              ${(item.photos && item.photos.length > 0) ? `
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:8px; margin-top:6px;">
+                  ${item.photos.map(url => `
+                    <a href="${url}" target="_blank">
+                      <img src="${url}" style="width:100%; height:115px; object-fit:cover; border-radius:8px; border:1px solid rgba(56,189,248,0.35);">
+                    </a>
+                  `).join('')}
+                </div>
+              ` : ''}
             </div>
-          ` : ''}
-        </div>
-      `).join('');
+          `;
+        }).join('');
+      }
 
       document.getElementById('listModal').classList.remove('hidden');
     }
@@ -1850,11 +1909,16 @@ let liveCamStream = null;
       if (tabId === 'tabFormBuilder') renderSchemaEditor();
     }
 
-    function refreshAdminDropdowns() {
+   function refreshAdminDropdowns() {
       const html = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
       document.getElementById('outletProjSelect').innerHTML = html;
       document.getElementById('userProjSelect').innerHTML = html;
       document.getElementById('cfgProjSelect').innerHTML = html;
+
+      const sups = allUsersList.filter(u => u.role === 'SUP');
+      document.getElementById('newUserSupSelect').innerHTML =
+        `<option value="">-- Tất cả Sup trong dự án --</option>` +
+        sups.map(s => `<option value="${s.username}">${s.fullname} (${s.username}) - DA ${s.projectId}</option>`).join('');
     }
 
     async function adminAddProject() {
@@ -1895,6 +1959,7 @@ let liveCamStream = null;
       const u = {
         projectId: document.getElementById('userProjSelect').value,
         role: document.getElementById('newUserRole').value,
+        supUsername: document.getElementById('newUserSupSelect').value,
         username: document.getElementById('newUsername').value.trim(),
         password: document.getElementById('newPassword').value.trim(),
         fullname: document.getElementById('newFullname').value.trim(),
@@ -1905,6 +1970,15 @@ let liveCamStream = null;
       showLoading('Đang tạo tài khoản trên Sheet...');
       await callSheetApi({ action: 'addUser', user: u });
       hideLoading();
+
+      allUsersList.push({
+        username: u.username,
+        fullname: u.fullname,
+        role: u.role,
+        projectId: u.projectId,
+        supUsername: u.supUsername
+      });
+      refreshAdminDropdowns();
       alert(`✅ Đã tạo tài khoản ${u.username} (${u.role}) lên Google Sheet!`);
     }
 
