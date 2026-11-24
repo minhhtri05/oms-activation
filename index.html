@@ -367,6 +367,51 @@
       justify-content: space-between;
       align-items: center;
     }
+    /* === BẢNG CHỌN QUÀ THEO MỐC HÓA ĐƠN & DỒN QUÀ === */
+    .promo-gift-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+    }
+    .promo-gift-item.selected {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+    }
+    .promo-tier-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+    }
+    .promo-stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .promo-step-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(14, 165, 233, 0.15);
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .promo-step-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body onclick="closeRightDropdownOnOutside(event)">
@@ -2177,6 +2222,7 @@ let liveCamStream = null;
       const cnt = document.getElementById('posValidCount');
       if (disp) disp.textContent = formatCurrencyVND(grandTotal) + ' ₫';
       if (cnt) cnt.textContent = validItems;
+      if (typeof updateSalesGiftPromoUI === 'function') updateSalesGiftPromoUI();
 
       // Tự động điền tổng tiền vào ô "Tổng giá trị đơn hàng (VNĐ)" nếu có trong form động
       const schema = getSchemaFor(selectedOutlet.projectId, 'BAN_HANG');
@@ -2226,6 +2272,217 @@ let liveCamStream = null;
         document.querySelectorAll('.pos-dropdown').forEach(d => d.classList.add('hidden'));
       }
     });
+    // Cơ cấu quà tặng GrowPLUS+ theo giá trị hóa đơn
+    const GROWPLUS_GIFT_RULES = [
+      // Nhóm A: Colostrum Lactoferrin / Tiêu Hóa / Sữa Non (Từ 300k - 3tr)
+      { code: 'GP_A_300', group: 'A', tier: 300000, tierLabel: '300k', name: 'Bộ đồ chơi bóng rổ' },
+      { code: 'GP_A_500', group: 'A', tier: 500000, tierLabel: '500k', name: 'Bình nước cao cấp GrowPLUS+' },
+      { code: 'GP_A_750', group: 'A', tier: 750000, tierLabel: '750k', name: 'Hộp trữ sữa bột AGI JUMBO' },
+      { code: 'GP_A_1500', group: 'A', tier: 1500000, tierLabel: '1.5tr', name: 'Túi đeo chéo con phiêu lưu' },
+      { code: 'GP_A_2000', group: 'A', tier: 2000000, tierLabel: '2tr', name: 'Kệ xe đẩy 3 tầng' },
+      { code: 'GP_A_3000_1', group: 'A', tier: 3000000, tierLabel: '3tr', name: 'Bộ quà tặng Bery Yummy Station' },
+      { code: 'GP_A_3000_2', group: 'A', tier: 3000000, tierLabel: '3tr', name: 'Set Nướng Chill Hươu Khủng Long' },
+      { code: 'GP_A_3000_3', group: 'A', tier: 3000000, tierLabel: '3tr', name: 'Vali xe chòi khủng long' },
+
+      // Nhóm B: Height Boosting (Bạc TCC) / Colos Immunel (Từ 650k - 1.5tr)
+      { code: 'GP_B_650', group: 'B', tier: 650000, tierLabel: '650k', name: 'Bình giữ nhiệt phiêu lưu' },
+      { code: 'GP_B_1500', group: 'B', tier: 1500000, tierLabel: '1.5tr', name: 'Nồi điện đa năng hiệu Gaabor' }
+    ];
+
+    let selectedPromoGifts = {}; // { giftCode: qty }
+    let includeCanvasBag = false;
+
+    function classifyGrowPlusProductGroup(prodName) {
+      const n = removeVietnameseTones(prodName);
+      if (n.includes('tcc') || n.includes('height') || n.includes('immunel')) return 'B';
+      if (n.includes('lactoferrin') || n.includes('xanh nhat') || n.includes('tieu hoa') || n.includes('sua non')) return 'A';
+      return 'ALL'; // Các dòng GrowPLUS+ khác áp dụng linh hoạt
+    }
+
+    function getSalesBillBreakdown() {
+      let totalAll = 0, totalA = 0, totalB = 0, totalFlex = 0;
+      document.querySelectorAll('.pos-card').forEach(row => {
+        const name = row.dataset.selectedProduct;
+        if (!name) return;
+        const qty = parseInt(row.querySelector('.pos-qty-input').value, 10) || 0;
+        const price = parsePriceInVND(row.querySelector('.pos-price-input').value);
+        const sub = qty * price;
+        if (sub <= 0) return;
+
+        totalAll += sub;
+        const grp = classifyGrowPlusProductGroup(name);
+        if (grp === 'A') totalA += sub;
+        else if (grp === 'B') totalB += sub;
+        else totalFlex += sub;
+      });
+      return { totalAll, totalA, totalB, totalFlex };
+    }
+
+    function findOutletGiftStockByName(giftName) {
+      if (!selectedOutlet) return null;
+      const target = removeVietnameseTones(giftName);
+      return giftStocks.find(g =>
+        g.projectId === selectedOutlet.projectId &&
+        g.outletCode === selectedOutlet.code &&
+        (removeVietnameseTones(g.name).includes(target) || target.includes(removeVietnameseTones(g.name)))
+      ) || null;
+    }
+
+    function changePromoGiftQty(code, delta) {
+      const rule = GROWPLUS_GIFT_RULES.find(r => r.code === code);
+      if (!rule) return;
+
+      const curQty = selectedPromoGifts[code] || 0;
+      const nextQty = curQty + delta;
+      if (nextQty <= 0) {
+        delete selectedPromoGifts[code];
+      } else {
+        // Kiểm tra tồn kho tại điểm (nếu có khai báo)
+        const stockObj = findOutletGiftStockByName(rule.name);
+        if (stockObj && nextQty > stockObj.remaining) {
+          alert(`⚠️ "${rule.name}" tại điểm chỉ còn tồn ${stockObj.remaining}!`);
+          return;
+        }
+        selectedPromoGifts[code] = nextQty;
+      }
+      updateSalesGiftPromoUI();
+    }
+
+    function toggleCanvasBagCheck(checked) {
+      includeCanvasBag = checked;
+      updateSalesGiftPromoUI();
+    }
+
+    function updateSalesGiftPromoUI() {
+      const giftBox = document.getElementById('giftDeductionSection');
+      if (!giftBox || currentActivityType !== 'BAN_HANG') return;
+
+      const { totalAll, totalA, totalB, totalFlex } = getSalesBillBreakdown();
+      const budgetA = totalA + totalFlex;
+      const budgetB = totalB + totalFlex;
+
+      // Tính tổng giá trị mốc quà đã chọn
+      let usedTotal = 0, usedA = 0, usedB = 0;
+      Object.keys(selectedPromoGifts).forEach(code => {
+        const rule = GROWPLUS_GIFT_RULES.find(r => r.code === code);
+        const qty = selectedPromoGifts[code] || 0;
+        if (rule && qty > 0) {
+          usedTotal += rule.tier * qty;
+          if (rule.group === 'A') usedA += rule.tier * qty;
+          if (rule.group === 'B') usedB += rule.tier * qty;
+        }
+      });
+
+      // Nếu giảm tiền bill làm vượt ngân sách quà đã chọn -> tự reset về 0 để chọn lại cho đúng
+      if (usedTotal > totalAll || usedA > budgetA || usedB > budgetB) {
+        selectedPromoGifts = {};
+        usedTotal = 0; usedA = 0; usedB = 0;
+      }
+
+      const remainTotal = Math.max(0, totalAll - usedTotal);
+      const remainA = Math.max(0, budgetA - usedA);
+      const remainB = Math.max(0, budgetB - usedB);
+
+      // Xét điều kiện Túi Canvas (Hóa đơn >= 500k)
+      const eligibleBag = totalAll >= 500000;
+      const bagStock = findOutletGiftStockByName('Túi canvas');
+      const bagOutOfStock = bagStock && bagStock.remaining <= 0;
+      if (!eligibleBag || bagOutOfStock) {
+        includeCanvasBag = false;
+      } else if (giftBox.dataset.autoBagDone !== '1') {
+        includeCanvasBag = true;
+        giftBox.dataset.autoBagDone = '1';
+      }
+      if (!eligibleBag) giftBox.dataset.autoBagDone = '0';
+
+      let html = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:13px; color:#34d399;">🎁 Quà tặng GrowPLUS+ (Cho phép chọn dồn)</strong>
+          <span style="font-size:11px; color:#38bdf8; font-weight:700;">Bill: ${formatCurrencyVND(totalAll)}đ</span>
+        </div>
+      `;
+
+      if (totalAll < 300000) {
+        html += `
+          <div style="font-size:12px; color:#fbbf24; background:rgba(245,158,11,0.12); padding:9px 10px; border-radius:8px;">
+            ⚠️ Hóa đơn từ <strong>300.000đ</strong> trở lên mới đủ điều kiện nhận quà (Từ <strong>500.000đ</strong> tặng thêm Túi canvas).
+          </div>
+        `;
+        giftBox.innerHTML = html;
+        return;
+      }
+
+      // 1. Mục Túi Canvas Nutifood (Hóa đơn >= 500k)
+      html += `
+        <div class="promo-gift-item ${includeCanvasBag ? 'selected' : ''}" style="border-style:dashed;">
+          <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-size:12px;">
+            <input type="checkbox" ${includeCanvasBag ? 'checked' : ''} ${(!eligibleBag || bagOutOfStock) ? 'disabled' : ''}
+                   onchange="toggleCanvasBagCheck(this.checked)" style="width:16px; height:16px; accent-color:#10b981;">
+            <div>
+              <div style="font-weight:700; color:#f8fafc;">🛍️ 1 Túi canvas Nutifood</div>
+              <div style="font-size:11px; color:${eligibleBag ? '#34d399' : '#94a3b8'};">
+                ${eligibleBag ? '✓ Đạt mốc hóa đơn ≥ 500k' : 'Cần hóa đơn từ 500k'}
+                ${bagStock ? ` • Tồn: ${bagStock.remaining}` : ''}
+              </div>
+            </div>
+          </label>
+          <span class="promo-tier-badge">≥ 500k</span>
+        </div>
+      `;
+
+      // 2. Thanh hiển thị ngân sách đổi quà còn dư
+      html += `
+        <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(56,189,248,0.25); border-radius:8px; padding:8px 10px; margin-bottom:8px; font-size:12px; display:flex; justify-content:space-between;">
+          <span>Đã quy đổi: <strong style="color:#fbbf24;">${formatCurrencyVND(usedTotal)}đ</strong></span>
+          <span>Hạn mức còn lại: <strong style="color:#34d399;">${formatCurrencyVND(remainTotal)}đ</strong></span>
+        </div>
+      `;
+
+      // 3. Danh sách quà theo từng nhóm sản phẩm khách mua
+      const renderGroupList = (grpCode, title, grpBudget, grpRemain) => {
+        if (grpBudget < (grpCode === 'A' ? 300000 : 650000)) return '';
+        const items = GROWPLUS_GIFT_RULES.filter(r => r.group === grpCode);
+        return `
+          <div style="font-size:11px; font-weight:700; color:#38bdf8; margin:8px 0 5px;">
+            ${title} (Còn dư: ${formatCurrencyVND(grpRemain)}đ)
+          </div>
+          ${items.map(r => {
+            const qty = selectedPromoGifts[r.code] || 0;
+            const stockObj = findOutletGiftStockByName(r.name);
+            const noStock = stockObj && (qty >= stockObj.remaining);
+            const canAdd = (r.tier <= grpRemain) && (r.tier <= remainTotal) && !noStock;
+
+            return `
+              <div class="promo-gift-item ${qty > 0 ? 'selected' : ''}">
+                <div>
+                  <div style="font-size:12px; font-weight:700; color:#f8fafc;">
+                    ${r.name} <span class="promo-tier-badge">Mức ${r.tierLabel}</span>
+                  </div>
+                  <div style="font-size:11px; color:var(--text-sub);">
+                    ${stockObj ? `Tồn kho điểm: <strong style="color:${stockObj.remaining > 0 ? '#34d399' : '#f87171'};">${stockObj.remaining}</strong>` : 'Sẵn sàng phát'}
+                  </div>
+                </div>
+                <div class="promo-stepper">
+                  <button type="button" class="promo-step-btn" onclick="changePromoGiftQty('${r.code}', -1)" ${qty === 0 ? 'disabled' : ''}>−</button>
+                  <strong style="min-width:18px; text-align:center; font-size:13px;">${qty}</strong>
+                  <button type="button" class="promo-step-btn" onclick="changePromoGiftQty('${r.code}', 1)" ${!canAdd ? 'disabled' : ''}>+</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        `;
+      };
+
+      if (totalA > 0 || totalFlex > 0) {
+        html += renderGroupList('A', '🍼 Quà Lactoferrin / Tiêu Hóa / Sữa Non', budgetA, remainA);
+      }
+      if (totalB > 0) {
+        html += renderGroupList('B', '🦒 Quà Height Boosting (TCC) / Colos Immunel', budgetB, remainB);
+      }
+
+      giftBox.innerHTML = html;
+    }
+
     function openActivityForm(type) {
       currentActivityType = type;
       const titles = {
@@ -2266,26 +2523,37 @@ let liveCamStream = null;
         return `<div class="form-group"><label>${f.label}${reqMark}</label><input type="${f.type}" id="dynField_${idx}" placeholder="Nhập ${f.label.toLowerCase()}"></div>`;
       }).join('');
 
-      // Hiển thị hộp chọn Quà tặng từ tồn kho điểm làm (nếu điểm có khai báo tồn quà)
-      const outletGifts = giftStocks.filter(g => g.projectId === selectedOutlet.projectId && g.outletCode === selectedOutlet.code);
-      const giftBox = document.getElementById('giftDeductionSection');
-      if (outletGifts.length > 0) {
-        giftBox.classList.remove('hidden');
-        document.getElementById('actGiftSelect').innerHTML =
-          `<option value="">-- Không phát quà / Chọn quà --</option>` +
-          outletGifts.map(g => `<option value="${g.id}">${g.name} (Tồn: ${g.remaining})</option>`).join('');
-        document.getElementById('actGiftQty').value = 1;
-      } else {
-        giftBox.classList.add('hidden');
-      }
-
-    // Bật khung thêm nhiều sản phẩm khi ở Hoạt động bán hàng
       const salesBox = document.getElementById('salesProductSection');
+      const giftBox = document.getElementById('giftDeductionSection');
+
       if (type === 'BAN_HANG') {
+        selectedPromoGifts = {};
+        includeCanvasBag = false;
+        giftBox.dataset.autoBagDone = '0';
+        giftBox.classList.remove('hidden');
         initSalesProductSection();
+        updateSalesGiftPromoUI();
       } else {
         salesBox.classList.add('hidden');
         salesBox.innerHTML = '';
+
+        // Các hoạt động khác (Vòng quay, Mini game, Check-in FB) giữ dropdown chọn quà từ kho
+        const outletGifts = giftStocks.filter(g => g.projectId === selectedOutlet.projectId && g.outletCode === selectedOutlet.code);
+        if (outletGifts.length > 0) {
+          giftBox.classList.remove('hidden');
+          giftBox.innerHTML = `
+            <div style="font-size:12px; font-weight:700; color:#34d399; margin-bottom:8px;">🎁 Quà tặng phát cho khách (Tự động trừ tồn kho)</div>
+            <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px;">
+              <select id="actGiftSelect">
+                <option value="">-- Không phát quà / Chọn quà --</option>
+                ${outletGifts.map(g => `<option value="${g.id}">${g.name} (Tồn: ${g.remaining})</option>`).join('')}
+              </select>
+              <input type="number" id="actGiftQty" value="1" min="0" placeholder="SL quà">
+            </div>
+          `;
+        } else {
+          giftBox.classList.add('hidden');
+        }
       }
 
       document.getElementById('activityModal').classList.remove('hidden');
@@ -2333,10 +2601,36 @@ let liveCamStream = null;
         structuredFields.push({ label: 'Chi tiết sản phẩm', value: productSummaryText });
         structuredFields.push({ label: 'Số dòng SP', value: posItems.length });
       }
-      // Kiểm tra quà tặng & trừ tồn kho
+      // Kiểm tra quà tặng & trừ tồn kho (Hỗ trợ chọn dồn nhiều quà ở BAN_HANG)
       let giftDeduction = null;
+      let giftDeductions = [];
       const giftBox = document.getElementById('giftDeductionSection');
-      if (!giftBox.classList.contains('hidden')) {
+
+      if (currentActivityType === 'BAN_HANG') {
+        let giftSummaryList = [];
+        if (includeCanvasBag) {
+          giftSummaryList.push('Túi canvas Nutifood (SL: 1)');
+          const bagStock = findOutletGiftStockByName('Túi canvas');
+          if (bagStock) giftDeductions.push({ giftId: bagStock.id, qty: 1 });
+        }
+
+        Object.keys(selectedPromoGifts).forEach(code => {
+          const rule = GROWPLUS_GIFT_RULES.find(r => r.code === code);
+          const qty = selectedPromoGifts[code] || 0;
+          if (rule && qty > 0) {
+            giftSummaryList.push(`${rule.name} [Mức ${rule.tierLabel}] (SL: ${qty})`);
+            const stockObj = findOutletGiftStockByName(rule.name);
+            if (stockObj) giftDeductions.push({ giftId: stockObj.id, qty: qty });
+          }
+        });
+
+        if (giftSummaryList.length > 0) {
+          const joinedGifts = giftSummaryList.join(', ');
+          detailParts.push(`Quà tặng: ${joinedGifts}`);
+          structuredFields.push({ label: 'Quà tặng', value: joinedGifts });
+        }
+        giftDeduction = giftDeductions[0] || null;
+      } else if (!giftBox.classList.contains('hidden')) {
         const selectedGiftId = document.getElementById('actGiftSelect').value;
         const giftQty = parseInt(document.getElementById('actGiftQty').value) || 0;
         if (selectedGiftId && giftQty > 0) {
@@ -2345,6 +2639,7 @@ let liveCamStream = null;
             return alert(`⚠️ Quà "${giftObj.name}" chỉ còn tồn ${giftObj.remaining}, không đủ phát ${giftQty}!`);
           }
           giftDeduction = { giftId: selectedGiftId, qty: giftQty };
+          giftDeductions.push(giftDeduction);
           detailParts.push(`Quà tặng: ${giftObj.name} (SL: ${giftQty})`);
           structuredFields.push({ label: 'Quà tặng', value: giftObj.name });
           structuredFields.push({ label: 'SL quà', value: giftQty });
@@ -2381,6 +2676,7 @@ let liveCamStream = null;
             structuredFields: structuredFields,
             photos: allPhotosToUpload,
             giftDeduction: giftDeduction
+            giftDeduction: giftDeductions
           }
         });
         hideLoading();
@@ -2401,13 +2697,14 @@ let liveCamStream = null;
           shiftId: activeShiftId
         });
 
-        if (giftDeduction) {
-          const giftObj = giftStocks.find(g => g.id === giftDeduction.giftId);
+      
+        giftDeductions.forEach(gd => {
+          const giftObj = giftStocks.find(g => g.id === gd.giftId);
           if (giftObj) {
-            giftObj.usedQty += giftDeduction.qty;
+            giftObj.usedQty += gd.qty;
             giftObj.remaining = Math.max(0, giftObj.initialQty - giftObj.usedQty);
           }
-        }
+        });
 
         refreshOutletCounters();
         closeModal('activityModal');
