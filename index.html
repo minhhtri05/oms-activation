@@ -220,7 +220,7 @@
       background: #111827; border-top: 1px solid var(--accent); border-radius: 20px 20px 0 0; padding: 20px 18px;
     }
 
-    .admin-tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 16px; }
+   .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
     .admin-tab {
       padding: 9px 2px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148,163,184,0.2);
       color: var(--text-sub); border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;
@@ -834,6 +834,7 @@
       <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddOutlet', this)">+ Điểm</button>
       <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddUser', this)">+ User</button>
       <button type="button" class="admin-tab" onclick="switchAdminTab('tabFormBuilder', this)">⚙️ Form</button>
+      <button type="button" class="admin-tab" onclick="switchAdminTab('tabProducts', this)">🛒 Sản phẩm</button>
       <button type="button" class="admin-tab" onclick="navFromDrawer('giftStockScreen')">🎁 Quà</button>
     </div>
 
@@ -947,6 +948,72 @@
         </div>
         <div id="schemaPhotosList"></div>
       </div>
+    </div>
+    <div id="tabProducts" class="glass-card admin-pane hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <h4 style="color:#38bdf8;">🛒 Danh Mục Sản Phẩm</h4>
+        <button type="button" class="icon-btn" style="background:rgba(16,185,129,0.2); color:#34d399; font-size:11px;" onclick="seedDefaultProductsToSheet()">
+          📥 Nạp 39 SP mẫu
+        </button>
+      </div>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">Đơn vị (Lon/Lốc), quy cách và giá sẽ do PG tự nhập khi tạo bill</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+        <div>
+          <label>Dự án áp dụng</label>
+          <select id="prodProjSelect" onchange="renderAdminProductList()"></select>
+        </div>
+        <div>
+          <label>Tìm nhanh</label>
+          <input type="text" id="prodSearchFilter" placeholder="🔍 Gõ tên hoặc nhóm..." oninput="renderAdminProductList()">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <button type="button" class="btn btn-primary btn-sm" onclick="openSingleProductEditor('')">+ Thêm từng cái</button>
+        <button type="button" class="btn btn-success btn-sm" onclick="openBulkProductEditor()">📋 Thêm hàng loạt</button>
+      </div>
+
+      <!-- Thêm / Sửa 1 sản phẩm -->
+      <div id="singleProdEditorBox" class="inline-editor-box hidden">
+        <div style="font-size:13px; font-weight:700; color:#38bdf8; margin-bottom:10px;" id="singleProdTitle">➕ Thêm sản phẩm mới</div>
+        <input type="hidden" id="sp_id">
+        <div class="form-group">
+          <label>Tên sản phẩm *</label>
+          <input type="text" id="sp_name" placeholder="VD: SB GrowPLUS+ Bạc TCC 1+ 800G">
+        </div>
+        <div class="form-group">
+          <label>Nhóm sản phẩm</label>
+          <input type="text" id="sp_group" placeholder="VD: Tăng Chiều Cao">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="saveSingleProduct()">💾 Lưu sản phẩm</button>
+          <button type="button" class="icon-btn" onclick="closeSingleProductEditor()">Hủy</button>
+        </div>
+      </div>
+
+      <!-- Thêm hàng loạt nhiều dòng -->
+      <div id="bulkProdEditorBox" class="inline-editor-box hidden" style="border-color:#10b981; background:rgba(16,185,129,0.08);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="font-size:13px; color:#34d399;">📋 Thêm hàng loạt (Mỗi dòng 1 SP)</strong>
+          <button type="button" class="icon-btn" style="font-size:11px;" onclick="fillBulkSample()">Điền mẫu</button>
+        </div>
+        <p style="font-size:11px; color:var(--text-sub); line-height:1.5; margin-bottom:8px;">
+          Cú pháp: <code style="color:#38bdf8;">Tên sản phẩm | Nhóm sản phẩm</code><br>
+          *(Nếu không ghi nhóm, hệ thống tự xếp vào nhóm "Khác")*
+        </p>
+        <textarea id="bulkProdTextarea" rows="6" style="width:100%; padding:10px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.3); border-radius:10px; color:#fff; font-size:12px; margin-bottom:10px;"
+          placeholder="SB NuVi Grow Height 1+ 800G | Tăng Chiều Cao&#10;SBPS NuVi Grow Height 110ml | Tăng Chiều Cao"></textarea>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="saveBulkProducts()">🚀 LƯU TẤT CẢ LÊN SHEET</button>
+          <button type="button" class="icon-btn" onclick="closeBulkProductEditor()">Hủy</button>
+        </div>
+      </div>
+
+      <div style="font-size:12px; color:var(--text-sub); margin-bottom:8px;">
+        Tổng số sản phẩm: <strong id="adminProdCount" style="color:#38bdf8;">0</strong>
+      </div>
+      <div id="adminProductListBody"></div>
     </div>
   </div>
 
@@ -1244,6 +1311,9 @@ let liveCamStream = null;
         shiftHistory = res.shifts || [];
         allActivityRecords = res.records || [];
         giftStocks = res.gifts || [];
+        productCatalog = (res.products && res.products.length > 0)
+          ? res.products
+          : JSON.parse(JSON.stringify(DEFAULT_PRODUCT_CATALOG));
         khoTonDauList = res.khoTonDau || [];
         phieuXuatNhapList = res.phieuXuatNhap || [];
       
@@ -1808,7 +1878,8 @@ let liveCamStream = null;
       return formSchemas[projectId][actType];
     }
 // ================= DANH MỤC SẢN PHẨM & POS BÁN HÀNG =================
-    const PRODUCT_CATALOG = [
+  const DEFAULT_PRODUCT_CATALOG = [
+    
       // Nhóm Tăng Chiều Cao
       { id: 'CC01', name: 'SB GrowPLUS+ Bạc TCC 1+ 800G', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 435 },
       { id: 'CC02', name: 'SB GrowPLUS+ Bạc TCC 2+ 800G', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 425 },
@@ -1856,6 +1927,7 @@ let liveCamStream = null;
       { id: 'TC08', name: 'SBPS GrowPLUS+ Đỏ', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 36 },
       { id: 'TC09', name: 'SBPS GrowPLUS+ Đỏ ít đường', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 36 }
     ];
+    let productCatalog = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_CATALOG));
 
     const UNIT_SPECS = {
       'Lon': ['350g', '400g', '780g', '800g', '850g', '900g', '1.5kg', '1.65kg'],
@@ -1996,9 +2068,10 @@ let liveCamStream = null;
       }
 
       const normKey = removeVietnameseTones(keyword);
-      const matches = PRODUCT_CATALOG.filter(item =>
-        removeVietnameseTones(item.name).includes(normKey) ||
-        removeVietnameseTones(item.group).includes(normKey)
+      const currentProj = selectedOutlet ? selectedOutlet.projectId : 'ALL';
+      const matches = productCatalog.filter(item =>
+        (!item.projectId || item.projectId === 'ALL' || item.projectId === currentProj) &&
+        (removeVietnameseTones(item.name).includes(normKey) || removeVietnameseTones(item.group).includes(normKey))
       );
 
       if (matches.length === 0) {
@@ -2008,7 +2081,7 @@ let liveCamStream = null;
           <button type="button" class="pos-dropdown-item" onclick="selectPosProduct('${rowId}', '${item.id}')">
             <div>
               <div style="font-size:13px; font-weight:700;">${item.name}</div>
-              <div style="font-size:11px; color:#94a3b8;">${item.group} • ${item.defaultUnit} (${item.defaultSpec}) - ${item.defaultPrice}k</div>
+              <div style="font-size:11px; color:#94a3b8;">Nhóm: ${item.group}</div>
             </div>
             <span style="font-size:11px; color:#38bdf8; font-weight:700;">Chọn</span>
           </button>
@@ -2018,7 +2091,7 @@ let liveCamStream = null;
     }
 
     function selectPosProduct(rowId, prodId) {
-      const prod = PRODUCT_CATALOG.find(p => p.id === prodId);
+      const prod = productCatalog.find(p => String(p.id) === String(prodId));
       if (!prod) return;
 
       const row = document.getElementById(rowId);
@@ -2032,8 +2105,11 @@ let liveCamStream = null;
       tag.classList.remove('hidden');
 
       row.querySelector('.pos-details').classList.remove('hidden');
-      selectPosUnit(rowId, prod.defaultUnit || 'Lon', prod.defaultSpec);
-      row.querySelector('.pos-price-input').value = prod.defaultPrice || '';
+      // Mặc định mở ở Lon (800g) hoặc Lốc (110ml), giá để trống cho PG tự điền
+      const isLoc = /sbps|lốc|110ml|180ml/i.test(prod.name);
+      selectPosUnit(rowId, isLoc ? 'Lốc' : 'Lon');
+      row.querySelector('.pos-price-input').value = '';
+      row.querySelector('.pos-price-input').focus();
 
       calcPosRowAndGrandTotal(rowId);
     }
@@ -2400,11 +2476,13 @@ let liveCamStream = null;
 
     // ================= 6. QUẢN TRỊ ADMIN & SẮP XẾP THỨ TỰ FORM =================
     function switchAdminTab(tabId, btn) {
+      
       document.querySelectorAll('.admin-pane').forEach(p => p.classList.add('hidden'));
       document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.remove('hidden');
       btn.classList.add('active');
       if (tabId === 'tabFormBuilder') renderSchemaEditor();
+      if (tabId === 'tabProducts') renderAdminProductList();
     }
 
    function refreshAdminDropdowns() {
@@ -2412,6 +2490,8 @@ let liveCamStream = null;
       document.getElementById('outletProjSelect').innerHTML = html;
       document.getElementById('userProjSelect').innerHTML = html;
       document.getElementById('cfgProjSelect').innerHTML = html;
+     document.getElementById('prodProjSelect').innerHTML =
+        `<option value="ALL">-- Dùng chung tất cả dự án --</option>` + html;
 
       const sups = allUsersList.filter(u => u.role === 'SUP');
       document.getElementById('newUserSupSelect').innerHTML =
@@ -2836,6 +2916,155 @@ let liveCamStream = null;
         p.nguoiDuyet = currentUser.username;
       }
       renderWarehouseView();
+    }
+    // ================= QUẢN LÝ DANH MỤC SẢN PHẨM (CHỈ TÊN & NHÓM) =================
+    function renderAdminProductList() {
+      const projFilter = document.getElementById('prodProjSelect').value || 'ALL';
+      const keyword = removeVietnameseTones(document.getElementById('prodSearchFilter').value.trim());
+
+      const list = productCatalog.filter(p => {
+        const matchProj = (projFilter === 'ALL') ? true : (p.projectId === projFilter || p.projectId === 'ALL');
+        const matchKey = !keyword || removeVietnameseTones(p.name).includes(keyword) || removeVietnameseTones(p.group).includes(keyword);
+        return matchProj && matchKey;
+      });
+
+      document.getElementById('adminProdCount').innerText = list.length;
+      const body = document.getElementById('adminProductListBody');
+      if (list.length === 0) {
+        body.innerHTML = '<p style="color:var(--text-sub); text-align:center; padding:14px;">Chưa có sản phẩm nào.</p>';
+        return;
+      }
+
+      body.innerHTML = list.map((p, idx) => `
+        <div class="schema-item">
+          <div style="padding-right:8px;">
+            <strong style="font-size:13px; color:#f8fafc;">${idx + 1}. ${p.name}</strong>
+            <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">
+              Nhóm: <span style="color:#38bdf8;">${p.group}</span>
+              ${p.projectId && p.projectId !== 'ALL' ? ` • DA: ${p.projectId}` : ''}
+            </div>
+          </div>
+          <div class="schema-actions">
+            <button type="button" class="icon-btn" onclick="openSingleProductEditor('${p.id}')">✏️</button>
+            <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.25);" onclick="deleteAdminProduct('${p.id}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openSingleProductEditor(prodId) {
+      closeBulkProductEditor();
+      const box = document.getElementById('singleProdEditorBox');
+      if (!prodId) {
+        document.getElementById('singleProdTitle').innerText = '➕ Thêm sản phẩm mới';
+        document.getElementById('sp_id').value = '';
+        document.getElementById('sp_name').value = '';
+        document.getElementById('sp_group').value = '';
+      } else {
+        const p = productCatalog.find(x => String(x.id) === String(prodId));
+        if (!p) return;
+        document.getElementById('singleProdTitle').innerText = '✏️ Sửa sản phẩm';
+        document.getElementById('sp_id').value = p.id;
+        document.getElementById('sp_name').value = p.name;
+        document.getElementById('sp_group').value = p.group;
+      }
+      box.classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeSingleProductEditor() {
+      document.getElementById('singleProdEditorBox').classList.add('hidden');
+    }
+
+    async function saveSingleProduct() {
+      const id = document.getElementById('sp_id').value;
+      const projectId = document.getElementById('prodProjSelect').value || 'ALL';
+      const name = document.getElementById('sp_name').value.trim();
+      const group = document.getElementById('sp_group').value.trim() || 'Khác';
+
+      if (!name) return alert('⚠️ Vui lòng nhập Tên sản phẩm!');
+
+      showLoading('Đang lưu sản phẩm lên Sheet...');
+      const res = await callSheetApi({ action: 'upsertProduct', product: { id, projectId, name, group } });
+      hideLoading();
+
+      if (id) {
+        const idx = productCatalog.findIndex(x => String(x.id) === String(id));
+        if (idx !== -1) productCatalog[idx] = { id, projectId, name, group };
+      } else {
+        productCatalog.unshift({ id: res.id, projectId, name, group });
+      }
+      closeSingleProductEditor();
+      renderAdminProductList();
+      alert('✅ Đã lưu sản phẩm thành công!');
+    }
+
+    function openBulkProductEditor() {
+      closeSingleProductEditor();
+      document.getElementById('bulkProdTextarea').value = '';
+      document.getElementById('bulkProdEditorBox').classList.remove('hidden');
+    }
+
+    function closeBulkProductEditor() {
+      document.getElementById('bulkProdEditorBox').classList.add('hidden');
+    }
+
+    function fillBulkSample() {
+      document.getElementById('bulkProdTextarea').value =
+        "SB NuVi Grow Height 1+ 800G | Tăng Chiều Cao\n" +
+        "SBPS NuVi Grow Height 110ml | Tăng Chiều Cao\n" +
+        "SB GrowPLUS+ Colostrum 0+ 400G | Tăng Đề Kháng";
+    }
+
+    async function saveBulkProducts() {
+      const raw = document.getElementById('bulkProdTextarea').value.trim();
+      if (!raw) return alert('⚠️ Vui lòng nhập danh sách sản phẩm (mỗi dòng 1 món)!');
+
+      const projectId = document.getElementById('prodProjSelect').value || 'ALL';
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      const parsedList = lines.map(line => {
+        const parts = line.split('|').map(s => s.trim());
+        return { projectId, name: parts[0], group: parts[1] || 'Khác' };
+      }).filter(item => item.name);
+
+      showLoading(`Đang thêm hàng loạt ${parsedList.length} sản phẩm lên Sheet...`);
+      const res = await callSheetApi({ action: 'bulkAddProducts', products: parsedList });
+      hideLoading();
+
+      if (res.products && res.products.length > 0) {
+        productCatalog = res.products.concat(productCatalog);
+      }
+      closeBulkProductEditor();
+      renderAdminProductList();
+      alert(`✅ Đã thêm thành công ${parsedList.length} sản phẩm!`);
+    }
+
+    async function deleteAdminProduct(prodId) {
+      const p = productCatalog.find(x => String(x.id) === String(prodId));
+      if (!p || !confirm(`Xác nhận xóa sản phẩm:\n"${p.name}"?`)) return;
+
+      showLoading('Đang xóa sản phẩm...');
+      await callSheetApi({ action: 'deleteProduct', id: prodId });
+      hideLoading();
+
+      productCatalog = productCatalog.filter(x => String(x.id) !== String(prodId));
+      renderAdminProductList();
+    }
+
+    async function seedDefaultProductsToSheet() {
+      if (!confirm('Nạp toàn bộ 39 sản phẩm mẫu lên tab SanPham trên Google Sheet?')) return;
+      const projectId = document.getElementById('prodProjSelect').value || 'ALL';
+      const payload = DEFAULT_PRODUCT_CATALOG.map(p => ({ projectId, name: p.name, group: p.group }));
+
+      showLoading('Đang nạp 39 sản phẩm mẫu lên Sheet...');
+      const res = await callSheetApi({ action: 'bulkAddProducts', products: payload });
+      hideLoading();
+
+      if (res.products) {
+        productCatalog = res.products;
+        renderAdminProductList();
+        alert('✅ Đã nạp 39 sản phẩm mẫu lên Sheet!');
+      }
     }
   </script>
 </body>
