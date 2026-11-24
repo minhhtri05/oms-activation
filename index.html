@@ -880,7 +880,7 @@
       <button type="button" class="admin-tab" onclick="switchAdminTab('tabAddUser', this)">+ User</button>
       <button type="button" class="admin-tab" onclick="switchAdminTab('tabFormBuilder', this)">⚙️ Form</button>
       <button type="button" class="admin-tab" onclick="switchAdminTab('tabProducts', this)">🛒 Sản phẩm</button>
-      <button type="button" class="admin-tab" onclick="navFromDrawer('giftStockScreen')">🎁 Quà</button>
+      <button type="button" class="admin-tab" onclick="switchAdminTab('tabPromoRules', this)">🎁 ĐK Quà</button>
     </div>
 
     <div id="tabAddProject" class="glass-card admin-pane">
@@ -1059,6 +1059,136 @@
         Tổng số sản phẩm: <strong id="adminProdCount" style="color:#38bdf8;">0</strong>
       </div>
       <div id="adminProductListBody"></div>
+    </div>
+    <div id="tabPromoRules" class="glass-card admin-pane hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
+        <h4 style="color:#34d399;">🎁 Cấu Hình Quà & Điều Kiện</h4>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="icon-btn" style="background:rgba(16,185,129,0.2); color:#34d399; font-size:11px;" onclick="resetDefaultPromoConfig()">📥 Nạp mẫu GP+</button>
+          <button type="button" class="icon-btn" style="background:rgba(14,165,233,0.2); color:#38bdf8; font-size:11px;" onclick="navFromDrawer('giftStockScreen')">📦 Kho quà</button>
+        </div>
+      </div>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">
+        Tùy chỉnh khung quà theo giá trị đơn (tự động chia nhỏ/dồn quà) và điều kiện tặng kèm theo quy cách Lon/Lốc.
+      </p>
+
+      <div class="form-group">
+        <label>Dự án áp dụng</label>
+        <select id="promoProjSelect" onchange="renderAdminPromoAll()"></select>
+      </div>
+
+      <!-- PHẦN 1: KHUNG QUÀ THEO GIÁ TRỊ HÓA ĐƠN -->
+      <div style="margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed rgba(255,255,255,0.15);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <strong style="font-size:13px; color:#38bdf8;">1. Khung quà theo mức tiền (Chọn dồn)</strong>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openFrameEditor('')">+ Thêm khung quà</button>
+        </div>
+
+        <div id="frameEditorBox" class="inline-editor-box hidden">
+          <div style="font-size:13px; font-weight:700; color:#38bdf8; margin-bottom:10px;" id="frameEditorTitle">➕ Thêm khung quà mới</div>
+          <input type="hidden" id="fr_id">
+
+          <div class="form-group">
+            <label>Tên khung quà *</label>
+            <input type="text" id="fr_name" placeholder="VD: Khung 1 - Lactoferrin / Sữa Non / Tiêu Hóa">
+          </div>
+
+          <div class="form-group">
+            <label>Từ khóa dòng SP áp dụng <span style="font-weight:400; color:var(--text-sub);">(Cách nhau dấu phẩy, trống = tất cả SP)</span></label>
+            <input type="text" id="fr_keywords" placeholder="VD: lactoferrin, sua non, xanh nhat, tieu hoa">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+            <div>
+              <label>Đơn vị áp dụng</label>
+              <select id="fr_unit">
+                <option value="ANY">Tất cả (Lon & Lốc)</option>
+                <option value="Lon">Chỉ tính Lon</option>
+                <option value="Lốc">Chỉ tính Lốc</option>
+              </select>
+            </div>
+            <div>
+              <label>Quy cách bắt buộc (nếu có)</label>
+              <input type="text" id="fr_spec" placeholder="VD: 800g (trống = mọi loại)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label style="margin:0;">Các mốc tiền & quà (Mỗi dòng 1 mốc) *</label>
+              <button type="button" class="icon-btn" style="font-size:11px;" onclick="fillSampleFrameTiers()">Điền mẫu</button>
+            </div>
+            <p style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">
+              Cú pháp: <code style="color:#38bdf8;">Số tiền (nghìn đồng) | Quà 1 / Quà 2 / Quà 3</code>
+            </p>
+            <textarea id="fr_tiersText" rows="6" style="width:100%; padding:10px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.3); border-radius:10px; color:#fff; font-size:12px;"
+              placeholder="300 | Bộ đồ chơi bóng rổ&#10;500 | Bình nước cao cấp GrowPLUS+&#10;3000 | Quà A / Quà B / Quà C"></textarea>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="saveFrameEditor()">💾 Lưu khung quà</button>
+            <button type="button" class="icon-btn" onclick="closeFrameEditor()">Hủy</button>
+          </div>
+        </div>
+
+        <div id="adminFramesListBody"></div>
+      </div>
+
+      <!-- PHẦN 2: ĐIỀU KIỆN TẶNG KÈM / COMBO (MUA N LỐC + BILL >= X...) -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <strong style="font-size:13px; color:#fbbf24;">2. Điều kiện tặng kèm (Combo / Quy cách)</strong>
+          <button type="button" class="btn btn-success btn-sm" onclick="openBonusEditor('')">+ Thêm ĐK tặng kèm</button>
+        </div>
+
+        <div id="bonusEditorBox" class="inline-editor-box hidden" style="border-color:#f59e0b; background:rgba(245,158,11,0.08);">
+          <div style="font-size:13px; font-weight:700; color:#fbbf24; margin-bottom:10px;" id="bonusEditorTitle">➕ Thêm điều kiện tặng kèm</div>
+          <input type="hidden" id="bn_id">
+
+          <div class="form-group">
+            <label>Tên quà tặng kèm * <span style="font-weight:400; color:var(--text-sub);">(Nếu cho chọn 1 trong nhiều món, ngăn cách bằng dấu /)</span></label>
+            <input type="text" id="bn_gifts" placeholder="VD: Túi canvas Nutifood">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="form-group">
+              <label>Tổng bill tối thiểu (x 1.000đ)</label>
+              <input type="number" id="bn_minBill" value="500" placeholder="VD: 500 (= 500k)">
+            </div>
+            <div class="form-group">
+              <label>SL sản phẩm tối thiểu</label>
+              <input type="number" id="bn_minQty" value="2" min="0" placeholder="VD: 2 (0 = không cần)">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="form-group">
+              <label>Đơn vị bắt buộc</label>
+              <select id="bn_unit">
+                <option value="ANY">Bất kỳ (Lon / Lốc)</option>
+                <option value="Lốc">Chỉ tính Lốc</option>
+                <option value="Lon">Chỉ tính Lon</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Quy cách (VD: 110ml, 800g)</label>
+              <input type="text" id="bn_spec" placeholder="Trống = bất kỳ">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Từ khóa dòng SP bắt buộc <span style="font-weight:400; color:var(--text-sub);">(Trống = bất kỳ SP nào)</span></label>
+            <input type="text" id="bn_keywords" placeholder="VD: lactoferrin, sua non, xanh nhat, tieu hoa">
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="saveBonusEditor()">💾 Lưu điều kiện</button>
+            <button type="button" class="icon-btn" onclick="closeBonusEditor()">Hủy</button>
+          </div>
+        </div>
+
+        <div id="adminBonusListBody"></div>
+      </div>
     </div>
   </div>
 
@@ -2272,50 +2402,105 @@ let liveCamStream = null;
         document.querySelectorAll('.pos-dropdown').forEach(d => d.classList.add('hidden'));
       }
     });
-    // Cơ cấu quà tặng GrowPLUS+ theo giá trị hóa đơn
-    const GROWPLUS_GIFT_RULES = [
-      // Nhóm A: Colostrum Lactoferrin / Tiêu Hóa / Sữa Non (Từ 300k - 3tr)
-      { code: 'GP_A_300', group: 'A', tier: 300000, tierLabel: '300k', name: 'Bộ đồ chơi bóng rổ' },
-      { code: 'GP_A_500', group: 'A', tier: 500000, tierLabel: '500k', name: 'Bình nước cao cấp GrowPLUS+' },
-      { code: 'GP_A_750', group: 'A', tier: 750000, tierLabel: '750k', name: 'Hộp trữ sữa bột AGI JUMBO' },
-      { code: 'GP_A_1500', group: 'A', tier: 1500000, tierLabel: '1.5tr', name: 'Túi đeo chéo con phiêu lưu' },
-      { code: 'GP_A_2000', group: 'A', tier: 2000000, tierLabel: '2tr', name: 'Kệ xe đẩy 3 tầng' },
-      { code: 'GP_A_3000_1', group: 'A', tier: 3000000, tierLabel: '3tr', name: 'Bộ quà tặng Bery Yummy Station' },
-      { code: 'GP_A_3000_2', group: 'A', tier: 3000000, tierLabel: '3tr', name: 'Set Nướng Chill Hươu Khủng Long' },
-      { code: 'GP_A_3000_3', group: 'A', tier: 3000000, tierLabel: '3tr', name: 'Vali xe chòi khủng long' },
+    // ================= ENGINE QUÀ TẶNG ĐA KHUNG & ĐIỀU KIỆN LINH HOẠT =================
+    const DEFAULT_PROMO_CONFIG = {
+      frames: [
+        {
+          id: 'FR_GP_1',
+          projectId: 'ALL',
+          name: 'Khung 1: Lactoferrin / Sữa Non / Tiêu Hóa (300k - 3tr)',
+          keywords: 'lactoferrin, sua non, xanh nhat, tieu hoa',
+          unit: 'ANY',
+          spec: '',
+          tiers: [
+            { tierAmount: 300000, gifts: ['Bộ đồ chơi bóng rổ'] },
+            { tierAmount: 500000, gifts: ['Bình nước cao cấp GrowPLUS+'] },
+            { tierAmount: 750000, gifts: ['Hộp trữ sữa bột AOI JUMBO'] },
+            { tierAmount: 1500000, gifts: ['Túi đeo chéo cún phiêu lưu'] },
+            { tierAmount: 2000000, gifts: ['Kệ xe đẩy 3 tầng'] },
+            { tierAmount: 3000000, gifts: ['Bộ quà tặng Beary Yummy Station', 'Set Nướng Chill Mèo / Khủng Long', 'Vali xe chòi khủng long'] }
+          ]
+        },
+        {
+          id: 'FR_GP_2',
+          projectId: 'ALL',
+          name: 'Khung 2: Height Boosting (TCC) / Colos Immunel (650k - 1.5tr)',
+          keywords: 'tcc, height, immunel',
+          unit: 'ANY',
+          spec: '',
+          tiers: [
+            { tierAmount: 650000, gifts: ['Bình giữ nhiệt phiêu lưu'] },
+            { tierAmount: 1500000, gifts: ['Nồi điện đa năng hiệu Gaabor'] }
+          ]
+        }
+      ],
+      bonuses: [
+        {
+          id: 'BN_GP_BAG',
+          projectId: 'ALL',
+          minBill: 500000,
+          minQty: 2,
+          unit: 'Lốc',
+          spec: '',
+          keywords: 'lactoferrin, sua non, xanh nhat, tieu hoa',
+          gifts: ['Túi canvas Nutifood']
+        }
+      ]
+    };
 
-      // Nhóm B: Height Boosting (Bạc TCC) / Colos Immunel (Từ 650k - 1.5tr)
-      { code: 'GP_B_650', group: 'B', tier: 650000, tierLabel: '650k', name: 'Bình giữ nhiệt phiêu lưu' },
-      { code: 'GP_B_1500', group: 'B', tier: 1500000, tierLabel: '1.5tr', name: 'Nồi điện đa năng hiệu Gaabor' }
-    ];
+    let promoConfig = JSON.parse(localStorage.getItem('oms_promo_config_v2')) || JSON.parse(JSON.stringify(DEFAULT_PROMO_CONFIG));
+    // Lưu lựa chọn của PG:
+    // selectedFrameGifts = { "frameId::tierAmount::giftName": qty }
+    // selectedBonusGifts = { "bonusId::giftName": 1 }
+    let selectedFrameGifts = {};
+    let selectedBonusGifts = {};
 
-    let selectedPromoGifts = {}; // { giftCode: qty }
-    let includeCanvasBag = false;
-
-    function classifyGrowPlusProductGroup(prodName) {
-      const n = removeVietnameseTones(prodName);
-      if (n.includes('tcc') || n.includes('height') || n.includes('immunel')) return 'B';
-      if (n.includes('lactoferrin') || n.includes('xanh nhat') || n.includes('tieu hoa') || n.includes('sua non')) return 'A';
-      return 'ALL'; // Các dòng GrowPLUS+ khác áp dụng linh hoạt
+    function savePromoConfigStorage() {
+      localStorage.setItem('oms_promo_config_v2', JSON.stringify(promoConfig));
     }
 
-    function getSalesBillBreakdown() {
-      let totalAll = 0, totalA = 0, totalB = 0, totalFlex = 0;
+    function formatShortK(amount) {
+      if (amount >= 1000000) {
+        const tr = amount / 1000000;
+        return Number.isInteger(tr) ? `${tr}tr` : `${tr.toFixed(1)}tr`;
+      }
+      return `${Math.round(amount / 1000)}k`;
+    }
+
+    function getCartItemsForPromo() {
+      const items = [];
+      let totalAll = 0;
       document.querySelectorAll('.pos-card').forEach(row => {
         const name = row.dataset.selectedProduct;
         if (!name) return;
+        const unit = row.querySelector('.pos-unit-val').value;
+        const spec = row.querySelector('.pos-spec-select').value;
         const qty = parseInt(row.querySelector('.pos-qty-input').value, 10) || 0;
         const price = parsePriceInVND(row.querySelector('.pos-price-input').value);
-        const sub = qty * price;
-        if (sub <= 0) return;
-
-        totalAll += sub;
-        const grp = classifyGrowPlusProductGroup(name);
-        if (grp === 'A') totalA += sub;
-        else if (grp === 'B') totalB += sub;
-        else totalFlex += sub;
+        const subtotal = qty * price;
+        if (qty > 0 && subtotal > 0) {
+          totalAll += subtotal;
+          items.push({ name, normName: removeVietnameseTones(name), unit, spec, qty, subtotal });
+        }
       });
-      return { totalAll, totalA, totalB, totalFlex };
+      return { items, totalAll };
+    }
+
+    function calcMatchingCartStats(keywordsStr, unitReq, specReq, cartData) {
+      const kwList = (keywordsStr || '').split(',').map(k => removeVietnameseTones(k.trim())).filter(Boolean);
+      let matchedSpend = 0;
+      let matchedQty = 0;
+
+      cartData.items.forEach(it => {
+        const matchName = kwList.length === 0 || kwList.some(kw => it.normName.includes(kw));
+        const matchUnit = !unitReq || unitReq === 'ANY' || it.unit === unitReq;
+        const matchSpec = !specReq || it.spec.toLowerCase() === specReq.trim().toLowerCase();
+        if (matchName && matchUnit && matchSpec) {
+          matchedSpend += it.subtotal;
+          matchedQty += it.qty;
+        }
+      });
+      return { matchedSpend, matchedQty };
     }
 
     function findOutletGiftStockByName(giftName) {
@@ -2328,28 +2513,36 @@ let liveCamStream = null;
       ) || null;
     }
 
-    function changePromoGiftQty(code, delta) {
-      const rule = GROWPLUS_GIFT_RULES.find(r => r.code === code);
-      if (!rule) return;
-
-      const curQty = selectedPromoGifts[code] || 0;
-      const nextQty = curQty + delta;
-      if (nextQty <= 0) {
-        delete selectedPromoGifts[code];
+    function changeFrameGiftQty(key, delta) {
+      const cur = selectedFrameGifts[key] || 0;
+      const next = cur + delta;
+      if (next <= 0) {
+        delete selectedFrameGifts[key];
       } else {
-        // Kiểm tra tồn kho tại điểm (nếu có khai báo)
-        const stockObj = findOutletGiftStockByName(rule.name);
-        if (stockObj && nextQty > stockObj.remaining) {
-          alert(`⚠️ "${rule.name}" tại điểm chỉ còn tồn ${stockObj.remaining}!`);
+        const giftName = key.split('::')[2];
+        const stockObj = findOutletGiftStockByName(giftName);
+        if (stockObj && next > stockObj.remaining) {
+          alert(`⚠️ "${giftName}" tại điểm chỉ còn tồn ${stockObj.remaining}!`);
           return;
         }
-        selectedPromoGifts[code] = nextQty;
+        selectedFrameGifts[key] = next;
       }
       updateSalesGiftPromoUI();
     }
 
-    function toggleCanvasBagCheck(checked) {
-      includeCanvasBag = checked;
+    function toggleBonusGiftChoice(bonusId, giftName, checked) {
+      // Mỗi điều kiện bonus chỉ nhận 1 phần quà
+      Object.keys(selectedBonusGifts).forEach(k => {
+        if (k.startsWith(bonusId + '::')) delete selectedBonusGifts[k];
+      });
+      if (checked && giftName) {
+        const stockObj = findOutletGiftStockByName(giftName);
+        if (stockObj && stockObj.remaining <= 0) {
+          alert(`⚠️ "${giftName}" tại điểm đã hết tồn kho!`);
+          return updateSalesGiftPromoUI();
+        }
+        selectedBonusGifts[`${bonusId}::${giftName}`] = 1;
+      }
       updateSalesGiftPromoUI();
     }
 
@@ -2357,132 +2550,360 @@ let liveCamStream = null;
       const giftBox = document.getElementById('giftDeductionSection');
       if (!giftBox || currentActivityType !== 'BAN_HANG') return;
 
-      const { totalAll, totalA, totalB, totalFlex } = getSalesBillBreakdown();
-      const budgetA = totalA + totalFlex;
-      const budgetB = totalB + totalFlex;
+      const cartData = getCartItemsForPromo();
+      const projId = selectedOutlet ? selectedOutlet.projectId : 'ALL';
+      const activeFrames = (promoConfig.frames || []).filter(f => !f.projectId || f.projectId === 'ALL' || f.projectId === projId);
+      const activeBonuses = (promoConfig.bonuses || []).filter(b => !b.projectId || b.projectId === 'ALL' || b.projectId === projId);
 
-      // Tính tổng giá trị mốc quà đã chọn
-      let usedTotal = 0, usedA = 0, usedB = 0;
-      Object.keys(selectedPromoGifts).forEach(code => {
-        const rule = GROWPLUS_GIFT_RULES.find(r => r.code === code);
-        const qty = selectedPromoGifts[code] || 0;
-        if (rule && qty > 0) {
-          usedTotal += rule.tier * qty;
-          if (rule.group === 'A') usedA += rule.tier * qty;
-          if (rule.group === 'B') usedB += rule.tier * qty;
+      // Tính doanh số hợp lệ cho từng khung quà
+      const frameSpendMap = {};
+      activeFrames.forEach(fr => {
+        frameSpendMap[fr.id] = calcMatchingCartStats(fr.keywords, fr.unit, fr.spec, cartData).matchedSpend;
+      });
+
+      // Tính số tiền đã dùng trong từng khung; nếu PG giảm giỏ hàng làm vượt hạn mức khung -> tự reset khung đó
+      const frameUsedMap = {};
+      Object.keys(selectedFrameGifts).forEach(key => {
+        const [frId, tierStr] = key.split('::');
+        const qty = selectedFrameGifts[key] || 0;
+        const cost = (parseInt(tierStr, 10) || 0) * qty;
+        frameUsedMap[frId] = (frameUsedMap[frId] || 0) + cost;
+      });
+
+      activeFrames.forEach(fr => {
+        if ((frameUsedMap[fr.id] || 0) > (frameSpendMap[fr.id] || 0)) {
+          Object.keys(selectedFrameGifts).forEach(k => {
+            if (k.startsWith(fr.id + '::')) delete selectedFrameGifts[k];
+          });
+          frameUsedMap[fr.id] = 0;
         }
       });
 
-      // Nếu giảm tiền bill làm vượt ngân sách quà đã chọn -> tự reset về 0 để chọn lại cho đúng
-      if (usedTotal > totalAll || usedA > budgetA || usedB > budgetB) {
-        selectedPromoGifts = {};
-        usedTotal = 0; usedA = 0; usedB = 0;
-      }
-
-      const remainTotal = Math.max(0, totalAll - usedTotal);
-      const remainA = Math.max(0, budgetA - usedA);
-      const remainB = Math.max(0, budgetB - usedB);
-
-      // Xét điều kiện Túi Canvas (Hóa đơn >= 500k)
-      const eligibleBag = totalAll >= 500000;
-      const bagStock = findOutletGiftStockByName('Túi canvas');
-      const bagOutOfStock = bagStock && bagStock.remaining <= 0;
-      if (!eligibleBag || bagOutOfStock) {
-        includeCanvasBag = false;
-      } else if (giftBox.dataset.autoBagDone !== '1') {
-        includeCanvasBag = true;
-        giftBox.dataset.autoBagDone = '1';
-      }
-      if (!eligibleBag) giftBox.dataset.autoBagDone = '0';
-
       let html = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong style="font-size:13px; color:#34d399;">🎁 Quà tặng GrowPLUS+ (Cho phép chọn dồn)</strong>
-          <span style="font-size:11px; color:#38bdf8; font-weight:700;">Bill: ${formatCurrencyVND(totalAll)}đ</span>
+          <strong style="font-size:13px; color:#34d399;">🎁 Quà tặng khuyến mãi (Chọn dồn & Combo)</strong>
+          <span style="font-size:11px; color:#38bdf8; font-weight:700;">Tổng bill: ${formatCurrencyVND(cartData.totalAll)}đ</span>
         </div>
       `;
 
-      if (totalAll < 300000) {
+      // 1. RENDER CÁC ĐIỀU KIỆN TẶNG KÈM / COMBO (VD: 2 Lốc + Bill >= 500k)
+      activeBonuses.forEach(bn => {
+        const stats = calcMatchingCartStats(bn.keywords, bn.unit, bn.spec, cartData);
+        const passBill = cartData.totalAll >= (bn.minBill || 0);
+        const passQty = stats.matchedQty >= (bn.minQty || 0);
+        const eligible = passBill && passQty && cartData.totalAll > 0;
+
+        // Xóa lựa chọn cũ nếu không còn đủ điều kiện
+        if (!eligible) {
+          Object.keys(selectedBonusGifts).forEach(k => {
+            if (k.startsWith(bn.id + '::')) delete selectedBonusGifts[k];
+          });
+          bn._autoDone = false;
+        } else if (bn.gifts.length === 1 && !bn._autoDone) {
+          // Tự tick nếu chỉ có 1 món quà duy nhất và đủ điều kiện
+          const stockObj = findOutletGiftStockByName(bn.gifts[0]);
+          if (!stockObj || stockObj.remaining > 0) {
+            selectedBonusGifts[`${bn.id}::${bn.gifts[0]}`] = 1;
+            bn._autoDone = true;
+          }
+        }
+
+        const condDesc = [
+          bn.minBill > 0 ? `Bill ≥ ${formatShortK(bn.minBill)}` : '',
+          bn.minQty > 0 ? `Mua ≥ ${bn.minQty} ${bn.unit !== 'ANY' ? bn.unit : 'SP'} ${bn.spec || ''}` : ''
+        ].filter(Boolean).join(' + ');
+
+        const selectedKey = Object.keys(selectedBonusGifts).find(k => k.startsWith(bn.id + '::'));
+        const selectedGiftName = selectedKey ? selectedKey.split('::')[1] : '';
+
         html += `
-          <div style="font-size:12px; color:#fbbf24; background:rgba(245,158,11,0.12); padding:9px 10px; border-radius:8px;">
-            ⚠️ Hóa đơn từ <strong>300.000đ</strong> trở lên mới đủ điều kiện nhận quà (Từ <strong>500.000đ</strong> tặng thêm Túi canvas).
+          <div style="background:rgba(15,23,42,0.88); border:1px dashed ${eligible ? '#10b981' : 'rgba(148,163,184,0.3)'}; border-radius:10px; padding:9px 10px; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:11px; font-weight:700; color:${eligible ? '#34d399' : '#fbbf24'};">
+                ${eligible ? `✓ Đủ ĐK tặng kèm (${condDesc})` : `🔒 ĐK tặng kèm: ${condDesc}`}
+              </span>
+              ${bn.minQty > 0 ? `<span style="font-size:11px; color:var(--text-sub);">Đang có: ${stats.matchedQty} ${bn.unit !== 'ANY' ? bn.unit : 'SP'}</span>` : ''}
+            </div>
+            ${bn.gifts.map(gName => {
+              const checked = selectedGiftName === gName;
+              const stockObj = findOutletGiftStockByName(gName);
+              const outOfStock = stockObj && stockObj.remaining <= 0;
+              return `
+                <label style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:4px; cursor:pointer; font-size:12px;">
+                  <span style="display:flex; align-items:center; gap:7px; color:#f8fafc; font-weight:700;">
+                    <input type="checkbox" ${checked ? 'checked' : ''} ${(!eligible || outOfStock) ? 'disabled' : ''}
+                           onchange="toggleBonusGiftChoice('${bn.id}', '${gName.replace(/'/g, "\\'")}', this.checked)"
+                           style="width:16px; height:16px; accent-color:#10b981;">
+                    🛍️ ${gName}
+                  </span>
+                  <span style="font-size:11px; color:var(--text-sub);">${stockObj ? `Tồn: ${stockObj.remaining}` : ''}</span>
+                </label>
+              `;
+            }).join('')}
           </div>
         `;
-        giftBox.innerHTML = html;
-        return;
-      }
+      });
 
-      // 1. Mục Túi Canvas Nutifood (Hóa đơn >= 500k)
-      html += `
-        <div class="promo-gift-item ${includeCanvasBag ? 'selected' : ''}" style="border-style:dashed;">
-          <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-size:12px;">
-            <input type="checkbox" ${includeCanvasBag ? 'checked' : ''} ${(!eligibleBag || bagOutOfStock) ? 'disabled' : ''}
-                   onchange="toggleCanvasBagCheck(this.checked)" style="width:16px; height:16px; accent-color:#10b981;">
-            <div>
-              <div style="font-weight:700; color:#f8fafc;">🛍️ 1 Túi canvas Nutifood</div>
-              <div style="font-size:11px; color:${eligibleBag ? '#34d399' : '#94a3b8'};">
-                ${eligibleBag ? '✓ Đạt mốc hóa đơn ≥ 500k' : 'Cần hóa đơn từ 500k'}
-                ${bagStock ? ` • Tồn: ${bagStock.remaining}` : ''}
-              </div>
+      // 2. RENDER CÁC KHUNG QUÀ THEO GIÁ TRỊ HÓA ĐƠN (CHỌN DỒN / CHIA NHỎ)
+      let hasAnyEligibleFrame = false;
+
+      activeFrames.forEach(fr => {
+        const spend = frameSpendMap[fr.id] || 0;
+        const used = frameUsedMap[fr.id] || 0;
+        const remain = Math.max(0, spend - used);
+        const sortedTiers = [...(fr.tiers || [])].sort((a, b) => a.tierAmount - b.tierAmount);
+        const eligibleTiers = sortedTiers.filter(t => spend >= t.tierAmount);
+
+        if (eligibleTiers.length === 0) return;
+        hasAnyEligibleFrame = true;
+
+        html += `
+          <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(56,189,248,0.28); border-radius:10px; padding:9px 10px; margin-bottom:8px;">
+            <div style="font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:4px;">${fr.name}</div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; background:rgba(30,41,59,0.8); padding:6px 8px; border-radius:7px; margin-bottom:8px;">
+              <span>Doanh số nhóm: <strong style="color:#fff;">${formatCurrencyVND(spend)}đ</strong></span>
+              <span>Hạn mức còn lại: <strong style="color:#34d399;">${formatCurrencyVND(remain)}đ</strong></span>
             </div>
-          </label>
-          <span class="promo-tier-badge">≥ 500k</span>
-        </div>
-      `;
+        `;
 
-      // 2. Thanh hiển thị ngân sách đổi quà còn dư
-      html += `
-        <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(56,189,248,0.25); border-radius:8px; padding:8px 10px; margin-bottom:8px; font-size:12px; display:flex; justify-content:space-between;">
-          <span>Đã quy đổi: <strong style="color:#fbbf24;">${formatCurrencyVND(usedTotal)}đ</strong></span>
-          <span>Hạn mức còn lại: <strong style="color:#34d399;">${formatCurrencyVND(remainTotal)}đ</strong></span>
-        </div>
-      `;
-
-      // 3. Danh sách quà theo từng nhóm sản phẩm khách mua
-      const renderGroupList = (grpCode, title, grpBudget, grpRemain) => {
-        if (grpBudget < (grpCode === 'A' ? 300000 : 650000)) return '';
-        const items = GROWPLUS_GIFT_RULES.filter(r => r.group === grpCode);
-        return `
-          <div style="font-size:11px; font-weight:700; color:#38bdf8; margin:8px 0 5px;">
-            ${title} (Còn dư: ${formatCurrencyVND(grpRemain)}đ)
-          </div>
-          ${items.map(r => {
-            const qty = selectedPromoGifts[r.code] || 0;
-            const stockObj = findOutletGiftStockByName(r.name);
+        eligibleTiers.forEach(t => {
+          const tierLabel = formatShortK(t.tierAmount);
+          t.gifts.forEach(gName => {
+            const key = `${fr.id}::${t.tierAmount}::${gName}`;
+            const qty = selectedFrameGifts[key] || 0;
+            const stockObj = findOutletGiftStockByName(gName);
             const noStock = stockObj && (qty >= stockObj.remaining);
-            const canAdd = (r.tier <= grpRemain) && (r.tier <= remainTotal) && !noStock;
+            const canAdd = (t.tierAmount <= remain) && !noStock;
 
-            return `
+            html += `
               <div class="promo-gift-item ${qty > 0 ? 'selected' : ''}">
                 <div>
                   <div style="font-size:12px; font-weight:700; color:#f8fafc;">
-                    ${r.name} <span class="promo-tier-badge">Mức ${r.tierLabel}</span>
+                    ${gName} <span class="promo-tier-badge">Mức ${tierLabel}</span>
                   </div>
                   <div style="font-size:11px; color:var(--text-sub);">
-                    ${stockObj ? `Tồn kho điểm: <strong style="color:${stockObj.remaining > 0 ? '#34d399' : '#f87171'};">${stockObj.remaining}</strong>` : 'Sẵn sàng phát'}
+                    ${stockObj ? `Tồn điểm: <strong style="color:${stockObj.remaining > 0 ? '#34d399' : '#f87171'};">${stockObj.remaining}</strong>` : 'Cho phép chọn dồn'}
                   </div>
                 </div>
                 <div class="promo-stepper">
-                  <button type="button" class="promo-step-btn" onclick="changePromoGiftQty('${r.code}', -1)" ${qty === 0 ? 'disabled' : ''}>−</button>
+                  <button type="button" class="promo-step-btn" onclick="changeFrameGiftQty('${key.replace(/'/g, "\\'")}', -1)" ${qty === 0 ? 'disabled' : ''}>−</button>
                   <strong style="min-width:18px; text-align:center; font-size:13px;">${qty}</strong>
-                  <button type="button" class="promo-step-btn" onclick="changePromoGiftQty('${r.code}', 1)" ${!canAdd ? 'disabled' : ''}>+</button>
+                  <button type="button" class="promo-step-btn" onclick="changeFrameGiftQty('${key.replace(/'/g, "\\'")}', 1)" ${!canAdd ? 'disabled' : ''}>+</button>
                 </div>
               </div>
             `;
-          }).join('')}
-        `;
-      };
+          });
+        });
 
-      if (totalA > 0 || totalFlex > 0) {
-        html += renderGroupList('A', '🍼 Quà Lactoferrin / Tiêu Hóa / Sữa Non', budgetA, remainA);
-      }
-      if (totalB > 0) {
-        html += renderGroupList('B', '🦒 Quà Height Boosting (TCC) / Colos Immunel', budgetB, remainB);
+        html += `</div>`;
+      });
+
+      if (!hasAnyEligibleFrame) {
+        html += `
+          <div style="font-size:12px; color:#fbbf24; background:rgba(245,158,11,0.12); padding:8px 10px; border-radius:8px;">
+            ⚠️ Nhập sản phẩm đạt mốc khung quà để mở danh sách chọn quà (VD: Từ 300k hoặc 650k tùy dòng sữa).
+          </div>
+        `;
       }
 
       giftBox.innerHTML = html;
     }
 
+    // ================= QUẢN TRỊ KHUNG QUÀ & ĐIỀU KIỆN (ADMIN) =================
+    function renderAdminPromoAll() {
+      const projFilter = document.getElementById('promoProjSelect').value || 'ALL';
+
+      // 1. Render danh sách Khung quà
+      const frames = (promoConfig.frames || []).filter(f => projFilter === 'ALL' || f.projectId === projFilter || f.projectId === 'ALL');
+      document.getElementById('adminFramesListBody').innerHTML = frames.map((fr, idx) => {
+        const tierSummary = (fr.tiers || []).map(t => `${formatShortK(t.tierAmount)} (${t.gifts.length} quà)`).join(', ');
+        return `
+          <div class="schema-item" style="flex-direction:column; align-items:stretch; gap:6px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <strong style="font-size:13px; color:#f8fafc;">${idx + 1}. ${fr.name}</strong>
+                <div style="font-size:11px; color:#38bdf8; margin-top:2px;">SP: ${fr.keywords || 'Tất cả'} • ĐVT: ${fr.unit} ${fr.spec ? '(' + fr.spec + ')' : ''}</div>
+                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Các mốc: ${tierSummary}</div>
+              </div>
+              <div class="schema-actions">
+                <button type="button" class="icon-btn" onclick="openFrameEditor('${fr.id}')">✏️</button>
+                <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.25);" onclick="deletePromoFrame('${fr.id}')">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') || '<p style="color:var(--text-sub); font-size:12px;">Chưa có khung quà nào.</p>';
+
+      // 2. Render danh sách Điều kiện tặng kèm
+      const bonuses = (promoConfig.bonuses || []).filter(b => projFilter === 'ALL' || b.projectId === projFilter || b.projectId === 'ALL');
+      document.getElementById('adminBonusListBody').innerHTML = bonuses.map((bn, idx) => {
+        const conds = [
+          bn.minBill > 0 ? `Bill ≥ ${formatShortK(bn.minBill)}` : '',
+          bn.minQty > 0 ? `Mua ≥ ${bn.minQty} ${bn.unit !== 'ANY' ? bn.unit : 'SP'} ${bn.spec || ''}` : (bn.unit !== 'ANY' ? `ĐVT: ${bn.unit}` : ''),
+          bn.keywords ? `SP: ${bn.keywords}` : 'Mọi SP'
+        ].filter(Boolean).join(' • ');
+        return `
+          <div class="schema-item">
+            <div style="padding-right:8px;">
+              <strong style="font-size:13px; color:#fbbf24;">${idx + 1}. Tặng: ${bn.gifts.join(' / ')}</strong>
+              <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">ĐK: ${conds}</div>
+            </div>
+            <div class="schema-actions">
+              <button type="button" class="icon-btn" onclick="openBonusEditor('${bn.id}')">✏️</button>
+              <button type="button" class="icon-btn" style="background:rgba(239,68,68,0.25);" onclick="deletePromoBonus('${bn.id}')">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('') || '<p style="color:var(--text-sub); font-size:12px;">Chưa có điều kiện tặng kèm nào.</p>';
+    }
+
+    function openFrameEditor(frameId) {
+      closeBonusEditor();
+      const box = document.getElementById('frameEditorBox');
+      if (!frameId) {
+        document.getElementById('frameEditorTitle').innerText = '➕ Thêm khung quà mới';
+        document.getElementById('fr_id').value = '';
+        document.getElementById('fr_name').value = '';
+        document.getElementById('fr_keywords').value = '';
+        document.getElementById('fr_unit').value = 'ANY';
+        document.getElementById('fr_spec').value = '';
+        document.getElementById('fr_tiersText').value = '';
+      } else {
+        const fr = promoConfig.frames.find(x => x.id === frameId);
+        if (!fr) return;
+        document.getElementById('frameEditorTitle').innerText = '✏️ Sửa khung quà';
+        document.getElementById('fr_id').value = fr.id;
+        document.getElementById('fr_name').value = fr.name;
+        document.getElementById('fr_keywords').value = fr.keywords || '';
+        document.getElementById('fr_unit').value = fr.unit || 'ANY';
+        document.getElementById('fr_spec').value = fr.spec || '';
+        document.getElementById('fr_tiersText').value = (fr.tiers || [])
+          .map(t => `${Math.round(t.tierAmount / 1000)} | ${t.gifts.join(' / ')}`).join('\n');
+      }
+      box.classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeFrameEditor() { document.getElementById('frameEditorBox').classList.add('hidden'); }
+
+    function fillSampleFrameTiers() {
+      document.getElementById('fr_tiersText').value =
+        "650 | Bình giữ nhiệt phiêu lưu\n" +
+        "1500 | Nồi điện đa năng hiệu Gaabor";
+    }
+
+    function saveFrameEditor() {
+      const id = document.getElementById('fr_id').value;
+      const projectId = document.getElementById('promoProjSelect').value || 'ALL';
+      const name = document.getElementById('fr_name').value.trim();
+      const keywords = document.getElementById('fr_keywords').value.trim();
+      const unit = document.getElementById('fr_unit').value;
+      const spec = document.getElementById('fr_spec').value.trim();
+      const rawTiers = document.getElementById('fr_tiersText').value.trim();
+
+      if (!name || !rawTiers) return alert('⚠️ Vui lòng nhập Tên khung quà và ít nhất 1 mốc tiền!');
+
+      const tiers = [];
+      rawTiers.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
+        const [amtStr, giftsStr] = line.split('|');
+        const amtK = parseFloat((amtStr || '').trim());
+        const gifts = (giftsStr || '').split('/').map(g => g.trim()).filter(Boolean);
+        if (!isNaN(amtK) && amtK > 0 && gifts.length > 0) {
+          tiers.push({ tierAmount: Math.round(amtK * 1000), gifts });
+        }
+      });
+
+      if (tiers.length === 0) return alert('⚠️ Cú pháp mốc quà chưa đúng (VD: 300 | Tên quà)!');
+
+      const obj = { id: id || ('FR_' + Date.now()), projectId, name, keywords, unit, spec, tiers };
+      if (id) {
+        const idx = promoConfig.frames.findIndex(x => x.id === id);
+        if (idx !== -1) promoConfig.frames[idx] = obj;
+      } else {
+        promoConfig.frames.push(obj);
+      }
+      savePromoConfigStorage();
+      closeFrameEditor();
+      renderAdminPromoAll();
+      alert('✅ Đã lưu khung quà!');
+    }
+
+    function deletePromoFrame(frameId) {
+      if (!confirm('Xóa khung quà này?')) return;
+      promoConfig.frames = promoConfig.frames.filter(x => x.id !== frameId);
+      savePromoConfigStorage();
+      renderAdminPromoAll();
+    }
+
+    function openBonusEditor(bonusId) {
+      closeFrameEditor();
+      const box = document.getElementById('bonusEditorBox');
+      if (!bonusId) {
+        document.getElementById('bonusEditorTitle').innerText = '➕ Thêm điều kiện tặng kèm';
+        document.getElementById('bn_id').value = '';
+        document.getElementById('bn_gifts').value = '';
+        document.getElementById('bn_minBill').value = 500;
+        document.getElementById('bn_minQty').value = 2;
+        document.getElementById('bn_unit').value = 'Lốc';
+        document.getElementById('bn_spec').value = '';
+        document.getElementById('bn_keywords').value = '';
+      } else {
+        const bn = promoConfig.bonuses.find(x => x.id === bonusId);
+        if (!bn) return;
+        document.getElementById('bonusEditorTitle').innerText = '✏️ Sửa điều kiện tặng kèm';
+        document.getElementById('bn_id').value = bn.id;
+        document.getElementById('bn_gifts').value = bn.gifts.join(' / ');
+        document.getElementById('bn_minBill').value = Math.round((bn.minBill || 0) / 1000);
+        document.getElementById('bn_minQty').value = bn.minQty || 0;
+        document.getElementById('bn_unit').value = bn.unit || 'ANY';
+        document.getElementById('bn_spec').value = bn.spec || '';
+        document.getElementById('bn_keywords').value = bn.keywords || '';
+      }
+      box.classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeBonusEditor() { document.getElementById('bonusEditorBox').classList.add('hidden'); }
+
+    function saveBonusEditor() {
+      const id = document.getElementById('bn_id').value;
+      const projectId = document.getElementById('promoProjSelect').value || 'ALL';
+      const gifts = document.getElementById('bn_gifts').value.split('/').map(g => g.trim()).filter(Boolean);
+      const minBill = Math.round((parseFloat(document.getElementById('bn_minBill').value) || 0) * 1000);
+      const minQty = parseInt(document.getElementById('bn_minQty').value, 10) || 0;
+      const unit = document.getElementById('bn_unit').value;
+      const spec = document.getElementById('bn_spec').value.trim();
+      const keywords = document.getElementById('bn_keywords').value.trim();
+
+      if (gifts.length === 0) return alert('⚠️ Vui lòng nhập Tên quà tặng kèm!');
+
+      const obj = { id: id || ('BN_' + Date.now()), projectId, minBill, minQty, unit, spec, keywords, gifts };
+      if (id) {
+        const idx = promoConfig.bonuses.findIndex(x => x.id === id);
+        if (idx !== -1) promoConfig.bonuses[idx] = obj;
+      } else {
+        promoConfig.bonuses.push(obj);
+      }
+      savePromoConfigStorage();
+      closeBonusEditor();
+      renderAdminPromoAll();
+      alert('✅ Đã lưu điều kiện tặng kèm!');
+    }
+
+    function deletePromoBonus(bonusId) {
+      if (!confirm('Xóa điều kiện tặng kèm này?')) return;
+      promoConfig.bonuses = promoConfig.bonuses.filter(x => x.id !== bonusId);
+      savePromoConfigStorage();
+      renderAdminPromoAll();
+    }
+
+    function resetDefaultPromoConfig() {
+      if (!confirm('Nạp lại bộ cấu hình quà chuẩn GrowPLUS+?')) return;
+      promoConfig = JSON.parse(JSON.stringify(DEFAULT_PROMO_CONFIG));
+      savePromoConfigStorage();
+      renderAdminPromoAll();
+      alert('✅ Đã nạp lại cấu hình quà GrowPLUS+!');
+    }
     function openActivityForm(type) {
       currentActivityType = type;
       const titles = {
@@ -2526,10 +2947,10 @@ let liveCamStream = null;
       const salesBox = document.getElementById('salesProductSection');
       const giftBox = document.getElementById('giftDeductionSection');
 
-      if (type === 'BAN_HANG') {
-        selectedPromoGifts = {};
-        includeCanvasBag = false;
-        giftBox.dataset.autoBagDone = '0';
+     if (type === 'BAN_HANG') {
+        selectedFrameGifts = {};
+        selectedBonusGifts = {};
+        (promoConfig.bonuses || []).forEach(b => b._autoDone = false);
         giftBox.classList.remove('hidden');
         initSalesProductSection();
         updateSalesGiftPromoUI();
@@ -2607,19 +3028,26 @@ let liveCamStream = null;
       const giftBox = document.getElementById('giftDeductionSection');
 
       if (currentActivityType === 'BAN_HANG') {
-        let giftSummaryList = [];
-        if (includeCanvasBag) {
-          giftSummaryList.push('Túi canvas Nutifood (SL: 1)');
-          const bagStock = findOutletGiftStockByName('Túi canvas');
-          if (bagStock) giftDeductions.push({ giftId: bagStock.id, qty: 1 });
-        }
+       let giftSummaryList = [];
 
-        Object.keys(selectedPromoGifts).forEach(code => {
-          const rule = GROWPLUS_GIFT_RULES.find(r => r.code === code);
-          const qty = selectedPromoGifts[code] || 0;
-          if (rule && qty > 0) {
-            giftSummaryList.push(`${rule.name} [Mức ${rule.tierLabel}] (SL: ${qty})`);
-            const stockObj = findOutletGiftStockByName(rule.name);
+        // Thu thập quà tặng kèm (Combo / Quy cách)
+        Object.keys(selectedBonusGifts).forEach(key => {
+          if (selectedBonusGifts[key] > 0) {
+            const giftName = key.split('::')[1];
+            giftSummaryList.push(`${giftName} [Tặng kèm] (SL: 1)`);
+            const stockObj = findOutletGiftStockByName(giftName);
+            if (stockObj) giftDeductions.push({ giftId: stockObj.id, qty: 1 });
+          }
+        });
+
+        // Thu thập quà theo khung giá trị hóa đơn (Chọn dồn)
+        Object.keys(selectedFrameGifts).forEach(key => {
+          const qty = selectedFrameGifts[key] || 0;
+          if (qty > 0) {
+            const [, tierStr, giftName] = key.split('::');
+            const tierLabel = formatShortK(parseInt(tierStr, 10) || 0);
+            giftSummaryList.push(`${giftName} [Mức ${tierLabel}] (SL: ${qty})`);
+            const stockObj = findOutletGiftStockByName(giftName);
             if (stockObj) giftDeductions.push({ giftId: stockObj.id, qty: qty });
           }
         });
@@ -2773,13 +3201,13 @@ let liveCamStream = null;
 
     // ================= 6. QUẢN TRỊ ADMIN & SẮP XẾP THỨ TỰ FORM =================
     function switchAdminTab(tabId, btn) {
-      
       document.querySelectorAll('.admin-pane').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
       document.getElementById(tabId).classList.remove('hidden');
       btn.classList.add('active');
-      if (tabId === 'tabFormBuilder') renderSchemaEditor();
+      if (tabId === 'tabFormBuilder') renderAdminSchemaList();
       if (tabId === 'tabProducts') renderAdminProductList();
+      if (tabId === 'tabPromoRules') renderAdminPromoAll();
     }
 
    function refreshAdminDropdowns() {
@@ -2788,6 +3216,8 @@ let liveCamStream = null;
       document.getElementById('userProjSelect').innerHTML = html;
       document.getElementById('cfgProjSelect').innerHTML = html;
      document.getElementById('prodProjSelect').innerHTML =
+        `<option value="ALL">-- Dùng chung tất cả dự án --</option>` + html;
+     document.getElementById('promoProjSelect').innerHTML =
         `<option value="ALL">-- Dùng chung tất cả dự án --</option>` + html;
 
       const sups = allUsersList.filter(u => u.role === 'SUP');
