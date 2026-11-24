@@ -497,7 +497,7 @@
   <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
   <div id="loginScreen" class="container" style="padding-top: 40px;">
     <div class="glass-card">
-      <h2 style="text-align:center; color:#38bdf8; margin-bottom:6px;">FIELD FORCE TRACKING</h2>
+      <h2 style="text-align:center; color:#38bdf8; margin-bottom:6px;">OMS ACTIVATION</h2>
       <p style="text-align:center; font-size:13px; color:var(--text-sub); margin-bottom:20px;">Đăng nhập tài khoản theo dự án</p>
 
       <div class="form-group">
@@ -2052,50 +2052,33 @@ let liveCamStream = null;
       }
       return formSchemas[projectId][actType];
     }
-// ================= DANH MỤC SẢN PHẨM & POS BÁN HÀNG =================
+// ================= DANH MỤC SẢN PHẨM CHUẨN (DÙNG CHUNG LON & LỐC) =================
     const DEFAULT_PRODUCT_CATALOG = [
       // Nhóm Tăng Chiều Cao
-      { id: 'CC01', name: 'SB GP+ BẠC TCC 1+ L800GX12 DCM', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC02', name: 'SB GP+ BẠC TCC 2+ L800GX12 LOY DCM', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC03', name: 'SDDPS GP+ TCC (BẠC) H110MLX24 LOY', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'CC04', name: 'SDDPS GP+ TCC (BẠC) H180MLX24 LOY', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 },
-      { id: 'CC05', name: 'SB NUVI GROW HEIGHT 1+ L800GX12', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC06', name: 'SB NUVI GROW HEIGHT 2+ L800GX12 LOY', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC07', name: 'SUDD NVG HEIGHT H110MLX24 LOY', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'CC08', name: 'SUDD NVG HEIGHT VỊ CHUỐI H110MLX24 LOY', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
+      { id: 'CC01', name: 'GrowPLUS+ Bạc TCC 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC02', name: 'GrowPLUS+ Bạc TCC 2+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC03', name: 'NuVi Grow Height 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC04', name: 'NuVi Grow Height 2+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC05', name: 'NuVi Grow Height Vị Chuối', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
 
       // Nhóm Tăng Đề Kháng
-      { id: 'DK01', name: 'SB GP+ VÀNG SI SN 1+ L800GX12 ND', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK02', name: 'SB GP+ VÀNG SI SN 2+ L800GX12 LOY ND', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK03', name: 'SPDDPS GP+ SN (VÀNG) 110MLX48 LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'DK04', name: 'SUDD GP+ SN (VÀNG) 1+ 180MLX48 LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 },
-      { id: 'DK05', name: 'SB GP+ COLOSTRUM LACTOFERRIN 1+ L800GX12', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK06', name: 'SB GP+ COLOSTRUM LACTOFERRIN2+L800GX12LY', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK07', name: 'SUDD GP+COLOSTRUM LACTOFERRIN110MLX24LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'DK08', name: 'SUDD GP+COLOSTRUM LACTOFERRIN180MLX24LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 },
-      { id: 'DK09', name: 'SB GP+ COLOS IMMUNEL 1+ L800GX12', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK10', name: 'SB GP+ COLOS IMMUNEL 2+ L800GX12 LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK11', name: 'SDDPS GP+ COLOS IMMUNEL H110MLX24 LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'DK12', name: 'SDDPS GP+ COLOS IMMUNEL H180MLX24 LOY', group: 'Tăng Đề Kháng', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 },
+      { id: 'DK01', name: 'GrowPLUS+ Sữa Non (Vàng) 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK02', name: 'GrowPLUS+ Sữa Non (Vàng) 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK03', name: 'GrowPLUS+ Colostrum Lactoferrin 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK04', name: 'GrowPLUS+ Colostrum Lactoferrin 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK05', name: 'GrowPLUS+ Colos Immunel 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK06', name: 'GrowPLUS+ Colos Immunel 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
 
       // Nhóm Tiêu Hóa Tốt
-      { id: 'TH01', name: 'SB GP+ XANH NHẠT TH 1+ L800GX12 TTDD', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'TH02', name: 'SB GP+ XANH NHẠT TH 2+ L800GX12 LOY TTDD', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'TH03', name: 'SUDD GP+ XANH NHẠT 1+ H110MLX48 LOY', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'TH04', name: 'SDDPS GP+ XANH NHẠT 2+ H180MLX24 LOY', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 },
+      { id: 'TH01', name: 'GrowPLUS+ Xanh Nhạt (Tiêu Hóa) 1+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'TH02', name: 'GrowPLUS+ Xanh Nhạt (Tiêu Hóa) 2+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
 
       // Nhóm Tăng Cân
-      { id: 'TC01', name: 'SB GP+ ĐỎ SDD 1+ L850GX12', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
-      { id: 'TC02', name: 'SB GP+ ĐỎ SDD 1+ L1500GX6', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '1.5kg', defaultPrice: 0 },
-      { id: 'TC03', name: 'SB GP+ ĐỎ SDD 2+ L850GX12 LOY', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
-      { id: 'TC04', name: 'SB GP+ ĐỎ SDD 2+ L1500GX6 LOY', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '1.5kg', defaultPrice: 0 },
-      { id: 'TC05', name: 'SUDD GP+ ĐỎ SDD IĐ H110MLX24 LOY', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'TC06', name: 'SUDD GP+ ĐỎ SDD IĐ H180MLX24 LOY', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 },
-      { id: 'TC07', name: 'SPDDCT GP+ 1+ (XANH) L900GX12', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 },
-      { id: 'TC08', name: 'TPBS SPDD GP+ 2+ (XANH) L900GX12_LOY', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 },
-      { id: 'TC09', name: 'SPDDCT GP+ 1+ (XANH) L1500GX6', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '1.5kg', defaultPrice: 0 },
-      { id: 'TC10', name: 'SPDDPS GP+ XANH BA H110MLX48 LOY', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'TC11', name: 'SPDDPS GP+ XANH BA H180MLX48 LOY', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '180ml', defaultPrice: 0 }
+      { id: 'TC01', name: 'GrowPLUS+ Đỏ (SDD) 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
+      { id: 'TC02', name: 'GrowPLUS+ Đỏ (SDD) 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
+      { id: 'TC03', name: 'GrowPLUS+ Đỏ Ít Đường', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
+      { id: 'TC04', name: 'GrowPLUS+ Xanh 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 },
+      { id: 'TC05', name: 'GrowPLUS+ Xanh 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 }
     ];
     let productCatalog = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_CATALOG));
 
