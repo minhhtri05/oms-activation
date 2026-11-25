@@ -2590,7 +2590,35 @@ let liveCamStream = null;
         <span class="prod-pill ${isExclude ? 'exclude' : ''}">${isExclude ? '✕' : '✓'} ${name}</span>
       `).join('');
     }
+let selectedFrameGifts = {};
+    let selectedBonusGifts = {};
 
+    function formatShortK(amount) {
+      if (amount >= 1000000) {
+        const tr = amount / 1000000;
+        return Number.isInteger(tr) ? `${tr}tr` : `${tr.toFixed(1)}tr`;
+      }
+      return `${Math.round(amount / 1000)}k`;
+    }
+
+    function getCartItemsForPromo() {
+      const items = [];
+      let totalAll = 0;
+      document.querySelectorAll('.pos-card').forEach(row => {
+        const name = row.dataset.selectedProduct;
+        if (!name) return;
+        const unit = row.querySelector('.pos-unit-val').value;
+        const spec = row.querySelector('.pos-spec-select').value;
+        const qty = parseInt(row.querySelector('.pos-qty-input').value, 10) || 0;
+        const price = parsePriceInVND(row.querySelector('.pos-price-input').value);
+        const subtotal = qty * price;
+        if (qty > 0 && subtotal > 0) {
+          totalAll += subtotal;
+          items.push({ name, normName: removeVietnameseTones(name), unit, spec, qty, subtotal });
+        }
+      });
+      return { items, totalAll };
+    }
     // Tính doanh số & số lượng khớp chính xác theo danh sách tên SP đã tick
     function calcMatchingCartStats(ruleObj, cartData) {
       const incList = ruleObj.includeProducts || [];
@@ -3229,8 +3257,8 @@ let liveCamStream = null;
             detailText: detailText,
             structuredFields: structuredFields,
             photos: allPhotosToUpload,
-            giftDeduction: giftDeduction,
-            giftDeduction: giftDeductions
+           giftDeduction: giftDeduction,
+           giftDeductions: giftDeductions
           }
         });
         hideLoading();
