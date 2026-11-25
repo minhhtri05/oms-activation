@@ -126,7 +126,7 @@
     .outlet-code { font-size: 12px; font-weight: 700; color: #38bdf8; margin: 4px 0; }
     .outlet-addr { font-size: 13px; color: var(--text-sub); margin-bottom: 12px; }
 
-    /* CARD LỊCH SỬ CA LÀM (GIỐNG MẪU) */
+    /* CARD LỊCH SỬ CA LÀM */
     .shift-history-card {
       background: rgba(24, 33, 54, 0.95);
       border: 1px solid rgba(56, 189, 248, 0.25);
@@ -1059,7 +1059,7 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <h4 style="color:#38bdf8;">🛒 Danh Mục Sản Phẩm</h4>
         <button type="button" class="icon-btn" style="background:rgba(16,185,129,0.2); color:#34d399; font-size:11px;" onclick="seedDefaultProductsToSheet()">
-          📥 Nạp 39 SP mẫu
+          📥 Nạp 18 SP mẫu
         </button>
       </div>
       <p style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">Đơn vị (Lon/Lốc), quy cách và giá sẽ do PG tự nhập khi tạo bill</p>
@@ -1322,15 +1322,15 @@
         ]
       },
       SAMPLING: {
-    photos: [
-      { label: 'Ảnh khách dùng thử / nhận quà', required: true }
-    ],
-    fields: [
-      { label: 'Tên khách hàng', type: 'text', required: true },
-      { label: 'Số điện thoại', type: 'tel', required: false },
-      { label: 'Sản phẩm dùng thử / Quà tặng', type: 'text', required: false }
-    ]
-  }
+        photos: [
+          { label: 'Ảnh khách dùng thử / nhận quà', required: true }
+        ],
+        fields: [
+          { label: 'Tên khách hàng', type: 'text', required: true },
+          { label: 'Số điện thoại', type: 'tel', required: false },
+          { label: 'Sản phẩm dùng thử / Quà tặng', type: 'text', required: false }
+        ]
+      }
     };
 
     let projects = [];
@@ -1580,7 +1580,7 @@
           : JSON.parse(JSON.stringify(DEFAULT_PRODUCT_CATALOG));
         khoTonDauList = res.khoTonDau || [];
         phieuXuatNhapList = res.phieuXuatNhap || [];
-        if (res.promoConfig && res.promoConfig.frames) {
+        if (res.promoConfig && Array.isArray(res.promoConfig.frames)) {
           promoConfig = res.promoConfig;
           localStorage.setItem('oms_promo_config_v6', JSON.stringify(promoConfig));
         }
@@ -2141,42 +2141,42 @@
     }
 
     function getSchemaFor(projectId, actType) {
-  if (!formSchemas[projectId]) {
-    formSchemas[projectId] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA));
-  }
-  if (!formSchemas[projectId][actType]) {
-    formSchemas[projectId][actType] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA[actType]));
-  }
-  return formSchemas[projectId][actType];
-}
+      if (!formSchemas[projectId]) {
+        formSchemas[projectId] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA));
+      }
+      if (!formSchemas[projectId][actType]) {
+        formSchemas[projectId][actType] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA[actType]));
+      }
+      return formSchemas[projectId][actType];
+    }
 
     // ================= DANH MỤC SẢN PHẨM CHUẨN (DÙNG CHUNG LON & LỐC) =================
     const DEFAULT_PRODUCT_CATALOG = [
       // Nhóm Tăng Chiều Cao
-      { id: 'CC01', name: 'GrowPLUS+ Bạc TCC 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC02', name: 'GrowPLUS+ Bạc TCC 2+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC03', name: 'NuVi Grow Height 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC04', name: 'NuVi Grow Height 2+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'CC05', name: 'NuVi Grow Height Vị Chuối', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
+      { id: 'CC01', projectId: 'ALL', name: 'GrowPLUS+ Bạc TCC 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC02', projectId: 'ALL', name: 'GrowPLUS+ Bạc TCC 2+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC03', projectId: 'ALL', name: 'NuVi Grow Height 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC04', projectId: 'ALL', name: 'NuVi Grow Height 2+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'CC05', projectId: 'ALL', name: 'NuVi Grow Height Vị Chuối', group: 'Tăng Chiều Cao', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
 
       // Nhóm Tăng Đề Kháng
-      { id: 'DK01', name: 'GrowPLUS+ Sữa Non (Vàng) 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK02', name: 'GrowPLUS+ Sữa Non (Vàng) 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK03', name: 'GrowPLUS+ Colostrum Lactoferrin 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK04', name: 'GrowPLUS+ Colostrum Lactoferrin 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK05', name: 'GrowPLUS+ Colos Immunel 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'DK06', name: 'GrowPLUS+ Colos Immunel 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK01', projectId: 'ALL', name: 'GrowPLUS+ Sữa Non (Vàng) 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK02', projectId: 'ALL', name: 'GrowPLUS+ Sữa Non (Vàng) 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK03', projectId: 'ALL', name: 'GrowPLUS+ Colostrum Lactoferrin 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK04', projectId: 'ALL', name: 'GrowPLUS+ Colostrum Lactoferrin 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK05', projectId: 'ALL', name: 'GrowPLUS+ Colos Immunel 1+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'DK06', projectId: 'ALL', name: 'GrowPLUS+ Colos Immunel 2+', group: 'Tăng Đề Kháng', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
 
       // Nhóm Tiêu Hóa Tốt
-      { id: 'TH01', name: 'GrowPLUS+ Xanh Nhạt (Tiêu Hóa) 1+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
-      { id: 'TH02', name: 'GrowPLUS+ Xanh Nhạt (Tiêu Hóa) 2+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'TH01', projectId: 'ALL', name: 'GrowPLUS+ Xanh Nhạt (Tiêu Hóa) 1+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
+      { id: 'TH02', projectId: 'ALL', name: 'GrowPLUS+ Xanh Nhạt (Tiêu Hóa) 2+', group: 'Tiêu Hóa Tốt', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
 
       // Nhóm Tăng Cân
-      { id: 'TC01', name: 'GrowPLUS+ Đỏ (SDD) 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
-      { id: 'TC02', name: 'GrowPLUS+ Đỏ (SDD) 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
-      { id: 'TC03', name: 'GrowPLUS+ Đỏ Ít Đường', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
-      { id: 'TC04', name: 'GrowPLUS+ Xanh 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 },
-      { id: 'TC05', name: 'GrowPLUS+ Xanh 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 }
+      { id: 'TC01', projectId: 'ALL', name: 'GrowPLUS+ Đỏ (SDD) 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
+      { id: 'TC02', projectId: 'ALL', name: 'GrowPLUS+ Đỏ (SDD) 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '850g', defaultPrice: 0 },
+      { id: 'TC03', projectId: 'ALL', name: 'GrowPLUS+ Đỏ Ít Đường', group: 'Tăng Cân', defaultUnit: 'Lốc', defaultSpec: '110ml', defaultPrice: 0 },
+      { id: 'TC04', projectId: 'ALL', name: 'GrowPLUS+ Xanh 1+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 },
+      { id: 'TC05', projectId: 'ALL', name: 'GrowPLUS+ Xanh 2+', group: 'Tăng Cân', defaultUnit: 'Lon', defaultSpec: '900g', defaultPrice: 0 }
     ];
     let productCatalog = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_CATALOG));
 
@@ -2190,7 +2190,12 @@
 
     function removeVietnameseTones(str) {
       if (!str) return '';
-      return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+      return String(str)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .toLowerCase();
     }
 
     function formatCurrencyVND(num) {
@@ -2211,7 +2216,7 @@
       box.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <strong style="font-size:13px; color:#38bdf8;">🛒 Danh sách sản phẩm khách mua *</strong>
-          <span style="font-size:11px; color:var(--text-sub);">Gõ từ khóa (VD: colostrum)</span>
+          <span style="font-size:11px; color:var(--text-sub);">Gõ từ khóa (VD: xanh, colostrum)</span>
         </div>
 
         <div id="posProductsContainer"></div>
@@ -2253,7 +2258,7 @@
 
         <div style="position:relative;">
           <div class="pos-search-wrap">
-            <input type="text" class="pos-search-input" placeholder="🔍 Gõ tên SP (VD: colostrum) hoặc 0 để dừng..."
+            <input type="text" class="pos-search-input" placeholder="🔍 Gõ tên SP (VD: xanh, colostrum) hoặc 0 để dừng..."
                    oninput="handlePosSearch(this, '${rowId}')" onfocus="handlePosSearch(this, '${rowId}')" autocomplete="off">
           </div>
           <div class="pos-dropdown hidden"></div>
@@ -2320,18 +2325,29 @@
         return;
       }
 
-      const normKey = removeVietnameseTones(keyword);
-      const currentProj = selectedOutlet ? selectedOutlet.projectId : 'ALL';
-      const matches = productCatalog.filter(item =>
-        (!item.projectId || item.projectId === 'ALL' || item.projectId === currentProj) &&
-        (removeVietnameseTones(item.name).includes(normKey) || removeVietnameseTones(item.group).includes(normKey))
-      );
+      const tokens = removeVietnameseTones(keyword).split(/\s+/).filter(Boolean);
+      const currentProj = String(selectedOutlet ? selectedOutlet.projectId : 'ALL').trim().toUpperCase();
+
+      const seenNames = new Set();
+      const matches = productCatalog.filter(item => {
+        const itemProj = String(item.projectId || 'ALL').trim().toUpperCase();
+        if (itemProj !== 'ALL' && itemProj !== currentProj) return false;
+
+        const haystack = removeVietnameseTones(`${item.name} ${item.group}`);
+        const isMatch = tokens.length === 0 || tokens.every(tk => haystack.includes(tk));
+        if (!isMatch) return false;
+
+        const dedupKey = String(item.name || '').trim().toLowerCase();
+        if (seenNames.has(dedupKey)) return false;
+        seenNames.add(dedupKey);
+        return true;
+      });
 
       if (matches.length === 0) {
         dropdown.innerHTML = `<div style="padding:10px; font-size:12px; color:#94a3b8; text-align:center;">Không tìm thấy "${rawVal}"</div>`;
       } else {
         dropdown.innerHTML = matches.map(item => `
-          <button type="button" class="pos-dropdown-item" onclick="selectPosProduct('${rowId}', '${item.id}')">
+          <button type="button" class="pos-dropdown-item" onclick="selectPosProduct('${rowId}', '${String(item.id).replace(/'/g, "\\'")}')">
             <div>
               <div style="font-size:13px; font-weight:700;">${item.name}</div>
               <div style="font-size:11px; color:#94a3b8;">Nhóm: ${item.group}</div>
@@ -2358,8 +2374,9 @@
       tag.classList.remove('hidden');
 
       row.querySelector('.pos-details').classList.remove('hidden');
-      // Mặc định mở ở Lon (800g) hoặc Lốc (110ml), giá để trống cho PG tự điền
-      selectPosUnit(rowId, prod.defaultUnit || 'Lon', prod.defaultSpec || null);
+      // Tự nhận diện đơn vị mặc định nếu tên bắt đầu bằng SBPS -> Lốc, ngược lại Lon
+      const autoUnit = prod.defaultUnit || (/^sbps\b/i.test(prod.name.trim()) ? 'Lốc' : 'Lon');
+      selectPosUnit(rowId, autoUnit, prod.defaultSpec || null);
       row.querySelector('.pos-price-input').value = '';
       row.querySelector('.pos-price-input').focus();
 
@@ -2540,10 +2557,12 @@
     let selectedFrameGifts = {};
     let selectedBonusGifts = {};
 
-    function savePromoConfigStorage() {
+    async function savePromoConfigStorage() {
       localStorage.setItem('oms_promo_config_v6', JSON.stringify(promoConfig));
       if (typeof callSheetApi === 'function') {
-        callSheetApi({ action: 'savePromoConfig', config: promoConfig });
+        try {
+          await callSheetApi({ action: 'savePromoConfig', config: promoConfig });
+        } catch (e) {}
       }
     }
 
@@ -2664,10 +2683,16 @@
       const normKey = removeVietnameseTones(keyword || '');
       const selectedSet = pickerState[containerId] || new Set();
 
-      const filtered = productCatalog.filter(p =>
-        (projFilter === 'ALL' || !p.projectId || p.projectId === 'ALL' || p.projectId === projFilter) &&
-        (!normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey))
-      );
+      const seenNames = new Set();
+      const filtered = productCatalog.filter(p => {
+        const matchProj = projFilter === 'ALL' || !p.projectId || p.projectId === 'ALL' || p.projectId === projFilter;
+        const matchKey = !normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey);
+        if (!matchProj || !matchKey) return false;
+        const dKey = String(p.name || '').trim().toLowerCase();
+        if (seenNames.has(dKey)) return false;
+        seenNames.add(dKey);
+        return true;
+      });
 
       const pillsHtml = Array.from(selectedSet).map(name => `
         <span class="prod-pill ${isExclude ? 'exclude' : ''}">${name}</span>
@@ -2990,7 +3015,7 @@
         : "300 | Gấu thỏ biến hình\n500 | Đồ chơi khiêu vũ";
     }
 
-    function saveFrameEditor() {
+    async function saveFrameEditor() {
       const id = document.getElementById('fr_id').value;
       const projectId = document.getElementById('promoProjSelect').value || 'ALL';
       const name = document.getElementById('fr_name').value.trim();
@@ -3014,7 +3039,7 @@
           if (mode === 'QTY') {
             tiers.push({ tierQty: Math.round(numVal), gifts });
           } else {
-            if (cleanVal.includes('tr')) numVal = numVal * 1000; // Tự quy đổi 1tr -> 1000k
+            if (cleanVal.includes('tr')) numVal = numVal * 1000;
             tiers.push({ tierAmount: Math.round(numVal * 1000), gifts });
           }
         }
@@ -3029,16 +3054,20 @@
       } else {
         promoConfig.frames.push(obj);
       }
-      savePromoConfigStorage();
+      showLoading('Đang lưu cấu hình khung quà...');
+      await savePromoConfigStorage();
+      hideLoading();
       closeFrameEditor();
       renderAdminPromoAll();
       alert('✅ Đã lưu khung quà!');
     }
 
-    function deletePromoFrame(frameId) {
+    async function deletePromoFrame(frameId) {
       if (!confirm('Xóa khung quà này?')) return;
       promoConfig.frames = promoConfig.frames.filter(x => x.id !== frameId);
-      savePromoConfigStorage();
+      showLoading('Đang cập nhật...');
+      await savePromoConfigStorage();
+      hideLoading();
       renderAdminPromoAll();
     }
 
@@ -3072,7 +3101,7 @@
 
     function closeBonusEditor() { document.getElementById('bonusEditorBox').classList.add('hidden'); }
 
-    function saveBonusEditor() {
+    async function saveBonusEditor() {
       const id = document.getElementById('bn_id').value;
       const projectId = document.getElementById('promoProjSelect').value || 'ALL';
       const gifts = document.getElementById('bn_gifts').value.split('/').map(g => g.trim()).filter(Boolean);
@@ -3091,23 +3120,29 @@
       } else {
         promoConfig.bonuses.push(obj);
       }
-      savePromoConfigStorage();
+      showLoading('Đang lưu điều kiện tặng kèm...');
+      await savePromoConfigStorage();
+      hideLoading();
       closeBonusEditor();
       renderAdminPromoAll();
       alert('✅ Đã lưu điều kiện tặng kèm!');
     }
 
-    function deletePromoBonus(bonusId) {
+    async function deletePromoBonus(bonusId) {
       if (!confirm('Xóa điều kiện tặng kèm này?')) return;
       promoConfig.bonuses = promoConfig.bonuses.filter(x => x.id !== bonusId);
-      savePromoConfigStorage();
+      showLoading('Đang cập nhật...');
+      await savePromoConfigStorage();
+      hideLoading();
       renderAdminPromoAll();
     }
 
-    function resetDefaultPromoConfig() {
+    async function resetDefaultPromoConfig() {
       if (!confirm('Nạp lại bộ cấu hình quà chuẩn GrowPLUS+?')) return;
       promoConfig = JSON.parse(JSON.stringify(DEFAULT_PROMO_CONFIG));
-      savePromoConfigStorage();
+      showLoading('Đang đồng bộ cấu hình quà...');
+      await savePromoConfigStorage();
+      hideLoading();
       renderAdminPromoAll();
       alert('✅ Đã nạp lại cấu hình quà GrowPLUS+!');
     }
@@ -3875,14 +3910,50 @@
     }
 
     // ================= QUẢN LÝ DANH MỤC SẢN PHẨM (CHỈ TÊN & NHÓM) =================
+    function mergeProductsToLocalCatalog(newItems) {
+      (newItems || []).forEach(np => {
+        const pId = String(np.projectId || 'ALL').trim();
+        const pName = String(np.name || '').trim();
+        if (!pName) return;
+
+        const existingIdx = productCatalog.findIndex(x =>
+          String(x.id) === String(np.id) ||
+          (String(x.projectId || 'ALL').trim().toLowerCase() === pId.toLowerCase() &&
+           String(x.name || '').trim().toLowerCase() === pName.toLowerCase())
+        );
+
+        if (existingIdx !== -1) {
+          productCatalog[existingIdx] = {
+            ...productCatalog[existingIdx],
+            id: np.id || productCatalog[existingIdx].id,
+            projectId: pId,
+            name: pName,
+            group: np.group || productCatalog[existingIdx].group || 'Khác'
+          };
+        } else {
+          productCatalog.unshift({
+            id: np.id,
+            projectId: pId,
+            name: pName,
+            group: np.group || 'Khác'
+          });
+        }
+      });
+    }
+
     function renderAdminProductList() {
       const projFilter = document.getElementById('prodProjSelect').value || 'ALL';
       const keyword = removeVietnameseTones(document.getElementById('prodSearchFilter').value.trim());
 
+      const seen = new Set();
       const list = productCatalog.filter(p => {
         const matchProj = (projFilter === 'ALL') ? true : (p.projectId === projFilter || p.projectId === 'ALL');
         const matchKey = !keyword || removeVietnameseTones(p.name).includes(keyword) || removeVietnameseTones(p.group).includes(keyword);
-        return matchProj && matchKey;
+        if (!matchProj || !matchKey) return false;
+        const dKey = String(p.projectId || 'ALL').toLowerCase() + '||' + String(p.name || '').trim().toLowerCase();
+        if (seen.has(dKey)) return false;
+        seen.add(dKey);
+        return true;
       });
 
       document.getElementById('adminProdCount').innerText = list.length;
@@ -3945,12 +4016,7 @@
       const res = await callSheetApi({ action: 'upsertProduct', product: { id, projectId, name, group } });
       hideLoading();
 
-      if (id) {
-        const idx = productCatalog.findIndex(x => String(x.id) === String(id));
-        if (idx !== -1) productCatalog[idx] = { id, projectId, name, group };
-      } else {
-        productCatalog.unshift({ id: res.id, projectId, name, group });
-      }
+      mergeProductsToLocalCatalog([{ id: res.id || id, projectId, name, group }]);
       closeSingleProductEditor();
       renderAdminProductList();
       alert('✅ Đã lưu sản phẩm thành công!');
@@ -3989,11 +4055,11 @@
       hideLoading();
 
       if (res.products && res.products.length > 0) {
-        productCatalog = res.products.concat(productCatalog);
+        mergeProductsToLocalCatalog(res.products);
       }
       closeBulkProductEditor();
       renderAdminProductList();
-      alert(`✅ Đã thêm thành công ${parsedList.length} sản phẩm!`);
+      alert(`✅ Đã đồng bộ thành công ${parsedList.length} sản phẩm!`);
     }
 
     async function deleteAdminProduct(prodId) {
@@ -4009,18 +4075,18 @@
     }
 
     async function seedDefaultProductsToSheet() {
-      if (!confirm('Nạp toàn bộ 39 sản phẩm mẫu lên tab SanPham trên Google Sheet?')) return;
+      if (!confirm(`Nạp toàn bộ ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu lên tab SanPham trên Google Sheet?`)) return;
       const projectId = document.getElementById('prodProjSelect').value || 'ALL';
       const payload = DEFAULT_PRODUCT_CATALOG.map(p => ({ projectId, name: p.name, group: p.group }));
 
-      showLoading('Đang nạp 39 sản phẩm mẫu lên Sheet...');
+      showLoading(`Đang nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu lên Sheet...`);
       const res = await callSheetApi({ action: 'bulkAddProducts', products: payload });
       hideLoading();
 
       if (res.products) {
-        productCatalog = res.products;
+        mergeProductsToLocalCatalog(res.products);
         renderAdminProductList();
-        alert('✅ Đã nạp 39 sản phẩm mẫu lên Sheet!');
+        alert(`✅ Đã nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu lên Sheet!`);
       }
     }
   </script>
