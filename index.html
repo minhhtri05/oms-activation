@@ -876,16 +876,16 @@
       <button type="button" class="plus-circle-btn" onclick="openActivityForm('CHECKIN_FB')">+</button>
     </div>
 
-    <div class="activity-card"> <!-- giữ nguyên class thẻ của bạn -->
-   <div>
-      <div class="activity-title">Hoạt động Sampling & Tặng Quà</div>
-     <div class="activity-sub">
-        <span onclick="openActivityList('SAMPLING')">☰ DANH SÁCH</span>
-       <span>Tổng số tại điểm: <strong id="count_SAMPLING">0</strong></span>
+    <div class="activity-card">
+      <div>
+        <div class="act-title">Hoạt động Sampling & Tặng Quà</div>
+        <div class="act-meta">
+          <span class="list-link" onclick="openActivityList('SAMPLING')">☰ DANH SÁCH</span>
+          <span>Tổng số tại điểm: <strong id="count_SAMPLING" style="color:#fff;">0</strong></span>
+        </div>
       </div>
-   </div>
-   <button class="btn-add-circle" onclick="openActivityForm('SAMPLING')">+</button>
-  </div>
+      <button type="button" class="plus-circle-btn" onclick="openActivityForm('SAMPLING')">+</button>
+    </div>
 
     <div class="bottom-action-bar">
       <button type="button" class="bar-action-btn" onclick="alert('✅ Toàn bộ dữ liệu đã được lưu trực tiếp lên Google Sheet!')">ĐÃ ĐỒNG BỘ SHEET ✓</button>
@@ -1000,6 +1000,7 @@
             <option value="VONG_QUAY">Vòng quay may mắn</option>
             <option value="MINI_GAME">Mini Game</option>
             <option value="CHECKIN_FB">Check-in FB nhận quà</option>
+            <option value="SAMPLING">Sampling & Tặng Quà</option>
           </select>
         </div>
       </div>
@@ -1792,7 +1793,8 @@
         { code: 'BAN_HANG', name: 'Hoạt động bán hàng' },
         { code: 'VONG_QUAY', name: 'Hoạt động chơi vòng quay may mắn' },
         { code: 'MINI_GAME', name: 'Hoạt động Mini Game' },
-        { code: 'CHECKIN_FB', name: 'Hoạt động check-in FB nhận quà' }
+        { code: 'CHECKIN_FB', name: 'Hoạt động check-in FB nhận quà' },
+        { code: 'SAMPLING', name: 'Hoạt động Sampling & Tặng Quà' }
       ];
 
       document.getElementById('shDetailActivitiesBody').innerHTML = actTypes.map(act => {
@@ -2133,7 +2135,7 @@
     }
 
     function refreshOutletCounters() {
-      ['BAN_HANG', 'VONG_QUAY', 'MINI_GAME', 'CHECKIN_FB'].forEach(type => {
+      ['BAN_HANG', 'VONG_QUAY', 'MINI_GAME', 'CHECKIN_FB', 'SAMPLING'].forEach(type => {
         document.getElementById('count_' + type).innerText = getRecordsForCurrentShift(type).length;
       });
     }
