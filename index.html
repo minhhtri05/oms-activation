@@ -2586,7 +2586,94 @@ let liveCamStream = null;
       });
       return { matchedSpend, matchedQty };
     }
+// 1. Tìm tồn kho quà tại điểm hiện tại theo tên quà
+function findOutletGiftStockByName(giftName) {
+  if (!selectedOutlet || !giftName) return null;
+  const target = removeVietnameseTones(giftName.trim());
+  return giftStocks.find(g =>
+    g.projectId === selectedOutlet.projectId &&
+    g.outletCode === selectedOutlet.code &&
+    removeVietnameseTones(g.name.trim()) === target
+  ) || null;
+}
 
+// 2. Tăng/giảm số lượng quà chọn dồn theo khung
+function changeFrameGiftQty(key, delta) {
+  const next = (selectedFrameGifts[key] || 0) + delta;
+  if (next <= 0) {
+    delete selectedFrameGifts[key];
+  } else {
+    selectedFrameGifts[key] = next;
+  }
+  updateSalesGiftPromoUI();
+}
+
+// 3. Tick chọn quà tặng kèm (Combo / Quy cách - chỉ chọn 1 món trong nhóm)
+function toggleBonusGiftChoice(bnId, giftName, isChecked) {
+  Object.keys(selectedBonusGifts).forEach(k => {
+    if (k.startsWith(bnId + '::')) delete selectedBonusGifts[k];
+  });
+  if (isChecked) {
+    selectedBonusGifts[`${bnId}::${giftName}`] = 1;
+  }
+  updateSalesGiftPromoUI();
+}
+
+// 4. Bộ chọn nhiều sản phẩm áp dụng / loại trừ trong Admin (ĐK Quà)
+let pickerState = {};
+
+function initProdPicker(containerId, selectedList, isExclude) {
+  pickerState[containerId] = new Set(selectedList || []);
+  renderProdPicker(containerId, '', isExclude);
+}
+
+function renderProdPicker(containerId, keyword, isExclude) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const projFilter = document.getElementById('promoProjSelect')?.value || 'ALL';
+  const normKey = removeVietnameseTones(keyword || '');
+  const selectedSet = pickerState[containerId] || new Set();
+
+  const filtered = productCatalog.filter(p =>
+    (projFilter === 'ALL' || !p.projectId || p.projectId === 'ALL' || p.projectId === projFilter) &&
+    (!normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey))
+  );
+
+  const pillsHtml = Array.from(selectedSet).map(name => `
+    <span class="prod-pill ${isExclude ? 'exclude' : ''}">${name}</span>
+  `).join('');
+
+  container.innerHTML = `
+    <div class="prod-picker-box">
+      <input type="text" placeholder="🔍 Tìm tên SP để tick..." value="${keyword || ''}"
+             oninput="renderProdPicker('${containerId}', this.value, ${isExclude})"
+             style="padding:7px 10px; font-size:12px;">
+      <div class="selected-pills-wrap">${pillsHtml}</div>
+      <div class="prod-picker-list">
+        ${filtered.map(p => {
+          const checked = selectedSet.has(p.name) ? 'checked' : '';
+          const safeName = p.name.replace(/'/g, "\\'");
+          return `
+            <label class="prod-picker-item ${isExclude ? 'exclude' : ''}">
+              <input type="checkbox" ${checked} onchange="toggleProdPickerItem('${containerId}', '${safeName}', this.checked, ${isExclude})">
+              <span>${p.name} <small style="color:#94a3b8;">(${p.group})</small></span>
+            </label>
+          `;
+        }).join('') || '<div style="font-size:11px; color:#94a3b8; padding:6px;">Không có sản phẩm phù hợp</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
+  if (!pickerState[containerId]) pickerState[containerId] = new Set();
+  if (isChecked) pickerState[containerId].add(prodName);
+  else pickerState[containerId].delete(prodName);
+
+  const input = document.querySelector(`#${containerId} input[type="text"]`);
+  renderProdPicker(containerId, input ? input.value : '', isExclude);
+}
     function updateSalesGiftPromoUI() {
       const giftBox = document.getElementById('giftDeductionSection');
       if (!giftBox || currentActivityType !== 'BAN_HANG') return;
@@ -3292,7 +3379,7 @@ let liveCamStream = null;
       document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
       document.getElementById(tabId).classList.remove('hidden');
       btn.classList.add('active');
-      if (tabId === 'tabFormBuilder') renderAdminSchemaList();
+      if (tabId === 'tabFormBuilder') renderSchemaEditor();
       if (tabId === 'tabProducts') renderAdminProductList();
       if (tabId === 'tabPromoRules') renderAdminPromoAll();
     }
