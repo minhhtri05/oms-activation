@@ -323,9 +323,9 @@
       gap: 8px;
       margin-bottom: 10px;
     }
-    .pos-unit-switch {
+   .pos-unit-switch {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 4px;
       background: rgba(30, 41, 59, 0.9);
       padding: 3px;
@@ -1147,31 +1147,41 @@
             <div id="fr_excludePicker"></div>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
             <div>
-              <label>Đơn vị áp dụng</label>
-              <select id="fr_unit">
-                <option value="ANY">Tất cả (Lon & Lốc)</option>
-                <option value="Lon">Chỉ tính Lon</option>
-                <option value="Lốc">Chỉ tính Lốc</option>
+              <label>Xét mốc theo *</label>
+              <select id="fr_mode" onchange="updateFrameModeHint()">
+                <option value="AMOUNT">💰 Giá trị tiền (nghìn đ)</option>
+                <option value="QTY">📦 Số lượng mua (Lon/Lốc/Thùng)</option>
               </select>
             </div>
             <div>
-              <label>Quy cách bắt buộc (nếu có)</label>
-              <input type="text" id="fr_spec" placeholder="VD: 800g (trống = mọi loại)">
+              <label>Đơn vị áp dụng</label>
+              <select id="fr_unit">
+                <option value="ANY">Tất cả (Lon / Lốc / Thùng)</option>
+                <option value="Lon">Chỉ tính Lon</option>
+                <option value="Lốc">Chỉ tính Lốc</option>
+                <option value="Thùng">Chỉ tính Thùng</option>
+                <option value="Lon,Thùng">Lon hoặc Thùng</option>
+              </select>
             </div>
           </div>
 
           <div class="form-group">
+            <label>Quy cách bắt buộc (nếu có)</label>
+            <input type="text" id="fr_spec" placeholder="VD: 800g hoặc 110ml (trống = mọi quy cách)">
+          </div>
+
+          <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label style="margin:0;">Các mốc tiền & quà (Mỗi dòng 1 mốc) *</label>
+              <label style="margin:0;">Các mốc & quà tặng (Mỗi dòng 1 mốc) *</label>
               <button type="button" class="icon-btn" style="font-size:11px;" onclick="fillSampleFrameTiers()">Điền mẫu</button>
             </div>
-            <p style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">
-              Cú pháp: <code style="color:#38bdf8;">Số tiền (nghìn đồng) | Quà 1 / Quà 2 / Quà 3</code>
+            <p id="fr_modeHint" style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">
+              Cú pháp theo tiền: <code style="color:#38bdf8;">Số tiền nghìn đồng | Quà 1 / Quà 2</code> (VD: <code>500 | Gấu thỏ biến hình</code>)
             </p>
-            <textarea id="fr_tiersText" rows="6" style="width:100%; padding:10px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.3); border-radius:10px; color:#fff; font-size:12px;"
-              placeholder="300 | Bộ đồ chơi bóng rổ&#10;500 | Bình nước cao cấp GrowPLUS+&#10;3000 | Quà A / Quà B / Quà C"></textarea>
+            <textarea id="fr_tiersText" rows="5" style="width:100%; padding:10px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.3); border-radius:10px; color:#fff; font-size:12px;"
+              placeholder="1 | Bình lọc trà giữ nhiệt&#10;3 | Ấm đun siêu tốc"></textarea>
           </div>
 
           <div style="display:flex; gap:8px;">
@@ -2134,7 +2144,8 @@ let liveCamStream = null;
 
     const UNIT_SPECS = {
       'Lon': ['350g', '400g', '780g', '800g', '850g', '900g', '1.5kg', '1.65kg'],
-      'Lốc': ['110ml', '180ml']
+      'Lốc': ['110ml', '180ml'],
+      'Thùng': ['Thùng 48 hộp 110ml', 'Thùng 48 hộp 180ml', 'Thùng 24 hộp', 'Thùng 12 lon', 'Thùng 6 lon', 'Thùng 6 hộp', 'Thùng 12 hộp']
     };
 
     let posRowCounter = 0;
@@ -2221,6 +2232,7 @@ let liveCamStream = null;
               <div class="pos-unit-switch">
                 <button type="button" class="pos-unit-btn pos-btn-lon active" onclick="selectPosUnit('${rowId}', 'Lon')">Lon</button>
                 <button type="button" class="pos-unit-btn pos-btn-loc" onclick="selectPosUnit('${rowId}', 'Lốc')">Lốc</button>
+                <button type="button" class="pos-unit-btn pos-btn-thung" onclick="selectPosUnit('${rowId}', 'Thùng')">Thùng</button>
               </div>
               <input type="hidden" class="pos-unit-val" value="Lon">
             </div>
@@ -2333,23 +2345,21 @@ let liveCamStream = null;
       const row = document.getElementById(rowId);
       const btnLon = row.querySelector('.pos-btn-lon');
       const btnLoc = row.querySelector('.pos-btn-loc');
+      const btnThung = row.querySelector('.pos-btn-thung');
       const specLabel = row.querySelector('.pos-spec-label');
       const specSelect = row.querySelector('.pos-spec-select');
       row.querySelector('.pos-unit-val').value = unit;
 
       const specs = UNIT_SPECS[unit] || [];
-      const defaultVal = (preferredSpec && specs.includes(preferredSpec)) ? preferredSpec : (unit === 'Lon' ? '800g' : '110ml');
+      const defaultVal = (preferredSpec && specs.includes(preferredSpec))
+        ? preferredSpec
+        : (unit === 'Lon' ? '800g' : (unit === 'Lốc' ? '110ml' : specs[0]));
       specSelect.innerHTML = specs.map(s => `<option value="${s}" ${s === defaultVal ? 'selected' : ''}>${s}</option>`).join('');
 
-      if (unit === 'Lon') {
-        btnLon.classList.add('active');
-        btnLoc.classList.remove('active');
-        specLabel.textContent = 'Quy cách Lon';
-      } else {
-        btnLoc.classList.add('active');
-        btnLon.classList.remove('active');
-        specLabel.textContent = 'Dung tích Lốc';
-      }
+      btnLon.classList.toggle('active', unit === 'Lon');
+      btnLoc.classList.toggle('active', unit === 'Lốc');
+      if (btnThung) btnThung.classList.toggle('active', unit === 'Thùng');
+      specLabel.textContent = unit === 'Lon' ? 'Quy cách Lon' : (unit === 'Lốc' ? 'Dung tích Lốc' : 'Quy cách Thùng');
     }
 
     function calcPosRowAndGrandTotal(rowId) {
@@ -2429,12 +2439,13 @@ let liveCamStream = null;
         document.querySelectorAll('.pos-dropdown').forEach(d => d.classList.add('hidden'));
       }
     });
-    // ================= ENGINE QUÀ TẶNG CHỌN CHÍNH XÁC TÊN SẢN PHẨM =================
+   // ================= ENGINE QUÀ TẶNG ĐA KHUNG (THEO TIỀN & THEO SỐ LƯỢNG) =================
     const DEFAULT_PROMO_CONFIG = {
       frames: [
         {
           id: 'FR_NEW_1',
           projectId: 'ALL',
+          mode: 'AMOUNT', // Xét theo giá trị tiền
           name: 'Khung 1: SB/SBPS (GrowPlus SDD, Immunel, Bạc, A2) [500k - 4tr]',
           includeProducts: [
             'GrowPLUS+ Đỏ (SDD) 1+',
@@ -2459,8 +2470,9 @@ let liveCamStream = null;
         {
           id: 'FR_NEW_2',
           projectId: 'ALL',
+          mode: 'AMOUNT',
           name: 'Khung 2: All sản phẩm (Trừ: GrowPlus SDD, Immunel, Bạc, A2) [300k - 2tr]',
-          includeProducts: [], // Rỗng = Tất cả SP
+          includeProducts: [],
           excludeProducts: [
             'GrowPLUS+ Đỏ (SDD) 1+',
             'GrowPLUS+ Đỏ (SDD) 2+',
@@ -2470,6 +2482,7 @@ let liveCamStream = null;
             'GrowPLUS+ Bạc TCC 1+',
             'GrowPLUS+ Bạc TCC 2+'
           ],
+          keywordsExclude: 'varna',
           unit: 'ANY',
           spec: '',
           tiers: [
@@ -2479,119 +2492,33 @@ let liveCamStream = null;
             { tierAmount: 1500000, gifts: ['Set Nướng Chill'] },
             { tierAmount: 2000000, gifts: ['Máy hút bụi DEERMA'] }
           ]
-        }
-      ],
-      bonuses: [
-        {
-          id: 'BN_VARNA_1',
-          projectId: 'ALL',
-          minBill: 0,
-          minQty: 1,
-          unit: 'ANY',
-          spec: '',
-          includeProducts: [], // Admin vào tick tên SP Varna nếu đã thêm vào danh mục
-          keywords: 'varna',
-          gifts: ['Bình lọc trà giữ nhiệt']
         },
         {
-          id: 'BN_VARNA_3',
+          id: 'FR_VARNA_QTY',
           projectId: 'ALL',
-          minBill: 0,
-          minQty: 3,
-          unit: 'ANY',
-          spec: '',
+          mode: 'QTY', // Xét theo SỐ LƯỢNG (1 lon/thùng, 3 lon/thùng)
+          name: 'Khung 3: Quà tặng Varna (Theo SL Lon / Thùng)',
           includeProducts: [],
-          keywords: 'varna',
-          gifts: ['Ấm đun siêu tốc']
+          keywords: 'varna', // Tự bắt mọi SP có chữ Varna (hoặc Admin vào tick tên SP Varna)
+          excludeProducts: [],
+          unit: 'Lon,Thùng',
+          spec: '',
+          tiers: [
+            { tierQty: 1, gifts: ['Bình lọc trà giữ nhiệt'] },
+            { tierQty: 3, gifts: ['Ấm đun siêu tốc'] }
+          ]
         }
-      ]
+      ],
+      bonuses: []
     };
 
-    let promoConfig = JSON.parse(localStorage.getItem('oms_promo_config_v5')) || JSON.parse(JSON.stringify(DEFAULT_PROMO_CONFIG));
-    let pickerState = {
-      fr_includePicker: new Set(),
-      fr_excludePicker: new Set(),
-      bn_includePicker: new Set()
-    };
+    let promoConfig = JSON.parse(localStorage.getItem('oms_promo_config_v6')) || JSON.parse(JSON.stringify(DEFAULT_PROMO_CONFIG));
+    let selectedFrameGifts = {};
+    let selectedBonusGifts = {};
 
     function savePromoConfigStorage() {
-      localStorage.setItem('oms_promo_config_v5', JSON.stringify(promoConfig));
+      localStorage.setItem('oms_promo_config_v6', JSON.stringify(promoConfig));
     }
-
-    // Render giao diện tìm kiếm & tick chọn nhiều sản phẩm cho Admin
-    function initProdPicker(containerId, initialNames = [], isExclude = false) {
-      pickerState[containerId] = new Set(initialNames || []);
-      const wrap = document.getElementById(containerId);
-      if (!wrap) return;
-
-      wrap.innerHTML = `
-        <div class="prod-picker-box">
-          <div style="display:flex; gap:6px;">
-            <input type="text" placeholder="🔍 Gõ tên SP để lọc nhanh..." style="padding:7px 10px; font-size:12px;"
-                   oninput="filterProdPickerList('${containerId}', this.value, ${isExclude})">
-            <button type="button" class="icon-btn" style="font-size:11px; white-space:nowrap;"
-                    onclick="clearProdPicker('${containerId}', ${isExclude})">Bỏ chọn hết</button>
-          </div>
-          <div class="selected-pills-wrap" id="${containerId}_pills"></div>
-          <div class="prod-picker-list" id="${containerId}_list"></div>
-        </div>
-      `;
-      filterProdPickerList(containerId, '', isExclude);
-      renderProdPickerPills(containerId, isExclude);
-    }
-
-    function filterProdPickerList(containerId, keyword, isExclude) {
-      const listEl = document.getElementById(`${containerId}_list`);
-      if (!listEl) return;
-      const normKey = removeVietnameseTones(keyword.trim());
-      const selectedSet = pickerState[containerId];
-
-      const matches = productCatalog.filter(p =>
-        !normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey)
-      );
-
-      listEl.innerHTML = matches.map(p => {
-        const checked = selectedSet.has(p.name);
-        const safeName = p.name.replace(/"/g, '&quot;');
-        return `
-          <label class="prod-picker-item ${isExclude ? 'exclude' : ''}">
-            <input type="checkbox" ${checked ? 'checked' : ''}
-                   onchange="toggleProdPickerItem('${containerId}', this.dataset.pname, this.checked, ${isExclude})"
-                   data-pname="${safeName}">
-            <span>${p.name} <small style="color:#94a3b8;">(${p.group})</small></span>
-          </label>
-        `;
-      }).join('') || '<div style="font-size:11px; color:#94a3b8; text-align:center; padding:6px;">Không tìm thấy sản phẩm</div>';
-    }
-
-    function toggleProdPickerItem(containerId, prodName, checked, isExclude) {
-      if (checked) pickerState[containerId].add(prodName);
-      else pickerState[containerId].delete(prodName);
-      renderProdPickerPills(containerId, isExclude);
-    }
-
-    function clearProdPicker(containerId, isExclude) {
-      pickerState[containerId].clear();
-      const box = document.getElementById(containerId);
-      const searchInp = box ? box.querySelector('input[type="text"]') : null;
-      filterProdPickerList(containerId, searchInp ? searchInp.value : '', isExclude);
-      renderProdPickerPills(containerId, isExclude);
-    }
-
-    function renderProdPickerPills(containerId, isExclude) {
-      const pillsEl = document.getElementById(`${containerId}_pills`);
-      if (!pillsEl) return;
-      const arr = Array.from(pickerState[containerId]);
-      if (arr.length === 0) {
-        pillsEl.innerHTML = `<span style="font-size:11px; color:#94a3b8;">${isExclude ? 'Chưa loại trừ SP nào' : 'Đang áp dụng: TẤT CẢ sản phẩm'}</span>`;
-        return;
-      }
-      pillsEl.innerHTML = arr.map(name => `
-        <span class="prod-pill ${isExclude ? 'exclude' : ''}">${isExclude ? '✕' : '✓'} ${name}</span>
-      `).join('');
-    }
-let selectedFrameGifts = {};
-    let selectedBonusGifts = {};
 
     function formatShortK(amount) {
       if (amount >= 1000000) {
@@ -2599,6 +2526,14 @@ let selectedFrameGifts = {};
         return Number.isInteger(tr) ? `${tr}tr` : `${tr.toFixed(1)}tr`;
       }
       return `${Math.round(amount / 1000)}k`;
+    }
+
+    function formatTierBadge(fr, tierObj) {
+      if ((fr.mode || 'AMOUNT') === 'QTY') {
+        const uLabel = (!fr.unit || fr.unit === 'ANY') ? 'SP' : fr.unit.replace(',', '/');
+        return `${tierObj.tierQty} ${uLabel}`;
+      }
+      return formatShortK(tierObj.tierAmount);
     }
 
     function getCartItemsForPromo() {
@@ -2619,20 +2554,21 @@ let selectedFrameGifts = {};
       });
       return { items, totalAll };
     }
-    // Tính doanh số & số lượng khớp chính xác theo danh sách tên SP đã tick
+
     function calcMatchingCartStats(ruleObj, cartData) {
       const incList = ruleObj.includeProducts || [];
       const excList = ruleObj.excludeProducts || [];
       const kwList = (ruleObj.keywords || '').split(',').map(k => removeVietnameseTones(k.trim())).filter(Boolean);
+      const kwExcList = (ruleObj.keywordsExclude || '').split(',').map(k => removeVietnameseTones(k.trim())).filter(Boolean);
+      const allowedUnits = (!ruleObj.unit || ruleObj.unit === 'ANY') ? [] : ruleObj.unit.split(',').map(u => u.trim());
 
       let matchedSpend = 0;
       let matchedQty = 0;
 
       cartData.items.forEach(it => {
-        // 1. Nếu nằm trong danh sách tên SP loại trừ -> Bỏ qua ngay
         if (excList.length > 0 && excList.includes(it.name)) return;
+        if (kwExcList.length > 0 && kwExcList.some(ex => it.normName.includes(ex))) return;
 
-        // 2. Xét danh sách tên SP được chọn (ưu tiên khớp chính xác tên đầy đủ)
         let matchName = true;
         if (incList.length > 0) {
           matchName = incList.includes(it.name);
@@ -2640,8 +2576,8 @@ let selectedFrameGifts = {};
           matchName = kwList.some(kw => it.normName.includes(kw));
         }
 
-        const matchUnit = !ruleObj.unit || ruleObj.unit === 'ANY' || it.unit === ruleObj.unit;
-        const matchSpec = !ruleObj.spec || it.spec.toLowerCase() === ruleObj.spec.trim().toLowerCase();
+        const matchUnit = allowedUnits.length === 0 || allowedUnits.includes(it.unit);
+        const matchSpec = !ruleObj.spec || it.spec.toLowerCase().includes(ruleObj.spec.trim().toLowerCase());
 
         if (matchName && matchUnit && matchSpec) {
           matchedSpend += it.subtotal;
@@ -2649,49 +2585,6 @@ let selectedFrameGifts = {};
         }
       });
       return { matchedSpend, matchedQty };
-    }
-
-    function findOutletGiftStockByName(giftName) {
-      if (!selectedOutlet) return null;
-      const target = removeVietnameseTones(giftName);
-      return giftStocks.find(g =>
-        g.projectId === selectedOutlet.projectId &&
-        g.outletCode === selectedOutlet.code &&
-        (removeVietnameseTones(g.name).includes(target) || target.includes(removeVietnameseTones(g.name)))
-      ) || null;
-    }
-
-    function changeFrameGiftQty(key, delta) {
-      const cur = selectedFrameGifts[key] || 0;
-      const next = cur + delta;
-      if (next <= 0) {
-        delete selectedFrameGifts[key];
-      } else {
-        const giftName = key.split('::')[2];
-        const stockObj = findOutletGiftStockByName(giftName);
-        if (stockObj && next > stockObj.remaining) {
-          alert(`⚠️ "${giftName}" tại điểm chỉ còn tồn ${stockObj.remaining}!`);
-          return;
-        }
-        selectedFrameGifts[key] = next;
-      }
-      updateSalesGiftPromoUI();
-    }
-
-    function toggleBonusGiftChoice(bonusId, giftName, checked) {
-      // Mỗi điều kiện bonus chỉ nhận 1 phần quà
-      Object.keys(selectedBonusGifts).forEach(k => {
-        if (k.startsWith(bonusId + '::')) delete selectedBonusGifts[k];
-      });
-      if (checked && giftName) {
-        const stockObj = findOutletGiftStockByName(giftName);
-        if (stockObj && stockObj.remaining <= 0) {
-          alert(`⚠️ "${giftName}" tại điểm đã hết tồn kho!`);
-          return updateSalesGiftPromoUI();
-        }
-        selectedBonusGifts[`${bonusId}::${giftName}`] = 1;
-      }
-      updateSalesGiftPromoUI();
     }
 
     function updateSalesGiftPromoUI() {
@@ -2703,23 +2596,24 @@ let selectedFrameGifts = {};
       const activeFrames = (promoConfig.frames || []).filter(f => !f.projectId || f.projectId === 'ALL' || f.projectId === projId);
       const activeBonuses = (promoConfig.bonuses || []).filter(b => !b.projectId || b.projectId === 'ALL' || b.projectId === projId);
 
-      // Tính doanh số hợp lệ cho từng khung quà
-      const frameSpendMap = {};
+      // Tính hạn mức (Tiền hoặc Số lượng) cho từng khung
+      const frameBudgetMap = {};
       activeFrames.forEach(fr => {
-        frameSpendMap[fr.id] = calcMatchingCartStats(fr, cartData).matchedSpend;
+        const stats = calcMatchingCartStats(fr, cartData);
+        frameBudgetMap[fr.id] = ((fr.mode || 'AMOUNT') === 'QTY') ? stats.matchedQty : stats.matchedSpend;
       });
 
-      // Tính số tiền đã dùng trong từng khung; nếu PG giảm giỏ hàng làm vượt hạn mức khung -> tự reset khung đó
+      // Tính hạn mức đã dùng của từng khung
       const frameUsedMap = {};
       Object.keys(selectedFrameGifts).forEach(key => {
-        const [frId, tierStr] = key.split('::');
+        const [frId, tierValStr] = key.split('::');
         const qty = selectedFrameGifts[key] || 0;
-        const cost = (parseInt(tierStr, 10) || 0) * qty;
+        const cost = (parseInt(tierValStr, 10) || 0) * qty;
         frameUsedMap[frId] = (frameUsedMap[frId] || 0) + cost;
       });
 
       activeFrames.forEach(fr => {
-        if ((frameUsedMap[fr.id] || 0) > (frameSpendMap[fr.id] || 0)) {
+        if ((frameUsedMap[fr.id] || 0) > (frameBudgetMap[fr.id] || 0)) {
           Object.keys(selectedFrameGifts).forEach(k => {
             if (k.startsWith(fr.id + '::')) delete selectedFrameGifts[k];
           });
@@ -2729,26 +2623,24 @@ let selectedFrameGifts = {};
 
       let html = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong style="font-size:13px; color:#34d399;">🎁 Quà tặng khuyến mãi (Chọn dồn & Combo)</strong>
+          <strong style="font-size:13px; color:#34d399;">🎁 Quà tặng khuyến mãi (Chọn dồn & Quy cách)</strong>
           <span style="font-size:11px; color:#38bdf8; font-weight:700;">Tổng bill: ${formatCurrencyVND(cartData.totalAll)}đ</span>
         </div>
       `;
 
-      // 1. RENDER CÁC ĐIỀU KIỆN TẶNG KÈM / COMBO (VD: 2 Lốc + Bill >= 500k)
+      // 1. RENDER CÁC ĐIỀU KIỆN COMBO KẾT HỢP (NẾU CÓ)
       activeBonuses.forEach(bn => {
         const stats = calcMatchingCartStats(bn, cartData);
         const passBill = cartData.totalAll >= (bn.minBill || 0);
         const passQty = stats.matchedQty >= (bn.minQty || 0);
         const eligible = passBill && passQty && cartData.totalAll > 0;
 
-        // Xóa lựa chọn cũ nếu không còn đủ điều kiện
         if (!eligible) {
           Object.keys(selectedBonusGifts).forEach(k => {
             if (k.startsWith(bn.id + '::')) delete selectedBonusGifts[k];
           });
           bn._autoDone = false;
         } else if (bn.gifts.length === 1 && !bn._autoDone) {
-          // Tự tick nếu chỉ có 1 món quà duy nhất và đủ điều kiện
           const stockObj = findOutletGiftStockByName(bn.gifts[0]);
           if (!stockObj || stockObj.remaining > 0) {
             selectedBonusGifts[`${bn.id}::${bn.gifts[0]}`] = 1;
@@ -2770,7 +2662,7 @@ let selectedFrameGifts = {};
               <span style="font-size:11px; font-weight:700; color:${eligible ? '#34d399' : '#fbbf24'};">
                 ${eligible ? `✓ Đủ ĐK tặng kèm (${condDesc})` : `🔒 ĐK tặng kèm: ${condDesc}`}
               </span>
-              ${bn.minQty > 0 ? `<span style="font-size:11px; color:var(--text-sub);">Đang có: ${stats.matchedQty} ${bn.unit !== 'ANY' ? bn.unit : 'SP'}</span>` : ''}
+              ${bn.minQty > 0 ? `<span style="font-size:11px; color:var(--text-sub);">Đang có: ${stats.matchedQty}</span>` : ''}
             </div>
             ${bn.gifts.map(gName => {
               const checked = selectedGiftName === gName;
@@ -2792,36 +2684,51 @@ let selectedFrameGifts = {};
         `;
       });
 
-      // 2. RENDER CÁC KHUNG QUÀ THEO GIÁ TRỊ HÓA ĐƠN (CHỌN DỒN / CHIA NHỎ)
+      // 2. RENDER CÁC KHUNG QUÀ (THEO TIỀN HOẶC THEO SỐ LƯỢNG)
       let hasAnyEligibleFrame = false;
 
       activeFrames.forEach(fr => {
-        const spend = frameSpendMap[fr.id] || 0;
+        const isQtyMode = (fr.mode || 'AMOUNT') === 'QTY';
+        const budget = frameBudgetMap[fr.id] || 0;
         const used = frameUsedMap[fr.id] || 0;
-        const remain = Math.max(0, spend - used);
-        const sortedTiers = [...(fr.tiers || [])].sort((a, b) => a.tierAmount - b.tierAmount);
-        const eligibleTiers = sortedTiers.filter(t => spend >= t.tierAmount);
+        const remain = Math.max(0, budget - used);
 
+        const sortedTiers = [...(fr.tiers || [])].sort((a, b) => {
+          const valA = isQtyMode ? a.tierQty : a.tierAmount;
+          const valB = isQtyMode ? b.tierQty : b.tierAmount;
+          return valA - valB;
+        });
+
+        const eligibleTiers = sortedTiers.filter(t => budget >= (isQtyMode ? t.tierQty : t.tierAmount));
         if (eligibleTiers.length === 0) return;
         hasAnyEligibleFrame = true;
+
+        const unitText = (!fr.unit || fr.unit === 'ANY') ? 'SP' : fr.unit.replace(',', '/');
+        const budgetLabel = isQtyMode
+          ? `SL nhóm đạt: <strong style="color:#fff;">${budget} ${unitText}</strong>`
+          : `Doanh số nhóm: <strong style="color:#fff;">${formatCurrencyVND(budget)}đ</strong>`;
+        const remainLabel = isQtyMode
+          ? `Suất quà còn lại: <strong style="color:#34d399;">${remain} ${unitText}</strong>`
+          : `Hạn mức còn lại: <strong style="color:#34d399;">${formatCurrencyVND(remain)}đ</strong>`;
 
         html += `
           <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(56,189,248,0.28); border-radius:10px; padding:9px 10px; margin-bottom:8px;">
             <div style="font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:4px;">${fr.name}</div>
             <div style="display:flex; justify-content:space-between; font-size:11px; background:rgba(30,41,59,0.8); padding:6px 8px; border-radius:7px; margin-bottom:8px;">
-              <span>Doanh số nhóm: <strong style="color:#fff;">${formatCurrencyVND(spend)}đ</strong></span>
-              <span>Hạn mức còn lại: <strong style="color:#34d399;">${formatCurrencyVND(remain)}đ</strong></span>
+              <span>${budgetLabel}</span>
+              <span>${remainLabel}</span>
             </div>
         `;
 
         eligibleTiers.forEach(t => {
-          const tierLabel = formatShortK(t.tierAmount);
+          const tierCost = isQtyMode ? t.tierQty : t.tierAmount;
+          const tierLabel = formatTierBadge(fr, t);
           t.gifts.forEach(gName => {
-            const key = `${fr.id}::${t.tierAmount}::${gName}`;
+            const key = `${fr.id}::${tierCost}::${gName}`;
             const qty = selectedFrameGifts[key] || 0;
             const stockObj = findOutletGiftStockByName(gName);
             const noStock = stockObj && (qty >= stockObj.remaining);
-            const canAdd = (t.tierAmount <= remain) && !noStock;
+            const canAdd = (tierCost <= remain) && !noStock;
 
             html += `
               <div class="promo-gift-item ${qty > 0 ? 'selected' : ''}">
@@ -2849,7 +2756,7 @@ let selectedFrameGifts = {};
       if (!hasAnyEligibleFrame) {
         html += `
           <div style="font-size:12px; color:#fbbf24; background:rgba(245,158,11,0.12); padding:8px 10px; border-radius:8px;">
-            ⚠️ Nhập sản phẩm đạt mốc khung quà để mở danh sách chọn quà (VD: Từ 300k hoặc 650k tùy dòng sữa).
+            ⚠️ Nhập sản phẩm đạt mốc tiền (từ 300k/500k) hoặc đạt số lượng (từ 1 lon/thùng Varna) để mở danh sách chọn quà.
           </div>
         `;
       }
@@ -2864,7 +2771,7 @@ let selectedFrameGifts = {};
       // 1. Render danh sách Khung quà
       const frames = (promoConfig.frames || []).filter(f => projFilter === 'ALL' || f.projectId === projFilter || f.projectId === 'ALL');
       document.getElementById('adminFramesListBody').innerHTML = frames.map((fr, idx) => {
-        const tierSummary = (fr.tiers || []).map(t => `${formatShortK(t.tierAmount)} (${t.gifts.length} quà)`).join(', ');
+       const tierSummary = (fr.tiers || []).map(t => `${formatTierBadge(fr, t)} (${t.gifts.length} quà)`).join(', ');
         const incText = (fr.includeProducts && fr.includeProducts.length > 0) ? fr.includeProducts.join(', ') : 'Tất cả SP';
         const excText = (fr.excludeProducts && fr.excludeProducts.length > 0) ? ` <span style="color:#fca5a5;">(Trừ: ${fr.excludeProducts.join(', ')})</span>` : '';
         return `
@@ -2908,6 +2815,19 @@ let selectedFrameGifts = {};
       }).join('') || '<p style="color:var(--text-sub); font-size:12px;">Chưa có điều kiện tặng kèm nào.</p>';
     }
 
+   function updateFrameModeHint() {
+      const mode = document.getElementById('fr_mode').value;
+      const hint = document.getElementById('fr_modeHint');
+      const ta = document.getElementById('fr_tiersText');
+      if (mode === 'QTY') {
+        hint.innerHTML = `Cú pháp theo số lượng: <code style="color:#34d399;">Số lượng Lon/Lốc/Thùng | Quà 1 / Quà 2</code> (VD: <code>1 | Bình lọc trà</code>)`;
+        ta.placeholder = "1 | Bình lọc trà giữ nhiệt\n3 | Ấm đun siêu tốc";
+      } else {
+        hint.innerHTML = `Cú pháp theo tiền: <code style="color:#38bdf8;">Số tiền nghìn đồng | Quà 1 / Quà 2</code> (VD: <code>500 | Gấu thỏ biến hình</code>)`;
+        ta.placeholder = "500 | Gấu thỏ biến hình\n1000 | Đồ chơi khiêu vũ";
+      }
+    }
+
     function openFrameEditor(frameId) {
       closeBonusEditor();
       const box = document.getElementById('frameEditorBox');
@@ -2915,6 +2835,7 @@ let selectedFrameGifts = {};
         document.getElementById('frameEditorTitle').innerText = '➕ Thêm khung quà mới';
         document.getElementById('fr_id').value = '';
         document.getElementById('fr_name').value = '';
+        document.getElementById('fr_mode').value = 'QTY';
         document.getElementById('fr_unit').value = 'ANY';
         document.getElementById('fr_spec').value = '';
         document.getElementById('fr_tiersText').value = '';
@@ -2923,16 +2844,19 @@ let selectedFrameGifts = {};
       } else {
         const fr = promoConfig.frames.find(x => x.id === frameId);
         if (!fr) return;
+        const isQty = (fr.mode || 'AMOUNT') === 'QTY';
         document.getElementById('frameEditorTitle').innerText = '✏️ Sửa khung quà';
         document.getElementById('fr_id').value = fr.id;
         document.getElementById('fr_name').value = fr.name;
+        document.getElementById('fr_mode').value = isQty ? 'QTY' : 'AMOUNT';
         document.getElementById('fr_unit').value = fr.unit || 'ANY';
         document.getElementById('fr_spec').value = fr.spec || '';
         document.getElementById('fr_tiersText').value = (fr.tiers || [])
-          .map(t => `${Math.round(t.tierAmount / 1000)} | ${t.gifts.join(' / ')}`).join('\n');
+          .map(t => `${isQty ? t.tierQty : Math.round(t.tierAmount / 1000)} | ${t.gifts.join(' / ')}`).join('\n');
         initProdPicker('fr_includePicker', fr.includeProducts || [], false);
         initProdPicker('fr_excludePicker', fr.excludeProducts || [], true);
       }
+      updateFrameModeHint();
       box.classList.remove('hidden');
       box.scrollIntoView({ behavior: 'smooth' });
     }
@@ -2940,36 +2864,42 @@ let selectedFrameGifts = {};
     function closeFrameEditor() { document.getElementById('frameEditorBox').classList.add('hidden'); }
 
     function fillSampleFrameTiers() {
-      document.getElementById('fr_tiersText').value =
-        "650 | Bình giữ nhiệt phiêu lưu\n" +
-        "1500 | Nồi điện đa năng hiệu Gaabor";
+      const isQty = document.getElementById('fr_mode').value === 'QTY';
+      document.getElementById('fr_tiersText').value = isQty
+        ? "1 | Bình lọc trà giữ nhiệt\n3 | Ấm đun siêu tốc"
+        : "300 | Gấu thỏ biến hình\n500 | Đồ chơi khiêu vũ";
     }
 
-   function saveFrameEditor() {
+    function saveFrameEditor() {
       const id = document.getElementById('fr_id').value;
       const projectId = document.getElementById('promoProjSelect').value || 'ALL';
       const name = document.getElementById('fr_name').value.trim();
+      const mode = document.getElementById('fr_mode').value;
       const unit = document.getElementById('fr_unit').value;
       const spec = document.getElementById('fr_spec').value.trim();
       const rawTiers = document.getElementById('fr_tiersText').value.trim();
       const includeProducts = Array.from(pickerState['fr_includePicker']);
       const excludeProducts = Array.from(pickerState['fr_excludePicker']);
 
-      if (!name || !rawTiers) return alert('⚠️ Vui lòng nhập Tên khung quà và ít nhất 1 mốc tiền!');
+      if (!name || !rawTiers) return alert('⚠️ Vui lòng nhập Tên khung quà và ít nhất 1 mốc!');
 
       const tiers = [];
       rawTiers.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
-        const [amtStr, giftsStr] = line.split('|');
-        const amtK = parseFloat((amtStr || '').trim());
+        const [valStr, giftsStr] = line.split('|');
+        const numVal = parseFloat((valStr || '').trim());
         const gifts = (giftsStr || '').split('/').map(g => g.trim()).filter(Boolean);
-        if (!isNaN(amtK) && amtK > 0 && gifts.length > 0) {
-          tiers.push({ tierAmount: Math.round(amtK * 1000), gifts });
+        if (!isNaN(numVal) && numVal > 0 && gifts.length > 0) {
+          if (mode === 'QTY') {
+            tiers.push({ tierQty: Math.round(numVal), gifts });
+          } else {
+            tiers.push({ tierAmount: Math.round(numVal * 1000), gifts });
+          }
         }
       });
 
-      if (tiers.length === 0) return alert('⚠️ Cú pháp mốc quà chưa đúng (VD: 300 | Tên quà)!');
+      if (tiers.length === 0) return alert('⚠️ Cú pháp mốc quà chưa đúng!');
 
-      const obj = { id: id || ('FR_' + Date.now()), projectId, name, includeProducts, excludeProducts, unit, spec, tiers };
+      const obj = { id: id || ('FR_' + Date.now()), projectId, mode, name, includeProducts, excludeProducts, unit, spec, tiers };
       if (id) {
         const idx = promoConfig.frames.findIndex(x => x.id === id);
         if (idx !== -1) promoConfig.frames[idx] = obj;
@@ -2981,7 +2911,6 @@ let selectedFrameGifts = {};
       renderAdminPromoAll();
       alert('✅ Đã lưu khung quà!');
     }
-
     function deletePromoFrame(frameId) {
       if (!confirm('Xóa khung quà này?')) return;
       promoConfig.frames = promoConfig.frames.filter(x => x.id !== frameId);
@@ -3198,8 +3127,12 @@ let selectedFrameGifts = {};
         Object.keys(selectedFrameGifts).forEach(key => {
           const qty = selectedFrameGifts[key] || 0;
           if (qty > 0) {
-            const [, tierStr, giftName] = key.split('::');
-            const tierLabel = formatShortK(parseInt(tierStr, 10) || 0);
+            const [frId, tierValStr, giftName] = key.split('::');
+            const frObj = (promoConfig.frames || []).find(f => f.id === frId);
+            const numVal = parseInt(tierValStr, 10) || 0;
+            const tierLabel = (frObj && frObj.mode === 'QTY')
+              ? `${numVal} ${(!frObj.unit || frObj.unit === 'ANY') ? 'SP' : frObj.unit.replace(',', '/')}`
+              : formatShortK(numVal);
             giftSummaryList.push(`${giftName} [Mức ${tierLabel}] (SL: ${qty})`);
             const stockObj = findOutletGiftStockByName(giftName);
             if (stockObj) giftDeductions.push({ giftId: stockObj.id, qty: qty });
