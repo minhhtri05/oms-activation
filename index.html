@@ -220,7 +220,7 @@
       background: #111827; border-top: 1px solid var(--accent); border-radius: 20px 20px 0 0; padding: 20px 18px;
     }
 
-   .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
+    .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
     .admin-tab {
       padding: 9px 2px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148,163,184,0.2);
       color: var(--text-sub); border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;
@@ -323,7 +323,7 @@
       gap: 8px;
       margin-bottom: 10px;
     }
-   .pos-unit-switch {
+    .pos-unit-switch {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 4px;
@@ -464,7 +464,8 @@
     <div style="font-size:28px; margin-bottom:10px;">⏳</div>
     <div id="loadingText">Đang đồng bộ dữ liệu...</div>
   </div>
-<!-- MODAL CAMERA CHỤP TRỰC TIẾP (CHỐNG CHỌN ẢNH TỪ THƯ VIỆN) -->
+
+  <!-- MODAL CAMERA CHỤP TRỰC TIẾP (CHỐNG CHỌN ẢNH TỪ THƯ VIỆN) -->
   <div id="liveCameraModal" class="lightbox-overlay hidden" style="z-index:3600; flex-direction:column; gap:12px;">
     <div style="width:100%; max-width:480px; background:#0f172a; border:1px solid #38bdf8; border-radius:16px; overflow:hidden;">
       <div style="padding:10px 14px; display:flex; justify-content:space-between; align-items:center; background:rgba(14,165,233,0.15);">
@@ -478,6 +479,7 @@
       </div>
     </div>
   </div>
+
   <!-- LIGHTBOX XEM PHÓNG TO + TẢI ẢNH -->
   <div id="photoLightbox" class="lightbox-overlay hidden" onclick="closePhotoLightbox()">
     <div class="lightbox-card" onclick="event.stopPropagation()">
@@ -583,7 +585,7 @@
     </div>
   </div>
 
- <!-- 3. LỊCH SỬ HOẠT ĐỘNG (THEO TỪNG CA ĐÃ LÀM) -->
+  <!-- 3. LỊCH SỬ HOẠT ĐỘNG (THEO TỪNG CA ĐÃ LÀM) -->
   <div id="historyScreen" class="container hidden">
     <h3 style="margin-bottom:10px; color:#38bdf8;">🕒 LỊCH SỬ HOẠT ĐỘNG</h3>
     <div id="supHistoryFilterBox" class="form-group hidden">
@@ -636,6 +638,7 @@
       <div id="giftStockListBody"></div>
     </div>
   </div>
+
   <!-- MÀN HÌNH KHO TỔNG DỰ ÁN <-> CÁC BOOTH -->
   <div id="warehouseScreen" class="container hidden">
     <div class="glass-card">
@@ -712,6 +715,7 @@
       </div>
     </div>
   </div>
+
   <!-- 5. CÁC MÀN HÌNH PHỤ -->
   <div id="notifScreen" class="container hidden">
     <div class="glass-card">
@@ -733,10 +737,10 @@
     <div class="glass-card">
       <h3 style="margin-bottom:12px; color:#38bdf8;">❓ Đào Tạo & Hỗ Trợ</h3>
       <p style="font-size:13px; color:var(--text-sub); line-height:1.6;">
-        1. Chọn điểm làm việc thuộc dự án.<br>
-        2. Đứng trong bán kính GPS cho phép và chụp đủ 2 ảnh Check-in đầu ca.<br>
-        3. Ghi nhận hoạt động (chọn quà sẽ tự động trừ vào tồn kho điểm).<br>
-        4. Bấm Check-out khi kết thúc ca để lưu ca vào Lịch sử và reset ca mới.
+1. Chọn điểm làm việc thuộc dự án.<br>
+2. Đứng trong bán kính GPS cho phép và chụp đủ 2 ảnh Check-in đầu ca.<br>
+3. Ghi nhận hoạt động (chọn quà sẽ tự động trừ vào tồn kho điểm).<br>
+4. Bấm Check-out khi kết thúc ca để lưu ca vào Lịch sử và reset ca mới.
       </p>
     </div>
   </div>
@@ -872,6 +876,17 @@
       <button type="button" class="plus-circle-btn" onclick="openActivityForm('CHECKIN_FB')">+</button>
     </div>
 
+    <div class="activity-card"> <!-- giữ nguyên class thẻ của bạn -->
+   <div>
+      <div class="activity-title">Hoạt động Sampling & Tặng Quà</div>
+     <div class="activity-sub">
+        <span onclick="openActivityList('SAMPLING')">☰ DANH SÁCH</span>
+       <span>Tổng số tại điểm: <strong id="count_SAMPLING">0</strong></span>
+      </div>
+   </div>
+   <button class="btn-add-circle" onclick="openActivityForm('SAMPLING')">+</button>
+  </div>
+
     <div class="bottom-action-bar">
       <button type="button" class="bar-action-btn" onclick="alert('✅ Toàn bộ dữ liệu đã được lưu trực tiếp lên Google Sheet!')">ĐÃ ĐỒNG BỘ SHEET ✓</button>
       <button type="button" class="bar-action-btn" style="color:#f87171;" onclick="handleCheckOut()">CHECK OUT ≫</button>
@@ -948,7 +963,7 @@
       <button type="button" class="btn btn-primary" onclick="adminAddOutlet()">LƯU ĐIỂM LÀM VÀO SHEET</button>
     </div>
 
-   <div id="tabAddUser" class="glass-card admin-pane hidden">
+    <div id="tabAddUser" class="glass-card admin-pane hidden">
       <h4 style="margin-bottom:12px;">Cấp Tài Khoản Nhân Sự</h4>
       <div class="form-group"><label>Phân công vào Dự án *</label><select id="userProjSelect"></select></div>
       <div class="form-group">
@@ -1038,6 +1053,7 @@
         <div id="schemaPhotosList"></div>
       </div>
     </div>
+
     <div id="tabProducts" class="glass-card admin-pane hidden">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <h4 style="color:#38bdf8;">🛒 Danh Mục Sản Phẩm</h4>
@@ -1104,6 +1120,7 @@
       </div>
       <div id="adminProductListBody"></div>
     </div>
+
     <div id="tabPromoRules" class="glass-card admin-pane hidden">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
         <h4 style="color:#34d399;">🎁 Cấu Hình Quà & Điều Kiện</h4>
@@ -1137,7 +1154,7 @@
             <input type="text" id="fr_name" placeholder="VD: Khung 1 - Lactoferrin / Sữa Non / Tiêu Hóa">
           </div>
 
-       <div class="form-group">
+          <div class="form-group">
             <label style="color:#34d399;">✅ Chọn các SP ĐƯỢC ÁP DỤNG <span style="font-weight:400; color:var(--text-sub);">(Không tick cái nào = Áp dụng tất cả SP)</span></label>
             <div id="fr_includePicker"></div>
           </div>
@@ -1147,7 +1164,7 @@
             <div id="fr_excludePicker"></div>
           </div>
 
-         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
             <div>
               <label>Xét mốc theo *</label>
               <select id="fr_mode" onchange="updateFrameModeHint()">
@@ -1235,7 +1252,6 @@
             </div>
           </div>
 
-        <!-- ✅ DÁN ĐÈ 4 DÒNG MỚI NÀY VÀO: -->
           <div class="form-group">
             <label style="color:#34d399;">✅ Chọn các SP bắt buộc mua <span style="font-weight:400; color:var(--text-sub);">(Không tick = Áp dụng mọi SP)</span></label>
             <div id="bn_includePicker"></div>
@@ -1303,7 +1319,17 @@
           { label: 'Ảnh màn hình bài đăng Check-in FB', required: true },
           { label: 'Ảnh khách nhận quà', required: true }
         ]
-      }
+      },
+      SAMPLING: {
+    photos: [
+      { label: 'Ảnh khách dùng thử / nhận quà', required: true }
+    ],
+    fields: [
+      { label: 'Tên khách hàng', type: 'text', required: true },
+      { label: 'Số điện thoại', type: 'tel', required: false },
+      { label: 'Sản phẩm dùng thử / Quà tặng', type: 'text', required: false }
+    ]
+  }
     };
 
     let projects = [];
@@ -1358,7 +1384,7 @@
       const canAddMore = !maxCount || list.length < maxCount;
       let html = `<div class="photo-gallery-grid">`;
 
-     if (canAddMore) {
+      if (canAddMore) {
         html += `
           <div class="cam-tile" onclick="openLiveCamera('${slotKey}', '${containerId}', ${maxCount || 0})">
             <div class="cam-icon">📷</div>
@@ -1422,7 +1448,8 @@
       };
       reader.readAsDataURL(file);
     }
-let liveCamStream = null;
+
+    let liveCamStream = null;
     let liveCamFacing = 'environment'; // 'environment' = cam sau, 'user' = cam trước
     let liveCamTarget = { slotKey: '', containerId: '', maxCount: 0 };
 
@@ -1499,6 +1526,7 @@ let liveCamStream = null;
       closeLiveCamera();
       renderPhotoGallery(slotKey, containerId, maxCount);
     }
+
     function deleteGalleryPhoto(slotKey, containerId, idx, maxCount) {
       if (photoGalleries[slotKey]) {
         photoGalleries[slotKey].splice(idx, 1);
@@ -1551,7 +1579,10 @@ let liveCamStream = null;
           : JSON.parse(JSON.stringify(DEFAULT_PRODUCT_CATALOG));
         khoTonDauList = res.khoTonDau || [];
         phieuXuatNhapList = res.phieuXuatNhap || [];
-      
+        if (res.promoConfig && res.promoConfig.frames) {
+          promoConfig = res.promoConfig;
+          localStorage.setItem('oms_promo_config_v6', JSON.stringify(promoConfig));
+        }
 
         document.getElementById('loginErr').innerText = '';
         document.getElementById('loginScreen').classList.add('hidden');
@@ -1684,7 +1715,7 @@ let liveCamStream = null;
       showScreen('outletListScreen');
     }
 
-   // Cấp 1 Lịch sử: Danh sách các ca làm việc (Sup xem được tất cả ca của PG thuộc tuyến)
+    // Cấp 1 Lịch sử: Danh sách các ca làm việc (Sup xem được tất cả ca của PG thuộc tuyến)
     function renderShiftHistoryList() {
       const container = document.getElementById('shiftHistoryListContainer');
       const filterBox = document.getElementById('supHistoryFilterBox');
@@ -1783,6 +1814,7 @@ let liveCamStream = null;
 
       showScreen('shiftHistoryDetailScreen');
     }
+
     // Cấp 3 Lịch sử: Xem chi tiết từng bill + ảnh đã chụp của PG trong ca đó
     function openHistoryBillList(shiftId, actCode, actTitle) {
       const list = allActivityRecords.filter(r => r.shiftId === shiftId && r.activityType === actCode);
@@ -2107,12 +2139,16 @@ let liveCamStream = null;
     }
 
     function getSchemaFor(projectId, actType) {
-      if (!formSchemas[projectId]) {
-        formSchemas[projectId] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA));
-      }
-      return formSchemas[projectId][actType];
-    }
-// ================= DANH MỤC SẢN PHẨM CHUẨN (DÙNG CHUNG LON & LỐC) =================
+  if (!formSchemas[projectId]) {
+    formSchemas[projectId] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA));
+  }
+  if (!formSchemas[projectId][actType]) {
+    formSchemas[projectId][actType] = JSON.parse(JSON.stringify(DEFAULT_PROJECT_SCHEMA[actType]));
+  }
+  return formSchemas[projectId][actType];
+}
+
+    // ================= DANH MỤC SẢN PHẨM CHUẨN (DÙNG CHUNG LON & LỐC) =================
     const DEFAULT_PRODUCT_CATALOG = [
       // Nhóm Tăng Chiều Cao
       { id: 'CC01', name: 'GrowPLUS+ Bạc TCC 1+', group: 'Tăng Chiều Cao', defaultUnit: 'Lon', defaultSpec: '800g', defaultPrice: 0 },
@@ -2439,23 +2475,17 @@ let liveCamStream = null;
         document.querySelectorAll('.pos-dropdown').forEach(d => d.classList.add('hidden'));
       }
     });
-   // ================= ENGINE QUÀ TẶNG ĐA KHUNG (THEO TIỀN & THEO SỐ LƯỢNG) =================
+
+    // ================= ENGINE QUÀ TẶNG ĐA KHUNG (THEO TIỀN & THEO SỐ LƯỢNG) =================
     const DEFAULT_PROMO_CONFIG = {
       frames: [
         {
           id: 'FR_NEW_1',
           projectId: 'ALL',
-          mode: 'AMOUNT', // Xét theo giá trị tiền
+          mode: 'AMOUNT',
           name: 'Khung 1: SB/SBPS (GrowPlus SDD, Immunel, Bạc, A2) [500k - 4tr]',
-          includeProducts: [
-            'GrowPLUS+ Đỏ (SDD) 1+',
-            'GrowPLUS+ Đỏ (SDD) 2+',
-            'GrowPLUS+ Đỏ Ít Đường',
-            'GrowPLUS+ Colos Immunel 1+',
-            'GrowPLUS+ Colos Immunel 2+',
-            'GrowPLUS+ Bạc TCC 1+',
-            'GrowPLUS+ Bạc TCC 2+'
-          ],
+          includeProducts: [],
+          keywords: 'growplus+ do, sdd, immunel, growplus+ bac, tcc, a2',
           excludeProducts: [],
           unit: 'ANY',
           spec: '',
@@ -2471,18 +2501,10 @@ let liveCamStream = null;
           id: 'FR_NEW_2',
           projectId: 'ALL',
           mode: 'AMOUNT',
-          name: 'Khung 2: All sản phẩm (Trừ: GrowPlus SDD, Immunel, Bạc, A2) [300k - 2tr]',
+          name: 'Khung 2: All sản phẩm (Trừ: GrowPlus SDD, Immunel, Bạc, A2, Varna) [300k - 2tr]',
           includeProducts: [],
-          excludeProducts: [
-            'GrowPLUS+ Đỏ (SDD) 1+',
-            'GrowPLUS+ Đỏ (SDD) 2+',
-            'GrowPLUS+ Đỏ Ít Đường',
-            'GrowPLUS+ Colos Immunel 1+',
-            'GrowPLUS+ Colos Immunel 2+',
-            'GrowPLUS+ Bạc TCC 1+',
-            'GrowPLUS+ Bạc TCC 2+'
-          ],
-          keywordsExclude: 'varna',
+          excludeProducts: [],
+          keywordsExclude: 'growplus+ do, sdd, immunel, growplus+ bac, tcc, a2, varna',
           unit: 'ANY',
           spec: '',
           tiers: [
@@ -2496,10 +2518,10 @@ let liveCamStream = null;
         {
           id: 'FR_VARNA_QTY',
           projectId: 'ALL',
-          mode: 'QTY', // Xét theo SỐ LƯỢNG (1 lon/thùng, 3 lon/thùng)
+          mode: 'QTY',
           name: 'Khung 3: Quà tặng Varna (Theo SL Lon / Thùng)',
           includeProducts: [],
-          keywords: 'varna', // Tự bắt mọi SP có chữ Varna (hoặc Admin vào tick tên SP Varna)
+          keywords: 'varna',
           excludeProducts: [],
           unit: 'Lon,Thùng',
           spec: '',
@@ -2518,6 +2540,9 @@ let liveCamStream = null;
 
     function savePromoConfigStorage() {
       localStorage.setItem('oms_promo_config_v6', JSON.stringify(promoConfig));
+      if (typeof callSheetApi === 'function') {
+        callSheetApi({ action: 'savePromoConfig', config: promoConfig });
+      }
     }
 
     function formatShortK(amount) {
@@ -2556,28 +2581,29 @@ let liveCamStream = null;
     }
 
     function calcMatchingCartStats(ruleObj, cartData) {
-      const incList = ruleObj.includeProducts || [];
-      const excList = ruleObj.excludeProducts || [];
+      const incList = (ruleObj.includeProducts || []).map(s => removeVietnameseTones(s.trim()));
+      const excList = (ruleObj.excludeProducts || []).map(s => removeVietnameseTones(s.trim()));
       const kwList = (ruleObj.keywords || '').split(',').map(k => removeVietnameseTones(k.trim())).filter(Boolean);
       const kwExcList = (ruleObj.keywordsExclude || '').split(',').map(k => removeVietnameseTones(k.trim())).filter(Boolean);
       const allowedUnits = (!ruleObj.unit || ruleObj.unit === 'ANY') ? [] : ruleObj.unit.split(',').map(u => u.trim());
+      const allowedSpecs = (ruleObj.spec || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 
       let matchedSpend = 0;
       let matchedQty = 0;
 
       cartData.items.forEach(it => {
-        if (excList.length > 0 && excList.includes(it.name)) return;
+        if (excList.length > 0 && excList.some(ex => it.normName === ex || it.normName.includes(ex))) return;
         if (kwExcList.length > 0 && kwExcList.some(ex => it.normName.includes(ex))) return;
 
         let matchName = true;
         if (incList.length > 0) {
-          matchName = incList.includes(it.name);
+          matchName = incList.some(inc => it.normName === inc || it.normName.includes(inc));
         } else if (kwList.length > 0) {
           matchName = kwList.some(kw => it.normName.includes(kw));
         }
 
         const matchUnit = allowedUnits.length === 0 || allowedUnits.includes(it.unit);
-        const matchSpec = !ruleObj.spec || it.spec.toLowerCase().includes(ruleObj.spec.trim().toLowerCase());
+        const matchSpec = allowedSpecs.length === 0 || allowedSpecs.some(sp => it.spec.toLowerCase().includes(sp));
 
         if (matchName && matchUnit && matchSpec) {
           matchedSpend += it.subtotal;
@@ -2586,94 +2612,96 @@ let liveCamStream = null;
       });
       return { matchedSpend, matchedQty };
     }
-// 1. Tìm tồn kho quà tại điểm hiện tại theo tên quà
-function findOutletGiftStockByName(giftName) {
-  if (!selectedOutlet || !giftName) return null;
-  const target = removeVietnameseTones(giftName.trim());
-  return giftStocks.find(g =>
-    g.projectId === selectedOutlet.projectId &&
-    g.outletCode === selectedOutlet.code &&
-    removeVietnameseTones(g.name.trim()) === target
-  ) || null;
-}
 
-// 2. Tăng/giảm số lượng quà chọn dồn theo khung
-function changeFrameGiftQty(key, delta) {
-  const next = (selectedFrameGifts[key] || 0) + delta;
-  if (next <= 0) {
-    delete selectedFrameGifts[key];
-  } else {
-    selectedFrameGifts[key] = next;
-  }
-  updateSalesGiftPromoUI();
-}
+    // 1. Tìm tồn kho quà tại điểm hiện tại theo tên quà
+    function findOutletGiftStockByName(giftName) {
+      if (!selectedOutlet || !giftName) return null;
+      const target = removeVietnameseTones(giftName.trim());
+      return giftStocks.find(g =>
+        g.projectId === selectedOutlet.projectId &&
+        g.outletCode === selectedOutlet.code &&
+        removeVietnameseTones(g.name.trim()) === target
+      ) || null;
+    }
 
-// 3. Tick chọn quà tặng kèm (Combo / Quy cách - chỉ chọn 1 món trong nhóm)
-function toggleBonusGiftChoice(bnId, giftName, isChecked) {
-  Object.keys(selectedBonusGifts).forEach(k => {
-    if (k.startsWith(bnId + '::')) delete selectedBonusGifts[k];
-  });
-  if (isChecked) {
-    selectedBonusGifts[`${bnId}::${giftName}`] = 1;
-  }
-  updateSalesGiftPromoUI();
-}
+    // 2. Tăng/giảm số lượng quà chọn dồn theo khung
+    function changeFrameGiftQty(key, delta) {
+      const next = (selectedFrameGifts[key] || 0) + delta;
+      if (next <= 0) {
+        delete selectedFrameGifts[key];
+      } else {
+        selectedFrameGifts[key] = next;
+      }
+      updateSalesGiftPromoUI();
+    }
 
-// 4. Bộ chọn nhiều sản phẩm áp dụng / loại trừ trong Admin (ĐK Quà)
-let pickerState = {};
+    // 3. Tick chọn quà tặng kèm (Combo / Quy cách - chỉ chọn 1 món trong nhóm)
+    function toggleBonusGiftChoice(bnId, giftName, isChecked) {
+      Object.keys(selectedBonusGifts).forEach(k => {
+        if (k.startsWith(bnId + '::')) delete selectedBonusGifts[k];
+      });
+      if (isChecked) {
+        selectedBonusGifts[`${bnId}::${giftName}`] = 1;
+      }
+      updateSalesGiftPromoUI();
+    }
 
-function initProdPicker(containerId, selectedList, isExclude) {
-  pickerState[containerId] = new Set(selectedList || []);
-  renderProdPicker(containerId, '', isExclude);
-}
+    // 4. Bộ chọn nhiều sản phẩm áp dụng / loại trừ trong Admin (ĐK Quà)
+    let pickerState = {};
 
-function renderProdPicker(containerId, keyword, isExclude) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
+    function initProdPicker(containerId, selectedList, isExclude) {
+      pickerState[containerId] = new Set(selectedList || []);
+      renderProdPicker(containerId, '', isExclude);
+    }
 
-  const projFilter = document.getElementById('promoProjSelect')?.value || 'ALL';
-  const normKey = removeVietnameseTones(keyword || '');
-  const selectedSet = pickerState[containerId] || new Set();
+    function renderProdPicker(containerId, keyword, isExclude) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
 
-  const filtered = productCatalog.filter(p =>
-    (projFilter === 'ALL' || !p.projectId || p.projectId === 'ALL' || p.projectId === projFilter) &&
-    (!normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey))
-  );
+      const projFilter = document.getElementById('promoProjSelect')?.value || 'ALL';
+      const normKey = removeVietnameseTones(keyword || '');
+      const selectedSet = pickerState[containerId] || new Set();
 
-  const pillsHtml = Array.from(selectedSet).map(name => `
-    <span class="prod-pill ${isExclude ? 'exclude' : ''}">${name}</span>
-  `).join('');
+      const filtered = productCatalog.filter(p =>
+        (projFilter === 'ALL' || !p.projectId || p.projectId === 'ALL' || p.projectId === projFilter) &&
+        (!normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey))
+      );
 
-  container.innerHTML = `
-    <div class="prod-picker-box">
-      <input type="text" placeholder="🔍 Tìm tên SP để tick..." value="${keyword || ''}"
-             oninput="renderProdPicker('${containerId}', this.value, ${isExclude})"
-             style="padding:7px 10px; font-size:12px;">
-      <div class="selected-pills-wrap">${pillsHtml}</div>
-      <div class="prod-picker-list">
-        ${filtered.map(p => {
-          const checked = selectedSet.has(p.name) ? 'checked' : '';
-          const safeName = p.name.replace(/'/g, "\\'");
-          return `
-            <label class="prod-picker-item ${isExclude ? 'exclude' : ''}">
-              <input type="checkbox" ${checked} onchange="toggleProdPickerItem('${containerId}', '${safeName}', this.checked, ${isExclude})">
-              <span>${p.name} <small style="color:#94a3b8;">(${p.group})</small></span>
-            </label>
-          `;
-        }).join('') || '<div style="font-size:11px; color:#94a3b8; padding:6px;">Không có sản phẩm phù hợp</div>'}
-      </div>
-    </div>
-  `;
-}
+      const pillsHtml = Array.from(selectedSet).map(name => `
+        <span class="prod-pill ${isExclude ? 'exclude' : ''}">${name}</span>
+      `).join('');
 
-function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
-  if (!pickerState[containerId]) pickerState[containerId] = new Set();
-  if (isChecked) pickerState[containerId].add(prodName);
-  else pickerState[containerId].delete(prodName);
+      container.innerHTML = `
+        <div class="prod-picker-box">
+          <input type="text" placeholder="🔍 Tìm tên SP để tick..." value="${keyword || ''}"
+                 oninput="const kw=this.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();this.closest('.prod-picker-box').querySelectorAll('.prod-picker-item').forEach(el=>{const t=el.textContent.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();el.style.display=t.includes(kw)?'':'none';})"
+                 style="padding:7px 10px; font-size:12px;">
+          <div class="selected-pills-wrap">${pillsHtml}</div>
+          <div class="prod-picker-list">
+            ${filtered.map(p => {
+              const checked = selectedSet.has(p.name) ? 'checked' : '';
+              const safeName = p.name.replace(/'/g, "\\'");
+              return `
+                <label class="prod-picker-item ${isExclude ? 'exclude' : ''}">
+                  <input type="checkbox" ${checked} onchange="toggleProdPickerItem('${containerId}', '${safeName}', this.checked, ${isExclude})">
+                  <span>${p.name} <small style="color:#94a3b8;">(${p.group})</small></span>
+                </label>
+              `;
+            }).join('') || '<div style="font-size:11px; color:#94a3b8; padding:6px;">Không có sản phẩm phù hợp</div>'}
+          </div>
+        </div>
+      `;
+    }
 
-  const input = document.querySelector(`#${containerId} input[type="text"]`);
-  renderProdPicker(containerId, input ? input.value : '', isExclude);
-}
+    function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
+      if (!pickerState[containerId]) pickerState[containerId] = new Set();
+      if (isChecked) pickerState[containerId].add(prodName);
+      else pickerState[containerId].delete(prodName);
+
+      const input = document.querySelector(`#${containerId} input[type="text"]`);
+      renderProdPicker(containerId, input ? input.value : '', isExclude);
+    }
+
     function updateSalesGiftPromoUI() {
       const giftBox = document.getElementById('giftDeductionSection');
       if (!giftBox || currentActivityType !== 'BAN_HANG') return;
@@ -2716,11 +2744,14 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       `;
 
       // 1. RENDER CÁC ĐIỀU KIỆN COMBO KẾT HỢP (NẾU CÓ)
+      let hasAnyEligibleBonus = false;
+
       activeBonuses.forEach(bn => {
         const stats = calcMatchingCartStats(bn, cartData);
         const passBill = cartData.totalAll >= (bn.minBill || 0);
         const passQty = stats.matchedQty >= (bn.minQty || 0);
         const eligible = passBill && passQty && cartData.totalAll > 0;
+        if (eligible) hasAnyEligibleBonus = true;
 
         if (!eligible) {
           Object.keys(selectedBonusGifts).forEach(k => {
@@ -2840,7 +2871,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
         html += `</div>`;
       });
 
-      if (!hasAnyEligibleFrame) {
+      if (!hasAnyEligibleFrame && !hasAnyEligibleBonus) {
         html += `
           <div style="font-size:12px; color:#fbbf24; background:rgba(245,158,11,0.12); padding:8px 10px; border-radius:8px;">
             ⚠️ Nhập sản phẩm đạt mốc tiền (từ 300k/500k) hoặc đạt số lượng (từ 1 lon/thùng Varna) để mở danh sách chọn quà.
@@ -2858,7 +2889,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       // 1. Render danh sách Khung quà
       const frames = (promoConfig.frames || []).filter(f => projFilter === 'ALL' || f.projectId === projFilter || f.projectId === 'ALL');
       document.getElementById('adminFramesListBody').innerHTML = frames.map((fr, idx) => {
-       const tierSummary = (fr.tiers || []).map(t => `${formatTierBadge(fr, t)} (${t.gifts.length} quà)`).join(', ');
+        const tierSummary = (fr.tiers || []).map(t => `${formatTierBadge(fr, t)} (${t.gifts.length} quà)`).join(', ');
         const incText = (fr.includeProducts && fr.includeProducts.length > 0) ? fr.includeProducts.join(', ') : 'Tất cả SP';
         const excText = (fr.excludeProducts && fr.excludeProducts.length > 0) ? ` <span style="color:#fca5a5;">(Trừ: ${fr.excludeProducts.join(', ')})</span>` : '';
         return `
@@ -2902,7 +2933,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       }).join('') || '<p style="color:var(--text-sub); font-size:12px;">Chưa có điều kiện tặng kèm nào.</p>';
     }
 
-   function updateFrameModeHint() {
+    function updateFrameModeHint() {
       const mode = document.getElementById('fr_mode').value;
       const hint = document.getElementById('fr_modeHint');
       const ta = document.getElementById('fr_tiersText');
@@ -2973,12 +3004,15 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       const tiers = [];
       rawTiers.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
         const [valStr, giftsStr] = line.split('|');
-        const numVal = parseFloat((valStr || '').trim());
+        const cleanVal = (valStr || '').trim().toLowerCase();
+        let numVal = parseFloat(cleanVal);
         const gifts = (giftsStr || '').split('/').map(g => g.trim()).filter(Boolean);
+
         if (!isNaN(numVal) && numVal > 0 && gifts.length > 0) {
           if (mode === 'QTY') {
             tiers.push({ tierQty: Math.round(numVal), gifts });
           } else {
+            if (cleanVal.includes('tr')) numVal = numVal * 1000; // Tự quy đổi 1tr -> 1000k
             tiers.push({ tierAmount: Math.round(numVal * 1000), gifts });
           }
         }
@@ -2998,6 +3032,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       renderAdminPromoAll();
       alert('✅ Đã lưu khung quà!');
     }
+
     function deletePromoFrame(frameId) {
       if (!confirm('Xóa khung quà này?')) return;
       promoConfig.frames = promoConfig.frames.filter(x => x.id !== frameId);
@@ -3074,13 +3109,15 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       renderAdminPromoAll();
       alert('✅ Đã nạp lại cấu hình quà GrowPLUS+!');
     }
+
     function openActivityForm(type) {
       currentActivityType = type;
       const titles = {
         BAN_HANG: 'Hoạt động bán hàng',
         VONG_QUAY: 'Vòng quay may mắn',
         MINI_GAME: 'Mini Game',
-        CHECKIN_FB: 'Check-in FB nhận quà'
+        CHECKIN_FB: 'Check-in FB nhận quà',
+        SAMPLING: 'Hoạt động Sampling & Tặng Quà'
       };
       document.getElementById('modalTitle').innerText = `${titles[type]} (${selectedOutlet.code})`;
 
@@ -3117,7 +3154,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       const salesBox = document.getElementById('salesProductSection');
       const giftBox = document.getElementById('giftDeductionSection');
 
-     if (type === 'BAN_HANG') {
+      if (type === 'BAN_HANG') {
         selectedFrameGifts = {};
         selectedBonusGifts = {};
         (promoConfig.bonuses || []).forEach(b => b._autoDone = false);
@@ -3151,6 +3188,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
     }
 
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
     async function saveActivityRecord() {
       const schema = getSchemaFor(selectedOutlet.projectId, currentActivityType);
       let detailParts = [];
@@ -3163,7 +3201,8 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
         detailParts.push(`${f.label}: ${val}`);
         structuredFields.push({ label: f.label, value: val });
       }
-// Thu thập danh sách sản phẩm đã chọn (nếu là Hoạt động bán hàng)
+
+      // Thu thập danh sách sản phẩm đã chọn (nếu là Hoạt động bán hàng)
       if (currentActivityType === 'BAN_HANG') {
         const posItems = [];
         let posGrandTotal = 0;
@@ -3192,13 +3231,14 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
         structuredFields.push({ label: 'Chi tiết sản phẩm', value: productSummaryText });
         structuredFields.push({ label: 'Số dòng SP', value: posItems.length });
       }
+
       // Kiểm tra quà tặng & trừ tồn kho (Hỗ trợ chọn dồn nhiều quà ở BAN_HANG)
       let giftDeduction = null;
       let giftDeductions = [];
       const giftBox = document.getElementById('giftDeductionSection');
 
       if (currentActivityType === 'BAN_HANG') {
-       let giftSummaryList = [];
+        let giftSummaryList = [];
 
         // Thu thập quà tặng kèm (Combo / Quy cách)
         Object.keys(selectedBonusGifts).forEach(key => {
@@ -3248,6 +3288,19 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
         }
       }
 
+      // Kiểm tra tổng tồn kho từng loại quà trước khi lưu
+      const mergedGiftMap = {};
+      giftDeductions.forEach(gd => {
+        mergedGiftMap[gd.giftId] = (mergedGiftMap[gd.giftId] || 0) + gd.qty;
+      });
+
+      for (const gId of Object.keys(mergedGiftMap)) {
+        const stockObj = giftStocks.find(g => g.id === gId);
+        if (stockObj && mergedGiftMap[gId] > stockObj.remaining) {
+          return alert(`⚠️ Quà "${stockObj.name}" chỉ còn tồn ${stockObj.remaining}, không đủ phát ${mergedGiftMap[gId]}!`);
+        }
+      }
+
       let allPhotosToUpload = [];
       for (let i = 0; i < schema.photos.length; i++) {
         const p = schema.photos[i];
@@ -3262,7 +3315,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       const detailText = detailParts.join(' | ');
       const gpsText = document.getElementById('wsGpsCoords').innerText;
 
-    showLoading(`Đang lưu dữ liệu & ảnh lên Sheet...`);
+      showLoading(`Đang lưu dữ liệu & ảnh lên Sheet...`);
       try {
         const res = await callSheetApi({
           action: 'saveRecord',
@@ -3277,8 +3330,8 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
             detailText: detailText,
             structuredFields: structuredFields,
             photos: allPhotosToUpload,
-           giftDeduction: giftDeduction,
-           giftDeductions: giftDeductions
+            giftDeduction: giftDeduction,
+            giftDeductions: giftDeductions
           }
         });
         hideLoading();
@@ -3299,7 +3352,6 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
           shiftId: activeShiftId
         });
 
-      
         giftDeductions.forEach(gd => {
           const giftObj = giftStocks.find(g => g.id === gd.giftId);
           if (giftObj) {
@@ -3384,14 +3436,14 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       if (tabId === 'tabPromoRules') renderAdminPromoAll();
     }
 
-   function refreshAdminDropdowns() {
+    function refreshAdminDropdowns() {
       const html = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
       document.getElementById('outletProjSelect').innerHTML = html;
       document.getElementById('userProjSelect').innerHTML = html;
       document.getElementById('cfgProjSelect').innerHTML = html;
-     document.getElementById('prodProjSelect').innerHTML =
+      document.getElementById('prodProjSelect').innerHTML =
         `<option value="ALL">-- Dùng chung tất cả dự án --</option>` + html;
-     document.getElementById('promoProjSelect').innerHTML =
+      document.getElementById('promoProjSelect').innerHTML =
         `<option value="ALL">-- Dùng chung tất cả dự án --</option>` + html;
 
       const sups = allUsersList.filter(u => u.role === 'SUP');
@@ -3621,7 +3673,8 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       persistSchemaToSheet(projId);
       renderSchemaEditor();
     }
-   // ================= QUẢN LÝ KHO TỔNG DỰ ÁN <-> BOOTH =================
+
+    // ================= QUẢN LÝ KHO TỔNG DỰ ÁN <-> BOOTH =================
     function initWarehouseScreen() {
       if (currentUser.role !== 'ADMIN' && currentUser.role !== 'SUP') {
         alert('⛔ Chỉ Sup và Admin mới có quyền truy cập Kho Tổng!');
@@ -3818,6 +3871,7 @@ function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
       }
       renderWarehouseView();
     }
+
     // ================= QUẢN LÝ DANH MỤC SẢN PHẨM (CHỈ TÊN & NHÓM) =================
     function renderAdminProductList() {
       const projFilter = document.getElementById('prodProjSelect').value || 'ALL';
