@@ -632,7 +632,7 @@
           <input type="text" id="gsNewName" placeholder="Tên quà (VD: Gấu bông)">
           <input type="number" id="gsNewInitQty" placeholder="SL tồn đầu">
         </div>
-        <button type="button" class="btn btn-success btn-sm" style="width:100%;" onclick="saveGiftStockItem()">💾 LƯU TỒN QUÀ LÊN SHEET</button>
+      <button type="button" class="btn btn-success btn-sm" style="width:100%;" onclick="saveGiftStockItem()">💾 LƯU TỒN QUÀ</button>
       </div>
 
       <div id="giftStockListBody"></div>
@@ -888,7 +888,7 @@
     </div>
 
     <div class="bottom-action-bar">
-      <button type="button" class="bar-action-btn" onclick="alert('✅ Toàn bộ dữ liệu đã được lưu trực tiếp lên Google Sheet!')">ĐÃ ĐỒNG BỘ SHEET ✓</button>
+      <button type="button" class="bar-action-btn" onclick="alert('✅ Dữ liệu đã được lưu trên máy chủ OMS.')">ĐÃ LƯU TRÊN MÁY CHỦ ✓</button>
       <button type="button" class="bar-action-btn" style="color:#f87171;" onclick="handleCheckOut()">CHECK OUT ≫</button>
     </div>
   </div>
@@ -914,7 +914,7 @@
         </div>
       </div>
 
-      <button type="button" class="btn btn-primary" onclick="saveActivityRecord()">LƯU GHI NHẬN LÊN SHEET</button>
+      <button type="button" class="btn btn-primary" onclick="saveActivityRecord()">LƯU GHI NHẬN</button>
     </div>
   </div>
 
@@ -946,7 +946,7 @@
       <h4 style="margin-bottom:12px;">Tạo Dự Án Mới</h4>
       <div class="form-group"><label>Mã dự án *</label><input type="text" id="newProjId" placeholder="VD: 2026401"></div>
       <div class="form-group"><label>Tên dự án *</label><input type="text" id="newProjName" placeholder="VD: NUVI BOOTH ACTIVATION"></div>
-      <button type="button" class="btn btn-primary" onclick="adminAddProject()">LƯU DỰ ÁN VÀO SHEET</button>
+          <button type="button" class="btn btn-primary" onclick="adminAddProject()">LƯU DỰ ÁN</button>
     </div>
 
     <div id="tabAddOutlet" class="glass-card admin-pane hidden">
@@ -960,7 +960,7 @@
         <div class="form-group"><label>Kinh độ (Longitude) *</label><input type="number" step="any" id="newOutletLng" placeholder="106.749812"></div>
       </div>
       <div class="form-group"><label>Bán kính cho phép Check-in (mét) *</label><input type="number" id="newOutletRadius" value="150"></div>
-      <button type="button" class="btn btn-primary" onclick="adminAddOutlet()">LƯU ĐIỂM LÀM VÀO SHEET</button>
+          <button type="button" class="btn btn-primary" onclick="adminAddOutlet()">LƯU ĐIỂM LÀM</button>
     </div>
 
     <div id="tabAddUser" class="glass-card admin-pane hidden">
@@ -984,7 +984,7 @@
       <div class="form-group"><label>Mật khẩu *</label><input type="text" id="newPassword" value="123"></div>
       <div class="form-group"><label>Họ tên nhân viên *</label><input type="text" id="newFullname" placeholder="Nguyễn Thị B"></div>
       <div class="form-group"><label>Số điện thoại</label><input type="tel" id="newUserPhone" placeholder="09xxxxxxxx"></div>
-      <button type="button" class="btn btn-primary" onclick="adminAddUser()">TẠO TÀI KHOẢN LÊN SHEET</button>
+          <button type="button" class="btn btn-primary" onclick="adminAddUser()">TẠO TÀI KHOẢN</button>
     </div>
 
     <div id="tabFormBuilder" class="glass-card admin-pane hidden">
@@ -1111,7 +1111,7 @@
         <textarea id="bulkProdTextarea" rows="6" style="width:100%; padding:10px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.3); border-radius:10px; color:#fff; font-size:12px; margin-bottom:10px;"
           placeholder="SB NuVi Grow Height 1+ 800G | Tăng Chiều Cao&#10;SBPS NuVi Grow Height 110ml | Tăng Chiều Cao"></textarea>
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="saveBulkProducts()">🚀 LƯU TẤT CẢ LÊN SHEET</button>
+          <button type="button" class="btn btn-success btn-sm" style="flex:1;" onclick="saveBulkProducts()">🚀 LƯU TẤT CẢ</button>
           <button type="button" class="icon-btn" onclick="closeBulkProductEditor()">Hủy</button>
         </div>
       </div>
@@ -1188,6 +1188,12 @@
           <div class="form-group">
             <label>Quy cách bắt buộc (nếu có)</label>
             <input type="text" id="fr_spec" placeholder="VD: 800g hoặc 110ml (trống = mọi quy cách)">
+          </div>
+
+          <div class="form-group">
+            <label>Số quà tối đa của khung cho mỗi hóa đơn</label>
+            <input type="number" id="fr_maxGiftsPerBill" min="0" step="1" value="0" placeholder="0 = không giới hạn">
+            <small style="color:var(--text-sub);">Nhập 1 cho chương trình voucher chỉ được nhận 1 quà trên mỗi hóa đơn.</small>
           </div>
 
           <div class="form-group">
@@ -1271,7 +1277,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzYHLM9DS_MGgVuNhHhz4Sofd5oSSvnxO8AOJpFiwJz1YqfIU4oA2A2c9wrDc1nF9nlZg/exec';
+    const API_URL = '/api';
 
     async function callSheetApi(bodyObj) {
       const response = await fetch(API_URL, {
@@ -1582,6 +1588,12 @@
         phieuXuatNhapList = res.phieuXuatNhap || [];
         if (res.promoConfig && Array.isArray(res.promoConfig.frames)) {
           promoConfig = res.promoConfig;
+          promoConfig.frames = promoConfig.frames.map(fr => {
+            if (fr.maxGiftsPerBill != null) return fr;
+            return /tối đa\s*1\s*voucher/i.test(fr.name || '')
+              ? { ...fr, maxGiftsPerBill: 1 }
+              : fr;
+          });
           localStorage.setItem('oms_promo_config_v6', JSON.stringify(promoConfig));
         }
 
@@ -1614,6 +1626,7 @@
     }
 
     function logout() {
+      fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'logout' }) }).catch(() => {});
       currentUser = null;
       document.getElementById('rightDropdownMenu').classList.add('hidden');
       document.getElementById('topNavbar').classList.add('hidden');
@@ -1706,11 +1719,11 @@
       const oldP = document.getElementById('cpOldPass').value;
       const newP = document.getElementById('cpNewPass').value;
       const confP = document.getElementById('cpConfirmPass').value;
-      if (oldP !== currentUser.password) return alert('❌ Mật khẩu hiện tại không đúng!');
       if (!newP || newP !== confP) return alert('❌ Mật khẩu mới không khớp!');
       showLoading('Đang đổi mật khẩu...');
-      await callSheetApi({ action: 'updateUser', username: currentUser.username, password: newP });
+      const result = await callSheetApi({ action: 'updateUser', username: currentUser.username, oldPassword: oldP, password: newP });
       hideLoading();
+      if (!result.success) return alert(result.message || '❌ Mật khẩu hiện tại không đúng!');
       currentUser.password = newP;
       alert('✅ Đổi mật khẩu thành công!');
       showScreen('outletListScreen');
@@ -1913,7 +1926,7 @@
         return alert('⚠️ Vui lòng nhập Tên quà và Số lượng tồn ban đầu hợp lệ!');
       }
 
-      showLoading('Đang lưu tồn quà tặng lên Sheet...');
+      showLoading('Đang lưu tồn quà tặng...');
       const existing = giftStocks.find(g => g.projectId === projectId && g.outletCode === outletCode && g.name.toLowerCase() === name.toLowerCase());
       const res = await callSheetApi({
         action: 'upsertGift',
@@ -2647,6 +2660,15 @@
 
     // 2. Tăng/giảm số lượng quà chọn dồn theo khung
     function changeFrameGiftQty(key, delta) {
+      const frameId = key.split('::')[0];
+      const frame = (promoConfig.frames || []).find(f => f.id === frameId);
+      const maxPerBill = Math.max(0, parseInt(frame?.maxGiftsPerBill, 10) || 0);
+      if (delta > 0 && maxPerBill > 0) {
+        const frameSelected = Object.keys(selectedFrameGifts)
+          .filter(k => k.startsWith(frameId + '::'))
+          .reduce((sum, k) => sum + (selectedFrameGifts[k] || 0), 0);
+        if (frameSelected >= maxPerBill) return;
+      }
       const next = (selectedFrameGifts[key] || 0) + delta;
       if (next <= 0) {
         delete selectedFrameGifts[key];
@@ -2700,6 +2722,10 @@
 
       container.innerHTML = `
         <div class="prod-picker-box">
+          <div style="display:flex; gap:6px; margin-bottom:6px;">
+            <button type="button" class="btn btn-sm" onclick="setProdPickerBulk('${containerId}', ${isExclude}, true)" style="font-size:11px;">Chọn tất cả sản phẩm đang lọc</button>
+            <button type="button" class="icon-btn" onclick="setProdPickerBulk('${containerId}', ${isExclude}, false)" style="font-size:11px;">Bỏ chọn sản phẩm đang lọc</button>
+          </div>
           <input type="text" placeholder="🔍 Tìm tên SP để tick..." value="${keyword || ''}"
                  oninput="const kw=this.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();this.closest('.prod-picker-box').querySelectorAll('.prod-picker-item').forEach(el=>{const t=el.textContent.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();el.style.display=t.includes(kw)?'':'none';})"
                  style="padding:7px 10px; font-size:12px;">
@@ -2718,6 +2744,29 @@
           </div>
         </div>
       `;
+    }
+
+    function setProdPickerBulk(containerId, isExclude, selectAll) {
+      if (!pickerState[containerId]) pickerState[containerId] = new Set();
+      const container = document.getElementById(containerId);
+      const keyword = container?.querySelector('input[type="text"]')?.value || '';
+      const normKey = removeVietnameseTones(keyword);
+      const projFilter = document.getElementById('promoProjSelect')?.value || 'ALL';
+      const seenNames = new Set();
+      const matchingNames = productCatalog.filter(p => {
+        const matchProj = projFilter === 'ALL' || !p.projectId || p.projectId === 'ALL' || p.projectId === projFilter;
+        const matchKey = !normKey || removeVietnameseTones(p.name).includes(normKey) || removeVietnameseTones(p.group).includes(normKey);
+        const name = String(p.name || '').trim();
+        if (!matchProj || !matchKey || !name || seenNames.has(name.toLowerCase())) return false;
+        seenNames.add(name.toLowerCase());
+        return true;
+      }).map(p => String(p.name).trim());
+
+      matchingNames.forEach(name => {
+        if (selectAll) pickerState[containerId].add(name);
+        else pickerState[containerId].delete(name);
+      });
+      renderProdPicker(containerId, keyword, isExclude);
     }
 
     function toggleProdPickerItem(containerId, prodName, isChecked, isExclude) {
@@ -2855,6 +2904,11 @@
         const remainLabel = isQtyMode
           ? `Suất quà còn lại: <strong style="color:#34d399;">${remain} ${unitText}</strong>`
           : `Hạn mức còn lại: <strong style="color:#34d399;">${formatCurrencyVND(remain)}đ</strong>`;
+        const maxPerBill = Math.max(0, parseInt(fr.maxGiftsPerBill, 10) || 0);
+        const frameSelected = Object.keys(selectedFrameGifts)
+          .filter(k => k.startsWith(fr.id + '::'))
+          .reduce((sum, k) => sum + (selectedFrameGifts[k] || 0), 0);
+        const atFrameLimit = maxPerBill > 0 && frameSelected >= maxPerBill;
 
         html += `
           <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(56,189,248,0.28); border-radius:10px; padding:9px 10px; margin-bottom:8px;">
@@ -2888,12 +2942,16 @@
                 <div class="promo-stepper">
                   <button type="button" class="promo-step-btn" onclick="changeFrameGiftQty('${key.replace(/'/g, "\\'")}', -1)" ${qty === 0 ? 'disabled' : ''}>−</button>
                   <strong style="min-width:18px; text-align:center; font-size:13px;">${qty}</strong>
-                  <button type="button" class="promo-step-btn" onclick="changeFrameGiftQty('${key.replace(/'/g, "\\'")}', 1)" ${!canAdd ? 'disabled' : ''}>+</button>
+                  <button type="button" class="promo-step-btn" onclick="changeFrameGiftQty('${key.replace(/'/g, "\\'")}', 1)" ${!canAdd || atFrameLimit ? 'disabled' : ''}>+</button>
                 </div>
               </div>
             `;
           });
         });
+
+        if (maxPerBill > 0) {
+          html += `<div style="font-size:11px;color:#fbbf24;margin-top:5px;">Tối đa ${maxPerBill} quà của khung này / hóa đơn</div>`;
+        }
 
         html += `</div>`;
       });
@@ -2917,6 +2975,7 @@
       const frames = (promoConfig.frames || []).filter(f => projFilter === 'ALL' || f.projectId === projFilter || f.projectId === 'ALL');
       document.getElementById('adminFramesListBody').innerHTML = frames.map((fr, idx) => {
         const tierSummary = (fr.tiers || []).map(t => `${formatTierBadge(fr, t)} (${t.gifts.length} quà)`).join(', ');
+        const maxPerBill = Math.max(0, parseInt(fr.maxGiftsPerBill, 10) || 0);
         const incText = (fr.includeProducts && fr.includeProducts.length > 0) ? fr.includeProducts.join(', ') : 'Tất cả SP';
         const excText = (fr.excludeProducts && fr.excludeProducts.length > 0) ? ` <span style="color:#fca5a5;">(Trừ: ${fr.excludeProducts.join(', ')})</span>` : '';
         return `
@@ -2925,7 +2984,7 @@
               <div>
                 <strong style="font-size:13px; color:#f8fafc;">${idx + 1}. ${fr.name}</strong>
                 <div style="font-size:11px; color:#38bdf8; margin-top:2px;">SP: ${incText}${excText} • ĐVT: ${fr.unit} ${fr.spec ? '(' + fr.spec + ')' : ''}</div>
-                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Các mốc: ${tierSummary}</div>
+                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Các mốc: ${tierSummary}${maxPerBill > 0 ? ` • Tối đa ${maxPerBill} quà/hóa đơn` : ''}</div>
               </div>
               <div class="schema-actions">
                 <button type="button" class="icon-btn" onclick="openFrameEditor('${fr.id}')">✏️</button>
@@ -2983,6 +3042,7 @@
         document.getElementById('fr_mode').value = 'QTY';
         document.getElementById('fr_unit').value = 'ANY';
         document.getElementById('fr_spec').value = '';
+        document.getElementById('fr_maxGiftsPerBill').value = 0;
         document.getElementById('fr_tiersText').value = '';
         initProdPicker('fr_includePicker', [], false);
         initProdPicker('fr_excludePicker', [], true);
@@ -2996,6 +3056,7 @@
         document.getElementById('fr_mode').value = isQty ? 'QTY' : 'AMOUNT';
         document.getElementById('fr_unit').value = fr.unit || 'ANY';
         document.getElementById('fr_spec').value = fr.spec || '';
+        document.getElementById('fr_maxGiftsPerBill').value = Math.max(0, parseInt(fr.maxGiftsPerBill, 10) || 0);
         document.getElementById('fr_tiersText').value = (fr.tiers || [])
           .map(t => `${isQty ? t.tierQty : Math.round(t.tierAmount / 1000)} | ${t.gifts.join(' / ')}`).join('\n');
         initProdPicker('fr_includePicker', fr.includeProducts || [], false);
@@ -3022,6 +3083,7 @@
       const mode = document.getElementById('fr_mode').value;
       const unit = document.getElementById('fr_unit').value;
       const spec = document.getElementById('fr_spec').value.trim();
+      const maxGiftsPerBill = Math.max(0, parseInt(document.getElementById('fr_maxGiftsPerBill').value, 10) || 0);
       const rawTiers = document.getElementById('fr_tiersText').value.trim();
       const includeProducts = Array.from(pickerState['fr_includePicker']);
       const excludeProducts = Array.from(pickerState['fr_excludePicker']);
@@ -3047,7 +3109,7 @@
 
       if (tiers.length === 0) return alert('⚠️ Cú pháp mốc quà chưa đúng!');
 
-      const obj = { id: id || ('FR_' + Date.now()), projectId, mode, name, includeProducts, excludeProducts, unit, spec, tiers };
+      const obj = { id: id || ('FR_' + Date.now()), projectId, mode, name, includeProducts, excludeProducts, unit, spec, maxGiftsPerBill, tiers };
       if (id) {
         const idx = promoConfig.frames.findIndex(x => x.id === id);
         if (idx !== -1) promoConfig.frames[idx] = obj;
@@ -3303,6 +3365,17 @@
           }
         });
 
+        for (const frame of promoConfig.frames || []) {
+          const maxPerBill = Math.max(0, parseInt(frame.maxGiftsPerBill, 10) || 0);
+          if (!maxPerBill) continue;
+          const selectedForFrame = Object.keys(selectedFrameGifts)
+            .filter(key => key.startsWith(frame.id + '::'))
+            .reduce((sum, key) => sum + (selectedFrameGifts[key] || 0), 0);
+          if (selectedForFrame > maxPerBill) {
+            return alert(`⚠️ Khung quà "${frame.name}" chỉ được chọn tối đa ${maxPerBill} quà cho mỗi hóa đơn!`);
+          }
+        }
+
         if (giftSummaryList.length > 0) {
           const joinedGifts = giftSummaryList.join(', ');
           detailParts.push(`Quà tặng: ${joinedGifts}`);
@@ -3352,7 +3425,7 @@
       const detailText = detailParts.join(' | ');
       const gpsText = document.getElementById('wsGpsCoords').innerText;
 
-      showLoading(`Đang lưu dữ liệu & ảnh lên Sheet...`);
+      showLoading(`Đang lưu dữ liệu & ảnh lên máy chủ...`);
       try {
         const res = await callSheetApi({
           action: 'saveRecord',
@@ -3499,7 +3572,7 @@
       hideLoading();
       projects.push({ id, name: `${id} - ${name}` });
       refreshAdminDropdowns();
-      alert('✅ Đã thêm dự án mới lên Google Sheet!');
+      alert('✅ Đã thêm dự án mới!');
     }
 
     async function adminAddOutlet() {
@@ -3520,7 +3593,7 @@
       o.id = res.id;
       outlets.push(o);
       renderOutlets();
-      alert(`✅ Đã lưu điểm "${o.name}" lên Google Sheet!`);
+      alert(`✅ Đã lưu điểm "${o.name}"!`);
     }
 
     async function adminAddUser() {
@@ -3535,7 +3608,7 @@
       };
       if (!u.username || !u.password || !u.fullname) return alert('Vui lòng nhập đủ thông tin tài khoản!');
 
-      showLoading('Đang tạo tài khoản trên Sheet...');
+      showLoading('Đang tạo tài khoản...');
       await callSheetApi({ action: 'addUser', user: u });
       hideLoading();
 
@@ -3547,7 +3620,7 @@
         supUsername: u.supUsername
       });
       refreshAdminDropdowns();
-      alert(`✅ Đã tạo tài khoản ${u.username} (${u.role}) lên Google Sheet!`);
+      alert(`✅ Đã tạo tài khoản ${u.username} (${u.role})!`);
     }
 
     function persistSchemaToSheet(projId) {
@@ -4012,7 +4085,7 @@
 
       if (!name) return alert('⚠️ Vui lòng nhập Tên sản phẩm!');
 
-      showLoading('Đang lưu sản phẩm lên Sheet...');
+      showLoading('Đang lưu sản phẩm...');
       const res = await callSheetApi({ action: 'upsertProduct', product: { id, projectId, name, group } });
       hideLoading();
 
@@ -4050,7 +4123,7 @@
         return { projectId, name: parts[0], group: parts[1] || 'Khác' };
       }).filter(item => item.name);
 
-      showLoading(`Đang thêm hàng loạt ${parsedList.length} sản phẩm lên Sheet...`);
+      showLoading(`Đang thêm ${parsedList.length} sản phẩm...`);
       const res = await callSheetApi({ action: 'bulkAddProducts', products: parsedList });
       hideLoading();
 
@@ -4075,18 +4148,18 @@
     }
 
     async function seedDefaultProductsToSheet() {
-      if (!confirm(`Nạp toàn bộ ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu lên tab SanPham trên Google Sheet?`)) return;
+      if (!confirm(`Nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu vào danh mục?`)) return;
       const projectId = document.getElementById('prodProjSelect').value || 'ALL';
       const payload = DEFAULT_PRODUCT_CATALOG.map(p => ({ projectId, name: p.name, group: p.group }));
 
-      showLoading(`Đang nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu lên Sheet...`);
+      showLoading(`Đang nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu...`);
       const res = await callSheetApi({ action: 'bulkAddProducts', products: payload });
       hideLoading();
 
       if (res.products) {
         mergeProductsToLocalCatalog(res.products);
         renderAdminProductList();
-        alert(`✅ Đã nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu lên Sheet!`);
+        alert(`✅ Đã nạp ${DEFAULT_PRODUCT_CATALOG.length} sản phẩm mẫu!`);
       }
     }
   </script>
